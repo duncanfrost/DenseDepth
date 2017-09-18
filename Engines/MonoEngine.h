@@ -6,6 +6,7 @@
 #include "FileTracker.h"
 #include <sophus/se3.hpp>
 #include <MonoLib/MonoDepthEstimatorFactory.h>
+#include <ORUtils/ImageTypes.h>
 
 class MonoEngine
 {
@@ -32,6 +33,8 @@ private:
     FileTracker* tracker;
     PhoneSource* source;
     cv::Mat image;
+    ORUChar4TSImage *orImage;
+
     long long timeStamp;
     Sophus::SE3f currPose;
     GlobalMap *map;

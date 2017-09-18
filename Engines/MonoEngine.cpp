@@ -8,9 +8,6 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
     currTrackerData = new TrackerData();
     map = new GlobalMap();
 
-
-
-    
     Vector2i imgSize(640, 480);
     Vector4f intrinsics;
 
@@ -26,9 +23,12 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
     intrinsics[2] = cx;
     intrinsics[3] = cy;
     
+    monoDepthEstimator =
+        MonoLib::MonoDepthEstimatorFactory::MakeMonoDepthEstimator( imgSize,
+                                                                    intrinsics,
+                                                                    "CUDA");
 
-    monoDepthEstimator = MonoLib::MonoDepthEstimatorFactory::MakeMonoDepthEstimator(
-        imgSize, intrinsics, "CUDA");
+    orImage = new ORUChar4TSImage(imgSize, true, true, true);
 }
 
 
