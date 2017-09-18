@@ -9,7 +9,7 @@ class FileTracker
 public:
     enum FileType {TUM, ORB};
     FileTracker(const std::string &poseFilePath, FileType type = TUM);
-    Sophus::SE3f PoseAtTime(double time, double &timeOut);
+    Sophus::SE3f PoseAtTime(long long time, long long &timeOut);
 
 private:
     void InitTUM(const std::string &poseFilePath);

@@ -134,7 +134,7 @@ void FileTracker::InitORB(const std::string &poseFilePath)
     }
 }
 
-Sophus::SE3f FileTracker::PoseAtTime(double time, double &timeOut)
+Sophus::SE3f FileTracker::PoseAtTime(long long time, long long &timeOut)
 {
     int current = 0;
     long long time2 = timedPoses[current+1].first;

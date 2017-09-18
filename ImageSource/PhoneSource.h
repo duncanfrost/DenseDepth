@@ -17,6 +17,11 @@ public:
         return imLeft;
     }
 
+    long long TimeStamp()
+    {
+        return timeStamp;
+    }
+
 private:
     void StereoPathsFromListFile(std::vector<std::string> &imagePaths,
                                  std::vector<long long> &timeStamps,
@@ -32,6 +37,8 @@ private:
 
     cv::Mat imLeft;
     cv::Mat imRight;
+
+    long long timeStamp;
 
     unsigned int frameNumber;
 };

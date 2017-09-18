@@ -30,7 +30,6 @@ private:
     FileTracker* tracker;
     PhoneSource* source;
     cv::Mat image;
+    long long timeStamp;
     GlobalMap *map;
-
-
 };

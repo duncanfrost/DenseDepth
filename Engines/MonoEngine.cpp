@@ -13,5 +13,11 @@ void MonoEngine::Process()
 {
     source->GrabNewFrame();
     image = source->Image();
+    timeStamp = source->TimeStamp();
+
+    long long timeOut;
+    Sophus::SE3f pose = tracker->PoseAtTime(timeStamp, timeOut);
+
+    currTrackerData->trackerPose = pose;
     currTrackerData->frame = image;
 }
