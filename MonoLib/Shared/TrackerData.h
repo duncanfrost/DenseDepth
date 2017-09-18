@@ -1,18 +1,12 @@
 #pragma once 
-#include <ORUtils/TimeStampedImage.h>
 #include "DenseMonoMath.h"
 #include <vector>
-
+#include <sophus/se3.hpp>
 
 struct TrackerData {
-	TrackerData()
-	{
-		frame = NULL;
-		frame_grey = NULL;
-	}
+    TrackerData()
+    {
+    }
 
-	DenseMono::SE3f trackerPose;
-	ORUtils::TimeStampedImage<Vector4u> *frame;
-	ORUtils::TimeStampedImage<float> *frame_grey;
-	ORUtils::Image<bool> *mask;
+    Sophus::SE3f trackerPose;
 };
