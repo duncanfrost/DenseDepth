@@ -15,7 +15,10 @@ PhoneSource::PhoneSource(const std::string& listFile)
 void PhoneSource::GrabNewFrame()
 {
     std::string path =  rgbImagePaths[frameNumber];
+    std::cout << path << std::endl;
     imLeft = cv::imread(path);
+
+    frameNumber++;
 }
 
 void PhoneSource::StereoPathsFromListFile(std::vector<std::string> &imagePaths,

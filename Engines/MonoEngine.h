@@ -1,10 +1,15 @@
 #pragma once
 #include <MonoLib/Shared/TrackerData.h>
+#include <opencv2/opencv.hpp>
+#include <ImageSource/PhoneSource.h>
 
 class MonoEngine
 {
 public:
-    MonoEngine();
+    MonoEngine(PhoneSource* source);
+
+    void Process();
+
     TrackerData* GetARData()
     {
         return currTrackerData;
@@ -13,5 +18,8 @@ public:
 
 private:
     TrackerData* currTrackerData;
+    PhoneSource* source;
+    cv::Mat image;
+
 
 };

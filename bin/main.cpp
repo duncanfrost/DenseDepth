@@ -14,7 +14,7 @@ int main(void)
 {
     std::string filename1 = "/home/duncan/Data/P9/SidewaysLong/log.txt";
     source = new PhoneSource(filename1);
-    engine = new MonoEngine();
+    engine = new MonoEngine(source);
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",640,480,engine->GetARData()));
@@ -25,7 +25,8 @@ int main(void)
 
 void Idle(void)
 {
-	visModule->DrawWindows();
+    visModule->DrawWindows();
+    engine->Process();
 }
 
 void KeyboardFunction(unsigned char key, int x, int y)
