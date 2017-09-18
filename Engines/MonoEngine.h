@@ -10,6 +10,7 @@ class MonoEngine
 {
 public:
     MonoEngine(PhoneSource* source, FileTracker *tracker);
+    void AddKeyFrame();
 
     void Process();
 
@@ -31,5 +32,6 @@ private:
     PhoneSource* source;
     cv::Mat image;
     long long timeStamp;
+    Sophus::SE3f currPose;
     GlobalMap *map;
 };

@@ -16,8 +16,36 @@ void MonoEngine::Process()
     timeStamp = source->TimeStamp();
 
     long long timeOut;
-    Sophus::SE3f pose = tracker->PoseAtTime(timeStamp, timeOut);
+    currPose = tracker->PoseAtTime(timeStamp, timeOut);
 
-    currTrackerData->trackerPose = pose;
+    currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
+}
+
+
+void MonoEngine::AddKeyFrame()
+{
+    std::cout << "About to make new keyframe" << std::endl;
+
+    KeyFrame *kf = new KeyFrame();
+    kf->pose = currPose;
+    map->keyframeList.push_back(kf);
+
+
+    // monoDepthEstimator->SetRefImage(rgbImage);
+    // invRefPose = kf->pose.inverse();
+
+    // fusionState->pose_d->SetFrom(&kf->pose);
+
+    // view->depth->UpdateHostFromDevice();
+
+    // monoDepthEstimator->SetLimitsFromGroundTruth(view->depth->GetData(MEMORYDEVICE_CPU),
+    //                                              view->depth->noDims);
+
+    // // monoDepthEstimator->SetLimitsManual(0.5,2);
+
+    // hasReferenceFrame = true;
+
+    // needsKeyFrame = false;
+    // std::cout << "Keyframes: " << map->keyframeList.size() << std::endl;
 }

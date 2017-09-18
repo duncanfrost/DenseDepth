@@ -42,5 +42,10 @@ void KeyboardFunction(unsigned char key, int x, int y)
     case 27://esc
         exit(0);
         break;
+
+    case ' ':
+        engine->AddKeyFrame();
+        break;
+
     }
 }
