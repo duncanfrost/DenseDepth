@@ -29,7 +29,7 @@ else()
    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
+LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 
 # Stop shitty eigen warnings
@@ -61,5 +61,6 @@ ${EIGEN3_INCLUDE_DIR}
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
+ADD_SUBDIRECTORY(MonoLib)
 ADD_SUBDIRECTORY(ORUtils)
 ADD_SUBDIRECTORY(bin)
