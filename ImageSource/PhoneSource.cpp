@@ -2,7 +2,21 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <opencv2/highgui/highgui.hpp>
 
+PhoneSource::PhoneSource(const std::string& listFile)
+{
+    StereoPathsFromListFile(rgbImagePaths, rgbTimeStamps, listFile, LEFT);
+    StereoPathsFromListFile(stereoImagePaths, stereoTimeStamps, listFile, RIGHT);
+
+    frameNumber = 0;
+}
+
+void PhoneSource::GrabNewFrame()
+{
+    std::string path =  rgbImagePaths[frameNumber];
+    imLeft = cv::imread(path);
+}
 
 void PhoneSource::StereoPathsFromListFile(std::vector<std::string> &imagePaths,
                                           std::vector<long long> &timeStamps,
