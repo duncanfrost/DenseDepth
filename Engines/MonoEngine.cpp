@@ -11,5 +11,5 @@ void MonoEngine::Process()
 {
     source->GrabNewFrame();
     image = source->Image();
-    std::cout << image.size() << std::endl;
+    currTrackerData->frame = image;
 }
