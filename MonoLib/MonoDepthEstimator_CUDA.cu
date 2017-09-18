@@ -987,9 +987,6 @@ void MonoDepthEstimator_CUDA::ReinitOptim()
     MonoLib::MonoPyramidLevel *monoLevel = currDepthFrame->dataImage;
     Vector2i imgSize = currDepthFrame->colorImageData->noDims;
 
-    //Cuda setup
-    SetupCUDA(imgSize);
-
     //	dim3 blocks=getBlocksForVolumeProcess(imgSize.x,imgSize.y,depthSamples);
     //	dim3 threadsPerBlock=getThreadsForVolumeProcess(imgSize.x,imgSize.y,depthSamples);
     dim3 blocks2=getBlocksFor2DProcess(imgSize.x ,imgSize.y);

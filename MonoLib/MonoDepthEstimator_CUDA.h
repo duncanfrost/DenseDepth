@@ -13,15 +13,6 @@ namespace MonoLib {
 
         void ComputeMaxPixel();
 
-        void SetupCUDA(Vector2i imgSize)
-        {
-            int denseBlockSize = 16;
-            dimBlock = dim3(denseBlockSize, denseBlockSize);
-            int gridX = (int)ceil((float)imgSize.x / (float)denseBlockSize);
-            int gridY = (int)ceil((float)imgSize.y / (float)denseBlockSize);
-            dimGrid = dim3(gridX, gridY);
-        }
-
         void SetRefImage(ORUChar4TSImage *frame);
         float EvaluateGT();
         void UpdateForPointCloud() {currDepthFrame->UpdateHostFromDevice();}
@@ -34,11 +25,6 @@ namespace MonoLib {
         void UpdatePhotoError(ORUtils::SE3Pose refToTracker,
                               ORUtils::TimeStampedImage<unsigned char> *frame);
 
-
-
-
-
-
         void OptimToDepth(bool useRawDepth);
 
         void RunTVOptimisation(unsigned int iterations);
@@ -48,9 +34,5 @@ namespace MonoLib {
 
         void SetGT();
         void MeasureError();
-
-    private:
-        dim3 dimGrid;
-        dim3 dimBlock;
     };
 }

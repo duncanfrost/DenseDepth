@@ -5,8 +5,8 @@
 #include <ImageSource/PhoneSource.h>
 #include "FileTracker.h"
 #include <sophus/se3.hpp>
-#include <MonoLib/MonoDepthEstimatorFactory.h>
 #include <ORUtils/ImageTypes.h>
+#include <MonoLib/MonoDepthEstimator_CUDA.h>
 
 class MonoEngine
 {

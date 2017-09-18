@@ -1,6 +1,8 @@
 #include "MonoEngine.h"
 #include <ORUtils/MathTypes.h>
 
+Sophus::SE3f MonoEngine::invRefPose;
+
 MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
 {
     this->source = source;
@@ -23,10 +25,7 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
     intrinsics[2] = cx;
     intrinsics[3] = cy;
     
-    monoDepthEstimator =
-        MonoLib::MonoDepthEstimatorFactory::MakeMonoDepthEstimator( imgSize,
-                                                                    intrinsics,
-                                                                    "CUDA");
+    monoDepthEstimator = new MonoLib::MonoDepthEstimator_CUDA(imgSize, intrinsics);
 
     orImage = new ORUChar4TSImage(imgSize, true, true, true);
 }
@@ -56,24 +55,11 @@ void MonoEngine::AddKeyFrame()
     kf->pose = currPose;
     map->keyframeList.push_back(kf);
 
+    monoDepthEstimator->SetRefImage(orImage);
+    invRefPose = kf->pose.inverse();
 
+    monoDepthEstimator->SetLimitsManual(0.5,2);
 
-
-
-
-    // monoDepthEstimator->SetRefImage(rgbImage);
-    // invRefPose = kf->pose.inverse();
-
-    // fusionState->pose_d->SetFrom(&kf->pose);
-
-    // view->depth->UpdateHostFromDevice();
-
-    // monoDepthEstimator->SetLimitsFromGroundTruth(view->depth->GetData(MEMORYDEVICE_CPU),
-    //                                              view->depth->noDims);
-
-    // // monoDepthEstimator->SetLimitsManual(0.5,2);
-
-    // hasReferenceFrame = true;
 
     // needsKeyFrame = false;
     // std::cout << "Keyframes: " << map->keyframeList.size() << std::endl;
