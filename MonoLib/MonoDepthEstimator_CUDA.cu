@@ -1,6 +1,52 @@
 #include "MonoDepthEstimator_CUDA.h"
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 using namespace MonoLib;
+
+
+inline dim3 getBlocksForVolumeProcess(int volDimx,int volDimy,int volDimz)
+{
+	//get parallel number of threads available
+	cudaDeviceProp deviceProp;
+	    cudaGetDeviceProperties(&deviceProp, 0);
+
+	int block_width_vol_proc=4;
+	int block_height_vol_proc=deviceProp.maxThreadsPerBlock/(volDimz*block_width_vol_proc);
+	if(block_height_vol_proc==0)
+		std::cerr<<"Problem in photometric error computation, not enough parallel threads available"<<std::endl;
+
+	dim3 blocks((volDimx + block_width_vol_proc - 1) / block_width_vol_proc, (volDimy + block_height_vol_proc - 1) / block_height_vol_proc);
+	return blocks;
+}
+
+inline dim3 getThreadsForVolumeProcess(int volDimx,int volDimy,int volDimz)
+{
+	//get parallel number of threads available
+	cudaDeviceProp deviceProp;
+	    cudaGetDeviceProperties(&deviceProp, 0);
+
+	int block_width_vol_proc=4;
+	int block_height_vol_proc=deviceProp.maxThreadsPerBlock/(volDimz*block_width_vol_proc);
+	if(block_height_vol_proc==0)
+		std::cerr<<"Problem in photometric error computation, not enough parallel threads available"<<std::endl;
+
+	dim3 threadsPerBlock(block_width_vol_proc,block_height_vol_proc,volDimz);// ! block_width_vol_proc*block_height_vol_proc*DEPTHVOXELS must be inf to 1024
+	return threadsPerBlock;
+}
+
+inline dim3 getBlocksFor2DProcess(int _width,int _height)
+{
+	return dim3((_width + 16 - 1) / 16, (_height + 16 - 1) / 16);
+
+}
+
+inline dim3 getThreadsFor2DProcess(int _width,int _height)
+{
+	return dim3(16,16);
+
+}
+
 
 inline float SumError(float *data, Vector2i imgSize)
 {

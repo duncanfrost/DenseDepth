@@ -1,4 +1,5 @@
 #include "MonoEngine.h"
+#include <ORUtils/MathTypes.h>
 
 MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
 {
@@ -6,6 +7,28 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
     this->tracker = tracker;
     currTrackerData = new TrackerData();
     map = new GlobalMap();
+
+
+
+    
+    Vector2i imgSize(640, 480);
+    Vector4f intrinsics;
+
+
+    float fx = 683.8249;
+    float fy = 683.6179;
+    float cx = 317.6438;
+    float cy = 239.5907;
+
+
+    intrinsics[0] = fx;
+    intrinsics[1] = fy;
+    intrinsics[2] = cx;
+    intrinsics[3] = cy;
+    
+
+    monoDepthEstimator = MonoLib::MonoDepthEstimatorFactory::MakeMonoDepthEstimator(
+        imgSize, intrinsics, "CUDA");
 }
 
 

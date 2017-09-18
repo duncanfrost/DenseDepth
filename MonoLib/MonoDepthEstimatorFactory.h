@@ -32,8 +32,8 @@ namespace MonoLib
         {
             MonoDepthEstimator *monoDepthEstimator = NULL;
 
-            if (deviceType == "CPU") monoDepthEstimator =
-                                         new MonoDepthEstimator_CPU(imgSize, intrinsics);
+            // if (deviceType == "CPU") monoDepthEstimator =
+                                         // new MonoDepthEstimator_CPU(imgSize, intrinsics);
 #ifdef COMPILE_WITH_CUDA
             if (deviceType == "CUDA") monoDepthEstimator =
                                           new MonoDepthEstimator_CUDA(imgSize, intrinsics);

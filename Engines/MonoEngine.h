@@ -5,6 +5,7 @@
 #include <ImageSource/PhoneSource.h>
 #include "FileTracker.h"
 #include <sophus/se3.hpp>
+#include <MonoLib/MonoDepthEstimatorFactory.h>
 
 class MonoEngine
 {
@@ -34,4 +35,5 @@ private:
     long long timeStamp;
     Sophus::SE3f currPose;
     GlobalMap *map;
+    MonoLib::MonoDepthEstimator *monoDepthEstimator;
 };
