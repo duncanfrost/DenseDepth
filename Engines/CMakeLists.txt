@@ -1,11 +1,13 @@
 SET(targetname Engines)
 
 SET(sources
-MonoEngine.cpp
+  MonoEngine.cpp
+  FileTracker.cpp
   )
 
 SET(headers
-MonoEngine.h
+  MonoEngine.h
+  FileTracker.h
   )
 
 

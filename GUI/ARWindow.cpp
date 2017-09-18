@@ -19,24 +19,6 @@ ARWindow::ARWindow(std::string title, int width, int height,
 
 void ARWindow::Draw()
 {
-//	ORUtils::Image<float> *image = trackerData->frame->GetLevel(interestLevel)->imageData;
-
-//	LoadTextureFloat(image->GetData(MEMORYDEVICE_CPU),
-//	               image->noDims.x,
-//	               image->noDims.y,
-//	               tempTextureImageWindow);
-
-	
-
-    // if (trackerData->frame != NULL)
-    // {
-        // LoadTextureVector4u(trackerData->frame->GetData(MEMORYDEVICE_CPU),
-        //                  trackerData->frame->noDims.x,
-        //                  trackerData->frame->noDims.y,
-        //                  tempTextureImageWindow);
-    // }
-
-
     std::cout << "Loading frame" << std::endl;
     cv::Mat imFrame=trackerData->frame;
     std::cout << imFrame.size() << std::endl;

@@ -13,6 +13,8 @@ PhoneSource *source;
 int main(void)
 {
     std::string filename1 = "/home/duncan/Data/P9/SidewaysLong/log.txt";
+    std::string gtFile = "/home/duncan/Data/P9/SidewaysLong/CameraTrajectory.txt";
+
     source = new PhoneSource(filename1);
     engine = new MonoEngine(source);
 
