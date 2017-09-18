@@ -29,6 +29,11 @@ public:
     static Sophus::SE3f invRefPose;
 
 private:
+
+
+    void ConvertToOR();
+
+
     TrackerData* currTrackerData;
     FileTracker* tracker;
     PhoneSource* source;

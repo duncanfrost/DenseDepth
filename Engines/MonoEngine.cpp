@@ -41,6 +41,8 @@ void MonoEngine::Process()
     long long timeOut;
     currPose = tracker->PoseAtTime(timeStamp, timeOut);
 
+    ConvertToOR();
+
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
 }
@@ -53,6 +55,10 @@ void MonoEngine::AddKeyFrame()
     KeyFrame *kf = new KeyFrame();
     kf->pose = currPose;
     map->keyframeList.push_back(kf);
+
+
+
+
 
 
     // monoDepthEstimator->SetRefImage(rgbImage);
@@ -71,4 +77,25 @@ void MonoEngine::AddKeyFrame()
 
     // needsKeyFrame = false;
     // std::cout << "Keyframes: " << map->keyframeList.size() << std::endl;
+}
+
+void MonoEngine::ConvertToOR()
+{
+    for (int y = 0; y < image.rows; y++)
+    {
+        for (int x = 0; x < image.cols; x++)
+        {
+            cv::Vec3b val = image.at<cv::Vec3b>(y,x);
+            Vector4u orVal;
+            orVal[0] = val[0];
+            orVal[1] = val[1];
+            orVal[2] = val[2];
+            orVal[3] = 0;
+
+            int index = x + image.cols*y;
+            orImage->GetData(MEMORYDEVICE_CPU)[index] = orVal;
+        }
+    }
+
+    orImage->UpdateDeviceFromHost();
 }
