@@ -48,7 +48,7 @@ void MapWindow::SetupModelView(Sophus::SE3f se3WorldFromCurrent)
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glMultMatrix(mse3ViewerFromWorldOR * se3WorldFromCurrent);
+    glMultMatrix(mse3ViewerFromWorld * se3WorldFromCurrent);
     return;
 }
 
@@ -100,22 +100,18 @@ void MapWindow::DrawOrigin()
 
 void MapWindow::UpdateCameraFromInput()
 {
-    //Deal with mouse and keyboard input
     Sophus::SE3f se3CamFromMC;
+    se3CamFromMC.translation() = mse3ViewerFromWorld * massCentre;
+    mse3ViewerFromWorld = Sophus::SE3f::exp(poseUpdateMouseCam)  *
+        se3CamFromMC * Sophus::SE3f::exp(poseUpdateMouseWorld) *
+        se3CamFromMC.inverse() * mse3ViewerFromWorld;
 
-    Sophus::Vector3f trans2 = mse3ViewerFromWorldOR * massCentre;
-    se3CamFromMC.translation() = trans2;
+    poseUpdateMouseWorld.setZero();
+    poseUpdateMouseCam.setZero();
 
-    Sophus::SE3f updateOR = Sophus::SE3f::exp(poseUpdateMouseCam) * se3CamFromMC
-        * Sophus::SE3f::exp(poseUpdateMouseWorld) * se3CamFromMC.inverse()
-        * Sophus::SE3f::exp(poseUpdateKeyboard);
-
-
-    mse3ViewerFromWorldOR = updateOR * mse3ViewerFromWorldOR;
-
-    poseUpdateMouseWorld = Sophus::SE3f::Tangent::Zero();
-    poseUpdateMouseCam = Sophus::SE3f::Tangent::Zero();
-    poseUpdateKeyboard = Sophus::SE3f::Tangent::Zero();
+    mse3ViewerFromWorld = Sophus::SE3f::exp(poseUpdateKeyboard)
+        * mse3ViewerFromWorld;
+    poseUpdateKeyboard.setZero();
 }
 
 

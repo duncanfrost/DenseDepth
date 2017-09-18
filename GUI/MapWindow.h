@@ -36,10 +36,10 @@ protected:
         Sophus::SE3f::Tangent v2 = Sophus::SE3f::Tangent::Zero();
         v2[3] = (float)(M_PI_4);
 
-        mse3ViewerFromWorldOR = Sophus::SE3f::exp(v1) * Sophus::SE3f::exp(v2);
+        mse3ViewerFromWorld = Sophus::SE3f::exp(v1) * Sophus::SE3f::exp(v2);
     }
     GlobalMap *map;
-    Sophus::SE3f mse3ViewerFromWorldOR;
+    Sophus::SE3f mse3ViewerFromWorld;
 
     Eigen::Vector2f lastMousePosition;
     Eigen::Vector3f massCentre;
