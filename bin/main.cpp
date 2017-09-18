@@ -16,9 +16,9 @@ int main(void)
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",640,480,engine->GetARData()));
 
+    visModule->SetKeyboardFunction(&KeyboardFunction);
+    visModule->StartLoop();
 
-    std::cout << "This is a test" << std::endl;
-    exit(1);
 }
 
 void Idle(void)
