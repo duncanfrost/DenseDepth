@@ -1,9 +1,11 @@
 #include "MonoEngine.h"
 
-MonoEngine::MonoEngine(PhoneSource* source)
+MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
 {
     this->source = source;
+    this->tracker = tracker;
     currTrackerData = new TrackerData();
+    map = new GlobalMap();
 }
 
 

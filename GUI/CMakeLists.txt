@@ -5,7 +5,7 @@ SET(sources
   Button.cpp
   glTexture.cpp
   glTools.cpp
-  # MapWindow.cpp
+  MapWindow.cpp
   VisualisationModule.cpp
   Window.cpp
   )
@@ -15,7 +15,7 @@ SET(headers
   Button.h
   glTexture.h
   glTools.h
-  # MapWindow.h
+  MapWindow.h
   VisualisationModule.h
   Window.h
   )

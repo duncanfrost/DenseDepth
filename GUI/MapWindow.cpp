@@ -5,23 +5,20 @@
 #include <time.h>       /* time */
 #include <cstring>
 
-MapWindow::MapWindow(std::string title, int width, int height)
+MapWindow::MapWindow(std::string title, int width, int height, MonoEngine *engine)
 {
     this->title = title;
     this->width = width;
     this->height = height;
-    this->map = monoEngine->GetMap();
-    this->trackerData = monoEngine->CurrTrackerData();
-    // this->monoEngine = monoEngine;
+    this->map = engine->GetMap();
+    this->trackerData = engine->GetARData();
+    this->monoEngine = engine;
 
     useStereo = false;
     updateType = 0;
-    massCentre = DenseMono::Vector3f(0,0,0);
+    massCentre = Eigen::Vector3f(0,0,0);
     mouseUp = true;
 
-    refPoint_data = new DenseMono::Vector3f[1000*1000];
-    color_data = new Vector4u[1000*1000];
-    sigma2_data = new float[1000*1000];
     updateDenseMaps = true;
 
     SetInitCamPose();
@@ -47,7 +44,7 @@ void MapWindow::SetupFrustum()
     return;
 }
 
-void MapWindow::SetupModelView(DenseMono::SE3f se3WorldFromCurrent)
+void MapWindow::SetupModelView(Sophus::SE3f se3WorldFromCurrent)
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -55,7 +52,7 @@ void MapWindow::SetupModelView(DenseMono::SE3f se3WorldFromCurrent)
     return;
 }
 
-void MapWindow::DrawCamera(DenseMono::SE3f se3CfromW, bool bSmall,
+void MapWindow::DrawCamera(Sophus::SE3f se3CfromW, bool bSmall,
                            float r, float g, float b)
 {
     SetupModelView(se3CfromW.inverse());
@@ -81,7 +78,7 @@ void MapWindow::DrawCamera(DenseMono::SE3f se3CfromW, bool bSmall,
 
 void MapWindow::DrawOrigin()
 {
-    DenseMono::SE3f origin;
+    Sophus::SE3f origin;
     SetupModelView(origin);
     SetupFrustum();
 
@@ -104,21 +101,21 @@ void MapWindow::DrawOrigin()
 void MapWindow::UpdateCameraFromInput()
 {
     //Deal with mouse and keyboard input
-    DenseMono::SE3f se3CamFromMC;
+    Sophus::SE3f se3CamFromMC;
 
-    DenseMono::Vector3f trans2 = mse3ViewerFromWorldOR * massCentre;
-    SET_TRANS(se3CamFromMC,trans2);
+    Sophus::Vector3f trans2 = mse3ViewerFromWorldOR * massCentre;
+    se3CamFromMC.translation() = trans2;
 
-    DenseMono::SE3f updateOR = DenseMono::SE3f::exp(poseUpdateMouseCam) * se3CamFromMC
-        * DenseMono::SE3f::exp(poseUpdateMouseWorld) * se3CamFromMC.inverse()
-        * DenseMono::SE3f::exp(poseUpdateKeyboard);
+    Sophus::SE3f updateOR = Sophus::SE3f::exp(poseUpdateMouseCam) * se3CamFromMC
+        * Sophus::SE3f::exp(poseUpdateMouseWorld) * se3CamFromMC.inverse()
+        * Sophus::SE3f::exp(poseUpdateKeyboard);
 
 
     mse3ViewerFromWorldOR = updateOR * mse3ViewerFromWorldOR;
 
-    poseUpdateMouseWorld = DenseMono::SE3f::Tangent::Zero();
-    poseUpdateMouseCam = DenseMono::SE3f::Tangent::Zero();
-    poseUpdateKeyboard = DenseMono::SE3f::Tangent::Zero();
+    poseUpdateMouseWorld = Sophus::SE3f::Tangent::Zero();
+    poseUpdateMouseCam = Sophus::SE3f::Tangent::Zero();
+    poseUpdateKeyboard = Sophus::SE3f::Tangent::Zero();
 }
 
 
@@ -162,8 +159,8 @@ void MapWindow::ProcessMouseMotion(int x, int y)
 {
     if (updateType)
     {
-        DenseMono::Vector2f position((float)x, (float)y);
-        DenseMono::Vector2f motion = position -  lastMousePosition;
+        Eigen::Vector2f position((float)x, (float)y);
+        Eigen::Vector2f motion = position -  lastMousePosition;
         lastMousePosition = position;
         if (mouseUp)
         {
@@ -235,58 +232,52 @@ void MapWindow::ProcessKeyboard(unsigned char key, int x, int y)
 
 void MapWindow::DrawDenseMap()
 {
-    SetupFrustum();
-    SetupModelView();
+    // SetupFrustum();
+    // SetupModelView();
 
-    Vector3f *refPoints;
-    Vector4u *colorData;
-    bool *goodData;
+    // Vector3f *refPoints;
+    // Vector4u *colorData;
+    // bool *goodData;
 
-    if (updateDenseMaps)
-    {
-        if (useStereo)
-            stereoEngine->GetPointCloud(imwidth,imheight,&refPoints,
-                                        &colorData, &goodData);
-        else
-            monoEngine->GetPointCloud(imwidth,imheight,&refPoints,
-                                      &colorData, &goodData);
+    // if (updateDenseMaps)
+    // {
+    //     if (useStereo)
+    //         monoEngine->GetPointCloud(imwidth,imheight,&refPoints,
+    //                                   &colorData, &goodData);
 
-        std::memcpy(refPoint_data,refPoints,imwidth*imheight*sizeof(DenseMono::Vector3f));
-        std::memcpy(color_data,colorData,imwidth*imheight*4*sizeof(unsigned char));
-    }
+    //     std::memcpy(refPoint_data,refPoints,imwidth*imheight*sizeof(DenseMono::Vector3f));
+    //     std::memcpy(color_data,colorData,imwidth*imheight*4*sizeof(unsigned char));
+    // }
 
 
-    DenseMono::SE3f invPose;
-    if (useStereo)
-        invPose = ITMLib::StereoEngine<ITMVoxel>::invRefPose;
-    else
-        invPose = ITMLib::MonoEngine<ITMVoxel>::invRefPose;
+    // DenseMono::SE3f invPose;
+    // invPose = ITMLib::MonoEngine<ITMVoxel>::invRefPose;
 
-    massCentre = DenseMono::Vector3f(0,0,0);
+    // massCentre = DenseMono::Vector3f(0,0,0);
 
-    for (unsigned int y = 0; y < imheight; y++)
-        for (unsigned int x = 0; x < imwidth; x++)
-        {
-            unsigned int index = x + imwidth*y;
+    // for (unsigned int y = 0; y < imheight; y++)
+    //     for (unsigned int x = 0; x < imwidth; x++)
+    //     {
+    //         unsigned int index = x + imwidth*y;
 
-            DenseMono::Vector3f pointRef = refPoint_data[index];
+    //         DenseMono::Vector3f pointRef = refPoint_data[index];
 
-            DenseMono::Vector3f pointWorld = invPose*pointRef;
-            Vector4u color = color_data[index];
-            unsigned char c1 = color[0];
-            unsigned char c2 = color[1];
-            unsigned char c3 = color[2];
+    //         DenseMono::Vector3f pointWorld = invPose*pointRef;
+    //         Vector4u color = color_data[index];
+    //         unsigned char c1 = color[0];
+    //         unsigned char c2 = color[1];
+    //         unsigned char c3 = color[2];
 
-            // if (std::isnan(pointRef[0]) || std::isnan(pointRef[1]) || std::isnan(pointRef[2]))
-            //			continue;
-            massCentre[0] += pointWorld[0];
-            massCentre[1] += pointWorld[1];
-            massCentre[2] += pointWorld[2];
-            glColor3ub(c1,c2,c3);
-            glPointSize(1);
-            glBegin(GL_POINTS);
-            glVertex3f(pointWorld[0],pointWorld[1],pointWorld[2]);
-            glEnd();
-        }
-    massCentre /= (float)(imheight*imwidth);
+    //         // if (std::isnan(pointRef[0]) || std::isnan(pointRef[1]) || std::isnan(pointRef[2]))
+    //         //			continue;
+    //         massCentre[0] += pointWorld[0];
+    //         massCentre[1] += pointWorld[1];
+    //         massCentre[2] += pointWorld[2];
+    //         glColor3ub(c1,c2,c3);
+    //         glPointSize(1);
+    //         glBegin(GL_POINTS);
+    //         glVertex3f(pointWorld[0],pointWorld[1],pointWorld[2]);
+    //         glEnd();
+    //     }
+    // massCentre /= (float)(imheight*imwidth);
 }

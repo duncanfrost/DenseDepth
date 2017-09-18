@@ -1,7 +1,9 @@
 #include <iostream>
 #include <GUI/VisualisationModule.h>
 #include <GUI/ARWindow.h>
+#include <GUI/MapWindow.h>
 #include <Engines/MonoEngine.h>
+#include <Engines/FileTracker.h>
 #include <ImageSource/PhoneSource.h>
 
 void Idle(void);
@@ -9,6 +11,7 @@ void KeyboardFunction(unsigned char key, int x, int y);
 VisualisationModule *visModule;
 MonoEngine *engine;
 PhoneSource *source;
+FileTracker *tracker;
 
 int main(void)
 {
@@ -16,10 +19,12 @@ int main(void)
     std::string gtFile = "/home/duncan/Data/P9/SidewaysLong/CameraTrajectory.txt";
 
     source = new PhoneSource(filename1);
-    engine = new MonoEngine(source);
+    tracker = new FileTracker(gtFile, FileTracker::ORB);
+    engine = new MonoEngine(source, tracker);
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",640,480,engine->GetARData()));
+    visModule->AddWindow(new MapWindow("Map",640,480,engine));
 
     visModule->SetKeyboardFunction(&KeyboardFunction);
     visModule->StartLoop();
