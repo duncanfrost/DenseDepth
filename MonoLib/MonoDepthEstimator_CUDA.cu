@@ -542,7 +542,7 @@ __global__ void updatePhotoError2d(Matrix3f R, Vector3f T,
             float newError = (nUpdate * oldError + obsError) / (nUpdate + 1);
 
             photo_error[offset] = newError;
-            nUpdates[offset] = nUpdate;
+            nUpdates[offset] = nUpdate + 1;
         }
         else
         {
