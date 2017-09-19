@@ -19,9 +19,7 @@ ARWindow::ARWindow(std::string title, int width, int height,
 
 void ARWindow::Draw()
 {
-    std::cout << "Loading frame" << std::endl;
     cv::Mat imFrame=trackerData->frame;
-    std::cout << imFrame.size() << std::endl;
     LoadTexture(imFrame,tempTextureImageWindow);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

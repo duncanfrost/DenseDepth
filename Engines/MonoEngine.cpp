@@ -59,16 +59,9 @@ void MonoEngine::Process()
     long long timeOut;
     currPose = tracker->PoseAtTime(timeStamp, timeOut);
 
-    std::cout << "Curr pose"  << std::endl;
-
-    std::cout << currPose.matrix() << std::endl;
-
-
-    std::cout << "Or pose" << std::endl;
-    std::cout << SophusToOR(currPose) << std::endl;
-
-
     ConvertToOR();
+    Sample();
+
 
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
@@ -116,9 +109,10 @@ void MonoEngine::Sample()
     if (!hasReferenceFrame)
         return;
 
+
+    std::cout << "Sampling" << std::endl;
     Sophus::SE3f inPose = currPose*invRefPose;
-    // monoDepthEstimator->UpdatePhotoError(inPose, orImage);
-    
+    monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), orImage);
 }
 
 

@@ -12,6 +12,7 @@ VisualisationModule *visModule;
 MonoEngine *engine;
 PhoneSource *source;
 FileTracker *tracker;
+bool paused = false;
 
 int main(void)
 {
@@ -32,8 +33,9 @@ int main(void)
 
 void Idle(void)
 {
+    if (!paused)
+        engine->Process();
     visModule->DrawWindows();
-    engine->Process();
 }
 
 void KeyboardFunction(unsigned char key, int x, int y)
@@ -45,6 +47,10 @@ void KeyboardFunction(unsigned char key, int x, int y)
 
     case ' ':
         engine->AddKeyFrame();
+        break;
+
+    case 'p':
+        paused = !paused;
         break;
 
     }
