@@ -16,9 +16,7 @@ void PhoneSource::GrabNewFrame()
 {
     std::string path =  rgbImagePaths[frameNumber];
     timeStamp = rgbTimeStamps[frameNumber];
-    std::cout << path << std::endl;
     imLeft = cv::imread(path);
-
 
     frameNumber++;
 }
