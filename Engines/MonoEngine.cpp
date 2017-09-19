@@ -3,6 +3,23 @@
 
 Sophus::SE3f MonoEngine::invRefPose;
 
+inline ORUtils::SE3Pose SophusToOR(Sophus::SE3f pose)
+{
+    ORUtils::SE3Pose out;
+
+    Matrix4f mat;
+    
+    for (unsigned int r = 0; r < 4; r++)
+        for (unsigned int c = 0; c < 4; c++)
+        {
+            mat.at(c,r) = pose.matrix()(r,c);
+        }
+
+    out.SetM(mat);
+    
+    return out;
+}
+
 MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
 {
     this->source = source;
@@ -28,6 +45,8 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
     monoDepthEstimator = new MonoLib::MonoDepthEstimator_CUDA(imgSize, intrinsics);
 
     orImage = new ORUChar4TSImage(imgSize, true, true, true);
+
+    hasReferenceFrame = false;
 }
 
 
@@ -39,6 +58,15 @@ void MonoEngine::Process()
 
     long long timeOut;
     currPose = tracker->PoseAtTime(timeStamp, timeOut);
+
+    std::cout << "Curr pose"  << std::endl;
+
+    std::cout << currPose.matrix() << std::endl;
+
+
+    std::cout << "Or pose" << std::endl;
+    std::cout << SophusToOR(currPose) << std::endl;
+
 
     ConvertToOR();
 
@@ -59,6 +87,7 @@ void MonoEngine::AddKeyFrame()
     invRefPose = kf->pose.inverse();
 
     monoDepthEstimator->SetLimitsManual(0.5,2);
+    hasReferenceFrame = true;
 }
 
 void MonoEngine::ConvertToOR()
@@ -81,3 +110,16 @@ void MonoEngine::ConvertToOR()
 
     orImage->UpdateDeviceFromHost();
 }
+
+void MonoEngine::Sample()
+{
+    if (!hasReferenceFrame)
+        return;
+
+    Sophus::SE3f inPose = currPose*invRefPose;
+    // monoDepthEstimator->UpdatePhotoError(inPose, orImage);
+    
+}
+
+
+

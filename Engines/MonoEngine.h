@@ -44,4 +44,11 @@ private:
     Sophus::SE3f currPose;
     GlobalMap *map;
     MonoLib::MonoDepthEstimator *monoDepthEstimator;
+
+    bool hasReferenceFrame;
+
+    void Sample();
+
+
+
 };
