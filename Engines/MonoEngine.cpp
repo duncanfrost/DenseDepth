@@ -126,6 +126,13 @@ void MonoEngine::SmoothPhoto(int iterations)
     monoDepthEstimator->RunTVOptimisation(iterations);
 }
 
+void MonoEngine::SmoothPhotoBuffer(int iterations)
+{
+    SampleFromBufferMid();
+    SmoothPhoto(iterations);
+}
+
+
 void MonoEngine::MakePointCloud(bool useRawDepth)
 {
     // If you want to use raw depth, don't use OptimToDepth
@@ -153,3 +160,24 @@ void MonoEngine::GetPointCloud(unsigned int &width,
     height = dataPyramidLevel->depth->noDims[1];
 }
 
+
+void MonoEngine::SampleFromBufferMid()
+{
+    // unsigned int nMid = 50; 
+    // ORUChar4TSImage *rgbImage = imageBuffer[nMid];
+    // DenseMono::SE3f kfPose = poseBuffer[nMid];
+
+    // AddKeyFrame(rgbImage, kfPose);
+
+    // for (unsigned int i = 0; i < BUFFERSIZE; i++)
+    // {
+    //     if (i == nMid)
+    //         continue;
+    //     std::cout << "Sampling: " << i << std::endl;
+    //     DenseMono::SE3f trackingPose = poseBuffer[i];
+    //     ORUtils::SE3Pose inPose = trackingPose*invRefPose;
+    //     ORUChar4TSImage *inputRGBImage = imageBuffer[i];
+    //     inputRGBImage->UpdateDeviceFromHost();
+    //     monoDepthEstimator->UpdatePhotoError(inPose, inputRGBImage);
+    // }
+}

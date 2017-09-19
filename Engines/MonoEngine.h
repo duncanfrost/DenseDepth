@@ -30,6 +30,7 @@ public:
 
     static Sophus::SE3f invRefPose;
     void SmoothPhoto(int iterations);
+    void SmoothPhotoBuffer(int iterations);
 
     void GetPointCloud(unsigned int &width,
                        unsigned int &height, Vector3f **points,
@@ -37,6 +38,7 @@ public:
 
 private:
 
+    void SampleFromBufferMid();
     void MakePointCloud(bool useRawDepth);
 
 
