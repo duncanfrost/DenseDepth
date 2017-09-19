@@ -14,7 +14,13 @@ class MonoEngine
 {
 public:
     MonoEngine(PhoneSource* source, FileTracker *tracker);
-    void AddKeyFrame();
+
+    void AddKeyFrameManual()
+    {
+        needsKeyFrame = true;
+    }
+    
+    void AddKeyFrame(ORUChar4TSImage *inImage, Sophus::SE3f inPose);
 
     void Process();
 
@@ -59,6 +65,7 @@ private:
 
     bool hasReferenceFrame;
     bool useRawDepth;
+    bool needsKeyFrame;
 
     ORUChar4TSImage *imageBuffer[BUFFERSIZE];
     Sophus::SE3f poseBuffer[BUFFERSIZE];

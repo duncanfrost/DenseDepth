@@ -53,6 +53,7 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
 
     hasReferenceFrame = false;
     useRawDepth = true;
+    needsKeyFrame = false;
 }
 
 
@@ -69,20 +70,26 @@ void MonoEngine::Process()
     Sample();
 
 
+    if (needsKeyFrame)
+    {
+        AddKeyFrame(orImage, currPose);
+        needsKeyFrame = false;
+    }
+
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
 }
 
 
-void MonoEngine::AddKeyFrame()
+void MonoEngine::AddKeyFrame(ORUChar4TSImage *inImage, Sophus::SE3f inPose)
 {
     std::cout << "About to make new keyframe" << std::endl;
 
     KeyFrame *kf = new KeyFrame();
-    kf->pose = currPose;
+    kf->pose = inPose;
     map->keyframeList.push_back(kf);
 
-    monoDepthEstimator->SetRefImage(orImage);
+    monoDepthEstimator->SetRefImage(inImage);
     invRefPose = kf->pose.inverse();
 
     monoDepthEstimator->SetLimitsManual(0.5,2);

@@ -46,7 +46,7 @@ void KeyboardFunction(unsigned char key, int x, int y)
         break;
 
     case ' ':
-        engine->AddKeyFrame();
+        engine->AddKeyFrameManual();
         break;
 
     case 'p':
