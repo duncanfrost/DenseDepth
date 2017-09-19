@@ -100,11 +100,14 @@ void MonoEngine::Process()
     SaveToBuffer(orImage, currPose);
 
 
-    if (needsKeyFrame)
-    {
+    // if (needsKeyFrame)
+    // {
         // AddKeyFrame(orImage, currPose);
-        needsKeyFrame = false;
-    }
+        // needsKeyFrame = false;
+    // }
+
+    if (framesProcessed > 102)
+        SmoothPhotoBuffer(200);
 
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
@@ -184,15 +187,17 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
     ORToCVConvert(monoDepthEstimator->currDepthFrame->dataImage->depth, testIm);
 
 
-    
+    std::stringstream outPath;
+    outPath << "/home/duncan/Data/P9/SidewaysLong/depth/" << timeStampBuffer[50] << "000000.png";
+    cv::imwrite(outPath.str(), testIm);
+
+    // cv::namedWindow( "Debug", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    // cv::imshow( "Debug", testIm );                   // Show our image inside it.
+    // cv::waitKey(0); 
+    // cv::destroyWindow("Debug");
 
 
-    cv::imwrite("/home/duncan/test.png", testIm);
 
-    cv::namedWindow( "Debug", cv::WINDOW_AUTOSIZE );// Create a window for display.
-    cv::imshow( "Debug", testIm );                   // Show our image inside it.
-    cv::waitKey(0); 
-    cv::destroyWindow("Debug");
 
 
 
@@ -277,7 +282,7 @@ void MonoEngine::SaveToBuffer(ORUChar4TSImage *inputRGBImage,
     {
         imageBuffer[i] = imageBuffer[i-1];
         poseBuffer[i] = poseBuffer[i-1];
-        frameNumberBuffer[i] = frameNumberBuffer[i-1];
+        timeStampBuffer[i] = timeStampBuffer[i-1];
     }
 
     //No need to do this for the pose buffer
@@ -285,7 +290,7 @@ void MonoEngine::SaveToBuffer(ORUChar4TSImage *inputRGBImage,
     imageBuffer[0]->SetFrom(inputRGBImage, MEMCPYDIR_CPU_TO_CPU);
 
     poseBuffer[0] = inputPose;
-    frameNumberBuffer[0] = framesProcessed;
+    timeStampBuffer[0] = timeStamp;
     if (bufferTop < BUFFERSIZE)
         bufferTop++;
 }

@@ -76,7 +76,7 @@ private:
 
     ORUChar4TSImage *imageBuffer[BUFFERSIZE];
     Sophus::SE3f poseBuffer[BUFFERSIZE];
-    unsigned int frameNumberBuffer[BUFFERSIZE];
+    unsigned int timeStampBuffer[BUFFERSIZE];
 
 
     void Sample();
