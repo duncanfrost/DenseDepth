@@ -59,10 +59,6 @@ void MonoEngine::AddKeyFrame()
     invRefPose = kf->pose.inverse();
 
     monoDepthEstimator->SetLimitsManual(0.5,2);
-
-
-    // needsKeyFrame = false;
-    // std::cout << "Keyframes: " << map->keyframeList.size() << std::endl;
 }
 
 void MonoEngine::ConvertToOR()

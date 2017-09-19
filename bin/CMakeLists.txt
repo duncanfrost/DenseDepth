@@ -1,4 +1,9 @@
-add_executable(main main.cpp)
+INCLUDE(${PROJECT_SOURCE_DIR}/cmake/UseCUDA.cmake)
+
+# add_executable(main main.cpp)
+
+CUDA_ADD_EXECUTABLE(main main.cpp  OPTIONS --generate-code arch=compute_${CUDA_COMPUTE_CAPABILITY},code=sm_${CUDA_COMPUTE_CAPABILITY})
+
 
 message("INTERN LIBS:")
 message("${INTERN_LIBS}")
