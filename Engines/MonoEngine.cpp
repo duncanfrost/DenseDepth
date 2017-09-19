@@ -46,6 +46,11 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
 
     orImage = new ORUChar4TSImage(imgSize, true, true, true);
 
+
+    for (unsigned int i = 0; i < BUFFERSIZE; i++)
+        imageBuffer[i] = new ORUChar4TSImage(imgSize, true, true, true);
+
+
     hasReferenceFrame = false;
     useRawDepth = true;
 }
@@ -60,7 +65,7 @@ void MonoEngine::Process()
     long long timeOut;
     currPose = tracker->PoseAtTime(timeStamp, timeOut);
 
-    ConvertToOR();
+    ConvertToOR(image, orImage);
     Sample();
 
 
@@ -84,25 +89,25 @@ void MonoEngine::AddKeyFrame()
     hasReferenceFrame = true;
 }
 
-void MonoEngine::ConvertToOR()
+void MonoEngine::ConvertToOR(cv::Mat inImage, ORUChar4TSImage *outImage)
 {
-    for (int y = 0; y < image.rows; y++)
+    for (int y = 0; y < inImage.rows; y++)
     {
-        for (int x = 0; x < image.cols; x++)
+        for (int x = 0; x < inImage.cols; x++)
         {
-            cv::Vec3b val = image.at<cv::Vec3b>(y,x);
+            cv::Vec3b val = inImage.at<cv::Vec3b>(y,x);
             Vector4u orVal;
             orVal[0] = val[2];
             orVal[1] = val[1];
             orVal[2] = val[0];
             orVal[3] = 0;
 
-            int index = x + image.cols*y;
-            orImage->GetData(MEMORYDEVICE_CPU)[index] = orVal;
+            int index = x + inImage.cols*y;
+            outImage->GetData(MEMORYDEVICE_CPU)[index] = orVal;
         }
     }
 
-    orImage->UpdateDeviceFromHost();
+    outImage->UpdateDeviceFromHost();
 }
 
 void MonoEngine::Sample()

@@ -8,6 +8,8 @@
 #include <ORUtils/ImageTypes.h>
 #include <MonoLib/MonoDepthEstimator_CUDA.h>
 
+#define BUFFERSIZE 100
+
 class MonoEngine
 {
 public:
@@ -39,7 +41,7 @@ private:
 
 
 
-    void ConvertToOR();
+    void ConvertToOR(cv::Mat inImage, ORUChar4TSImage *outImage);
 
 
     TrackerData* currTrackerData;
@@ -55,6 +57,11 @@ private:
 
     bool hasReferenceFrame;
     bool useRawDepth;
+
+    ORUChar4TSImage *imageBuffer[BUFFERSIZE];
+    Sophus::SE3f poseBuffer[BUFFERSIZE];
+    unsigned int frameNumberBuffer[BUFFERSIZE];
+
 
     void Sample();
 
