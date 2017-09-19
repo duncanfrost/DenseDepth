@@ -19,6 +19,9 @@ MapWindow::MapWindow(std::string title, int width, int height, MonoEngine *engin
     massCentre = Eigen::Vector3f(0,0,0);
     mouseUp = true;
 
+    refPoint_data = new DenseMono::Vector3f[1000*1000];
+    color_data = new Vector4u[1000*1000];
+    sigma2_data = new float[1000*1000];
     updateDenseMaps = true;
 
     SetInitCamPose();
@@ -228,52 +231,55 @@ void MapWindow::ProcessKeyboard(unsigned char key, int x, int y)
 
 void MapWindow::DrawDenseMap()
 {
-    // SetupFrustum();
-    // SetupModelView();
+    SetupFrustum();
+    SetupModelView();
 
-    // Vector3f *refPoints;
-    // Vector4u *colorData;
-    // bool *goodData;
+    Vector3f *refPoints;
+    Vector4u *colorData;
+    bool *goodData;
 
-    // if (updateDenseMaps)
-    // {
-    //     if (useStereo)
-    //         monoEngine->GetPointCloud(imwidth,imheight,&refPoints,
-    //                                   &colorData, &goodData);
+    if (updateDenseMaps)
+    {
+            monoEngine->GetPointCloud(imwidth,imheight,&refPoints,
+                                      &colorData, &goodData);
 
-    //     std::memcpy(refPoint_data,refPoints,imwidth*imheight*sizeof(DenseMono::Vector3f));
-    //     std::memcpy(color_data,colorData,imwidth*imheight*4*sizeof(unsigned char));
-    // }
+        std::memcpy(refPoint_data,refPoints,imwidth*imheight*sizeof(DenseMono::Vector3f));
+        std::memcpy(color_data,colorData,imwidth*imheight*4*sizeof(unsigned char));
+    }
 
 
-    // DenseMono::SE3f invPose;
-    // invPose = ITMLib::MonoEngine<ITMVoxel>::invRefPose;
+    Sophus::SE3f invPose;
+    invPose = MonoEngine::invRefPose;
 
-    // massCentre = DenseMono::Vector3f(0,0,0);
+    massCentre = Eigen::Vector3f(0,0,0);
 
-    // for (unsigned int y = 0; y < imheight; y++)
-    //     for (unsigned int x = 0; x < imwidth; x++)
-    //     {
-    //         unsigned int index = x + imwidth*y;
+    for (unsigned int y = 0; y < imheight; y++)
+        for (unsigned int x = 0; x < imwidth; x++)
+        {
+            unsigned int index = x + imwidth*y;
 
-    //         DenseMono::Vector3f pointRef = refPoint_data[index];
+            DenseMono::Vector3f pointRef = refPoint_data[index];
+            Eigen::Vector3f pointRefE;
+            pointRefE[0] = pointRef[0];
+            pointRefE[1] = pointRef[1];
+            pointRefE[2] = pointRef[2];
 
-    //         DenseMono::Vector3f pointWorld = invPose*pointRef;
-    //         Vector4u color = color_data[index];
-    //         unsigned char c1 = color[0];
-    //         unsigned char c2 = color[1];
-    //         unsigned char c3 = color[2];
+            Eigen::Vector3f pointWorld = invPose*pointRefE;
+            Vector4u color = color_data[index];
+            unsigned char c1 = color[0];
+            unsigned char c2 = color[1];
+            unsigned char c3 = color[2];
 
-    //         // if (std::isnan(pointRef[0]) || std::isnan(pointRef[1]) || std::isnan(pointRef[2]))
-    //         //			continue;
-    //         massCentre[0] += pointWorld[0];
-    //         massCentre[1] += pointWorld[1];
-    //         massCentre[2] += pointWorld[2];
-    //         glColor3ub(c1,c2,c3);
-    //         glPointSize(1);
-    //         glBegin(GL_POINTS);
-    //         glVertex3f(pointWorld[0],pointWorld[1],pointWorld[2]);
-    //         glEnd();
-    //     }
-    // massCentre /= (float)(imheight*imwidth);
+            if (std::isnan(pointRef[0]) || std::isnan(pointRef[1]) || std::isnan(pointRef[2]))
+                continue;
+            massCentre[0] += pointWorld[0];
+            massCentre[1] += pointWorld[1];
+            massCentre[2] += pointWorld[2];
+            glColor3ub(c1,c2,c3);
+                    glPointSize(1);
+            glBegin(GL_POINTS);
+            glVertex3f(pointWorld[0],pointWorld[1],pointWorld[2]);
+            glEnd();
+        }
+    massCentre /= (float)(imheight*imwidth);
 }

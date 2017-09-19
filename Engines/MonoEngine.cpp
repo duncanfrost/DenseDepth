@@ -92,9 +92,9 @@ void MonoEngine::ConvertToOR()
         {
             cv::Vec3b val = image.at<cv::Vec3b>(y,x);
             Vector4u orVal;
-            orVal[0] = val[0];
+            orVal[0] = val[2];
             orVal[1] = val[1];
-            orVal[2] = val[2];
+            orVal[2] = val[0];
             orVal[3] = 0;
 
             int index = x + image.cols*y;
