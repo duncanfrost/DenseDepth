@@ -35,8 +35,8 @@ namespace MonoLib {
 
 
                 //Edge weighting parameters
-                edgeAlpha = 4000;
-                edgeBeta = 0.09;
+                edgeAlpha = 400;
+                edgeBeta = 0.9;
             }
 
             float lambda;

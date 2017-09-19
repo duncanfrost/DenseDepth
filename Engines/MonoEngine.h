@@ -59,6 +59,7 @@ private:
     FileTracker* tracker;
     PhoneSource* source;
     cv::Mat image;
+    Vector2i imgSize;
     ORUChar4TSImage *orImage;
 
     int bufferTop;

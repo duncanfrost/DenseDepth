@@ -20,6 +20,16 @@ inline ORUtils::SE3Pose SophusToOR(Sophus::SE3f pose)
     return out;
 }
 
+inline void ORToCV(ORUtils::Image<float> *imageIn, cv::Mat in)
+{
+    for (int y = 0; y < imageIn->noDims.y; y++)
+        for (int x = 0; x < imageIn->noDims.x; x++)
+        {
+            int index = x + imageIn->noDims.x*y;
+            in.at<float>(y,x) = imageIn->GetData(MEMORYDEVICE_CPU)[index]; 
+        }
+}
+
 MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
 {
     this->source = source;
@@ -27,7 +37,8 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
     currTrackerData = new TrackerData();
     map = new GlobalMap();
 
-    Vector2i imgSize(640, 480);
+    imgSize.x = 640;
+    imgSize.y = 480;
     Vector4f intrinsics;
 
 
@@ -195,6 +206,21 @@ void MonoEngine::SampleFromBufferMid()
 
 
     AddKeyFrame(rgbImage, kfPose);
+
+
+    monoDepthEstimator->optimPyramid->g->UpdateHostFromDevice();
+
+    cv::Mat testIm(imgSize.y, imgSize.x, CV_32FC1); 
+    ORToCV(monoDepthEstimator->optimPyramid->g, testIm);
+
+    std::cout << testIm << std::endl;
+
+    cv::namedWindow( "Debug", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    cv::imshow( "Debug", testIm );                   // Show our image inside it.
+    cv::waitKey(0); 
+    cv::destroyWindow("Debug");
+
+
 
     for (unsigned int i = 0; i < BUFFERSIZE; i++)
     {

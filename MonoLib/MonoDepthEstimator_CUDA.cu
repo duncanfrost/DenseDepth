@@ -130,7 +130,13 @@ __global__ void Init2DValues_device(float *g_data, Vector4u *imageData,
     float dIx = pixXPlus - pixMid;
     float dIy = pixYPlus - pixMid;
 
-    g_data[offset]=expf(-alpha*powf(dIx*dIx+dIy*dIy,beta));
+    float norm = dIx*dIx + dIy*dIy;
+
+    float normb = powf(norm,beta);
+
+    g_data[offset]=expf(-alpha*normb);
+
+
 }
 
 __global__ void UpdateDQ(float *g_data, float *qx_data,float *qy_data,
