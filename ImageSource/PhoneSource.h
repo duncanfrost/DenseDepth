@@ -22,6 +22,11 @@ public:
         return timeStamp;
     }
 
+    long long FrameNumber()
+    {
+        return frameNumber;
+    }
+
 private:
     void StereoPathsFromListFile(std::vector<std::string> &imagePaths,
                                  std::vector<long long> &timeStamps,

@@ -86,8 +86,12 @@ void MonoEngine::Process()
     image = source->Image();
     timeStamp = source->TimeStamp();
 
+    long long count = source->FrameNumber();
+
+    std::cout << "Timestamp: " << timeStamp << std::endl;
+
     long long timeOut;
-    currPose = tracker->PoseAtTime(timeStamp, timeOut);
+    currPose = tracker->PoseAtTime(count, timeOut);
 
     ConvertToOR(image, orImage);
 
@@ -179,12 +183,16 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
     cv::Mat testIm(imgSize.y, imgSize.x, CV_16UC1); 
     ORToCVConvert(monoDepthEstimator->currDepthFrame->dataImage->depth, testIm);
 
+
+    
+
+
     cv::imwrite("/home/duncan/test.png", testIm);
 
-    // cv::namedWindow( "Debug", cv::WINDOW_AUTOSIZE );// Create a window for display.
-    // cv::imshow( "Debug", testIm );                   // Show our image inside it.
-    // cv::waitKey(0); 
-    // cv::destroyWindow("Debug");
+    cv::namedWindow( "Debug", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    cv::imshow( "Debug", testIm );                   // Show our image inside it.
+    cv::waitKey(0); 
+    cv::destroyWindow("Debug");
 
 
 

@@ -40,7 +40,6 @@ void PhoneSource::StereoPathsFromListFile(std::vector<std::string> &imagePaths,
     std::cout << "listDir" << std::endl;
     std::cout << listDir << std::endl;
 
-    long long count = 0;
     while (std::getline(listFile, line))
     {
         //Hashtags are considered comments
@@ -73,7 +72,7 @@ void PhoneSource::StereoPathsFromListFile(std::vector<std::string> &imagePaths,
             fullPath << listDir << folder << timestamp << "000000.png";
 
             imagePaths.push_back(fullPath.str());
-            timeStamps.push_back(count++);
+            timeStamps.push_back(timestamp);
         }
     }
 }
