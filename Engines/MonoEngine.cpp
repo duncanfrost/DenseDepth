@@ -170,21 +170,21 @@ void MonoEngine::GetPointCloud(unsigned int &width,
 
 void MonoEngine::SampleFromBufferMid()
 {
-    // unsigned int nMid = 50; 
-    // ORUChar4TSImage *rgbImage = imageBuffer[nMid];
-    // DenseMono::SE3f kfPose = poseBuffer[nMid];
+    unsigned int nMid = 50; 
+    ORUChar4TSImage *rgbImage = imageBuffer[nMid];
+    Sophus::SE3f kfPose = poseBuffer[nMid];
 
-    // AddKeyFrame(rgbImage, kfPose);
+    AddKeyFrame(rgbImage, kfPose);
 
-    // for (unsigned int i = 0; i < BUFFERSIZE; i++)
-    // {
-    //     if (i == nMid)
-    //         continue;
-    //     std::cout << "Sampling: " << i << std::endl;
-    //     DenseMono::SE3f trackingPose = poseBuffer[i];
-    //     ORUtils::SE3Pose inPose = trackingPose*invRefPose;
-    //     ORUChar4TSImage *inputRGBImage = imageBuffer[i];
-    //     inputRGBImage->UpdateDeviceFromHost();
-    //     monoDepthEstimator->UpdatePhotoError(inPose, inputRGBImage);
-    // }
+    for (unsigned int i = 0; i < BUFFERSIZE; i++)
+    {
+        if (i == nMid)
+            continue;
+        std::cout << "Sampling: " << i << std::endl;
+        Sophus::SE3f trackingPose = poseBuffer[i];
+        Sophus::SE3f inPose = trackingPose*invRefPose;
+        ORUChar4TSImage *inputRGBImage = imageBuffer[i];
+        inputRGBImage->UpdateDeviceFromHost();
+        monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), inputRGBImage);
+    }
 }
