@@ -29,7 +29,14 @@ public:
     static Sophus::SE3f invRefPose;
     void SmoothPhoto(int iterations);
 
+    void GetPointCloud(unsigned int &width,
+                       unsigned int &height, Vector3f **points,
+                       Vector4u **colorData, bool **goodData);
+
 private:
+
+    void MakePointCloud(bool useRawDepth);
+
 
 
     void ConvertToOR();
@@ -47,6 +54,7 @@ private:
     MonoLib::MonoDepthEstimator *monoDepthEstimator;
 
     bool hasReferenceFrame;
+    bool useRawDepth;
 
     void Sample();
 

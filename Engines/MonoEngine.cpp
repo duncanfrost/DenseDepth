@@ -47,6 +47,7 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
     orImage = new ORUChar4TSImage(imgSize, true, true, true);
 
     hasReferenceFrame = false;
+    useRawDepth = true;
 }
 
 
@@ -119,3 +120,31 @@ void MonoEngine::SmoothPhoto(int iterations)
 {
     monoDepthEstimator->RunTVOptimisation(iterations);
 }
+
+void MonoEngine::MakePointCloud(bool useRawDepth)
+{
+    // If you want to use raw depth, don't use OptimToDepth
+    // inside monodepthestimator and use it here
+
+    // monoDepthEstimator->OptimToDepth(useRawDepth);
+    monoDepthEstimator->UpdateForPointCloud();
+    monoDepthEstimator->currDepthFrame->MakePointCloud();
+}
+
+void MonoEngine::GetPointCloud(unsigned int &width,
+                               unsigned int &height, Vector3f **points,
+                               Vector4u **colorData, bool **goodData)
+{
+
+    this->MakePointCloud(useRawDepth);
+
+    MonoLib::MonoPyramidLevel *dataPyramidLevel =
+        monoDepthEstimator->currDepthFrame->dataImage;
+
+    *points = dataPyramidLevel->pointRef->GetData(MEMORYDEVICE_CPU);
+    *goodData = dataPyramidLevel->good->GetData(MEMORYDEVICE_CPU);
+    *colorData = monoDepthEstimator->currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CPU);
+    width = dataPyramidLevel->depth->noDims[0];
+    height = dataPyramidLevel->depth->noDims[1];
+}
+
