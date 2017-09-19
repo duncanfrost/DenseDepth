@@ -52,6 +52,10 @@ void KeyboardFunction(unsigned char key, int x, int y)
     case 'p':
         paused = !paused;
         break;
+        
+    case 'o':
+        engine->SmoothPhoto(200);
+        break;
 
     }
 }

@@ -115,5 +115,7 @@ void MonoEngine::Sample()
     monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), orImage);
 }
 
-
-
+void MonoEngine::SmoothPhoto(int iterations)
+{
+    monoDepthEstimator->RunTVOptimisation(iterations);
+}

@@ -27,6 +27,7 @@ public:
     }
 
     static Sophus::SE3f invRefPose;
+    void SmoothPhoto(int iterations);
 
 private:
 
