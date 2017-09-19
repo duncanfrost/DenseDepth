@@ -208,17 +208,14 @@ void MonoEngine::SampleFromBufferMid()
     AddKeyFrame(rgbImage, kfPose);
 
 
-    monoDepthEstimator->optimPyramid->g->UpdateHostFromDevice();
-
-    cv::Mat testIm(imgSize.y, imgSize.x, CV_32FC1); 
-    ORToCV(monoDepthEstimator->optimPyramid->g, testIm);
-
-    std::cout << testIm << std::endl;
-
-    cv::namedWindow( "Debug", cv::WINDOW_AUTOSIZE );// Create a window for display.
-    cv::imshow( "Debug", testIm );                   // Show our image inside it.
-    cv::waitKey(0); 
-    cv::destroyWindow("Debug");
+    // monoDepthEstimator->optimPyramid->g->UpdateHostFromDevice();
+    // cv::Mat testIm(imgSize.y, imgSize.x, CV_32FC1); 
+    // ORToCV(monoDepthEstimator->optimPyramid->g, testIm);
+    // std::cout << testIm << std::endl;
+    // cv::namedWindow( "Debug", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    // cv::imshow( "Debug", testIm );                   // Show our image inside it.
+    // cv::waitKey(0); 
+    // cv::destroyWindow("Debug");
 
 
 
