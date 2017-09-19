@@ -41,11 +41,14 @@ public:
     void GetPointCloud(unsigned int &width,
                        unsigned int &height, Vector3f **points,
                        Vector4u **colorData, bool **goodData);
+    void SampleFromBufferMid();
 
 private:
 
-    void SampleFromBufferMid();
     void MakePointCloud(bool useRawDepth);
+
+    void SaveToBuffer(ORUChar4TSImage *inputRGBImage,
+                      Sophus::SE3f inputPose);
 
 
 
@@ -57,6 +60,9 @@ private:
     PhoneSource* source;
     cv::Mat image;
     ORUChar4TSImage *orImage;
+
+    int bufferTop;
+    int framesProcessed;
 
     long long timeStamp;
     Sophus::SE3f currPose;

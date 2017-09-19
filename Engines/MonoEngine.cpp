@@ -54,6 +54,8 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
     hasReferenceFrame = false;
     useRawDepth = true;
     needsKeyFrame = false;
+    bufferTop = 0;
+    framesProcessed = 0;
 }
 
 
@@ -67,17 +69,22 @@ void MonoEngine::Process()
     currPose = tracker->PoseAtTime(timeStamp, timeOut);
 
     ConvertToOR(image, orImage);
-    Sample();
+
+
+    // Sample();
+    SaveToBuffer(orImage, currPose);
 
 
     if (needsKeyFrame)
     {
-        AddKeyFrame(orImage, currPose);
+        // AddKeyFrame(orImage, currPose);
         needsKeyFrame = false;
     }
 
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
+
+    framesProcessed++;
 }
 
 
@@ -85,10 +92,17 @@ void MonoEngine::AddKeyFrame(ORUChar4TSImage *inImage, Sophus::SE3f inPose)
 {
     std::cout << "About to make new keyframe" << std::endl;
 
+
+    std::cout << "In Image: " << inImage << std::endl;
+    Vector4u data = inImage->GetData(MEMORYDEVICE_CPU)[0];
+    std::cout << "Data: " << (int)data[0] << std::endl;
+
+
     KeyFrame *kf = new KeyFrame();
     kf->pose = inPose;
     map->keyframeList.push_back(kf);
 
+    inImage->UpdateDeviceFromHost();
     monoDepthEstimator->SetRefImage(inImage);
     invRefPose = kf->pose.inverse();
 
@@ -163,6 +177,11 @@ void MonoEngine::GetPointCloud(unsigned int &width,
     *points = dataPyramidLevel->pointRef->GetData(MEMORYDEVICE_CPU);
     *goodData = dataPyramidLevel->good->GetData(MEMORYDEVICE_CPU);
     *colorData = monoDepthEstimator->currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CPU);
+
+    // monoDepthEstimator->currDepthFrame->colorImageData->UpdateHostFromDevice();
+
+    // std::cout << "Color data here: " << (int)monoDepthEstimator->currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CPU)[0][0] << std::endl;
+
     width = dataPyramidLevel->depth->noDims[0];
     height = dataPyramidLevel->depth->noDims[1];
 }
@@ -174,17 +193,42 @@ void MonoEngine::SampleFromBufferMid()
     ORUChar4TSImage *rgbImage = imageBuffer[nMid];
     Sophus::SE3f kfPose = poseBuffer[nMid];
 
+
     AddKeyFrame(rgbImage, kfPose);
 
     for (unsigned int i = 0; i < BUFFERSIZE; i++)
     {
         if (i == nMid)
             continue;
-        std::cout << "Sampling: " << i << std::endl;
+        // std::cout << "Sampling: " << i << std::endl;
         Sophus::SE3f trackingPose = poseBuffer[i];
         Sophus::SE3f inPose = trackingPose*invRefPose;
         ORUChar4TSImage *inputRGBImage = imageBuffer[i];
         inputRGBImage->UpdateDeviceFromHost();
         monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), inputRGBImage);
     }
+}
+
+void MonoEngine::SaveToBuffer(ORUChar4TSImage *inputRGBImage,
+                              Sophus::SE3f inputPose)
+{
+    std::cout << "Frames processed: " << framesProcessed << std::endl;
+
+    ORUChar4TSImage *lastImage = imageBuffer[BUFFERSIZE - 1];
+
+    for (int i = BUFFERSIZE-1; i > 0; i--)
+    {
+        imageBuffer[i] = imageBuffer[i-1];
+        poseBuffer[i] = poseBuffer[i-1];
+        frameNumberBuffer[i] = frameNumberBuffer[i-1];
+    }
+
+    //No need to do this for the pose buffer
+    imageBuffer[0] = lastImage;
+    imageBuffer[0]->SetFrom(inputRGBImage, MEMCPYDIR_CPU_TO_CPU);
+
+    poseBuffer[0] = inputPose;
+    frameNumberBuffer[0] = framesProcessed;
+    if (bufferTop < BUFFERSIZE)
+        bufferTop++;
 }
