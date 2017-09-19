@@ -30,6 +30,16 @@ inline void ORToCV(ORUtils::Image<float> *imageIn, cv::Mat in)
         }
 }
 
+inline void ORToCVConvert(ORUtils::Image<float> *imageIn, cv::Mat in)
+{
+    for (int y = 0; y < imageIn->noDims.y; y++)
+        for (int x = 0; x < imageIn->noDims.x; x++)
+        {
+            int index = x + imageIn->noDims.x*y;
+            in.at<short>(y,x) = 5000*imageIn->GetData(MEMORYDEVICE_CPU)[index]; 
+        }
+}
+
 MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
 {
     this->source = source;
@@ -162,6 +172,22 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
 {
     SampleFromBufferMid();
     SmoothPhoto(iterations);
+
+    monoDepthEstimator->currDepthFrame->dataImage->depth->UpdateHostFromDevice();
+
+
+    cv::Mat testIm(imgSize.y, imgSize.x, CV_16UC1); 
+    ORToCVConvert(monoDepthEstimator->currDepthFrame->dataImage->depth, testIm);
+
+    cv::imwrite("/home/duncan/test.png", testIm);
+
+    // cv::namedWindow( "Debug", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    // cv::imshow( "Debug", testIm );                   // Show our image inside it.
+    // cv::waitKey(0); 
+    // cv::destroyWindow("Debug");
+
+
+
 }
 
 
