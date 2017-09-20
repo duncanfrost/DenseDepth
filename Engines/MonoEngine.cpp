@@ -40,6 +40,28 @@ inline void ORToCVConvert(ORUtils::Image<float> *imageIn, cv::Mat in)
         }
 }
 
+inline void ORToCVConvertUpdates(ORUtils::Image<float> *imageIn,
+                                 ORUtils::MemoryBlock<int> *updates,
+                                 cv::Mat in)
+{
+    for (int y = 0; y < imageIn->noDims.y; y++)
+        for (int x = 0; x < imageIn->noDims.x; x++)
+        {
+            int index = x + imageIn->noDims.x*y;
+            int noUpdates = updates->GetData(MEMORYDEVICE_CPU)[index];
+
+            // std::cout << noUpdates << std::endl;
+
+            short val = 0; 
+            if (noUpdates > 150)
+                val = 5000*imageIn->GetData(MEMORYDEVICE_CPU)[index];
+
+            in.at<short>(y,x) = val; 
+        }
+}
+
+
+
 MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
 {
     this->source = source;
@@ -198,8 +220,12 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
     monoDepthEstimator->currDepthFrame->dataImage->depth->UpdateHostFromDevice();
 
 
+    monoDepthEstimator->optimPyramid->nUpdates->UpdateHostFromDevice();
     cv::Mat testIm(imgSize.y, imgSize.x, CV_16UC1); 
-    ORToCVConvert(monoDepthEstimator->currDepthFrame->dataImage->depth, testIm);
+    ORToCVConvertUpdates(monoDepthEstimator->currDepthFrame->dataImage->depth,
+                         monoDepthEstimator->optimPyramid->nUpdates,
+                         testIm);
+
 
     std::stringstream outPath;
     outPath << "/home/duncan/Data/P9/SidewaysLong/depth3/" << timeStampBuffer[nMid] << "000000.png";
