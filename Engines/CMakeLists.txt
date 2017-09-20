@@ -4,11 +4,13 @@ INCLUDE(${PROJECT_SOURCE_DIR}/cmake/UseCUDA.cmake)
 
 SET(sources
   MonoEngine.cpp
+  FusionEngine.cpp
   FileTracker.cpp
   )
 
 SET(headers
   MonoEngine.h
+  FusionEngine.h
   FileTracker.h
   )
 

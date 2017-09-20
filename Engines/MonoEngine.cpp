@@ -71,22 +71,15 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
 
     imgSize.x = 640;
     imgSize.y = 480;
-    Vector4f intrinsics;
-
-
-    float fx = 683.8249;
-    float fy = 683.6179;
-    float cx = 317.6438;
-    float cy = 239.5907;
-
 
     imgSize.x = 160;
     imgSize.y = 120;
-    fx *= 0.25f;
-    fy *= 0.25f;
-    cx *= 0.25f;
-    cy *= 0.25f;
 
+    Vector4f intrinsics;
+    float fx = (683.8249/640)*imgSize.x;
+    float fy = (683.6179/480)*imgSize.y;
+    float cx = (317.6438/640)*imgSize.x;
+    float cy = (239.5907/480)*imgSize.y;
 
 
 
