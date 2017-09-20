@@ -1,6 +1,7 @@
 #include <iostream>
 #include <GUI/VisualisationModule.h>
 #include <GUI/ARWindow.h>
+#include <GUI/FusionWindow.h>
 #include <GUI/MapWindow.h>
 #include <Engines/FusionEngine.h>
 #include <Engines/FileTracker.h>
@@ -25,6 +26,7 @@ int main(void)
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",640,480,engine->GetARData()));
+    visModule->AddWindow(new FusionWindow("Fusion",640,480, engine));
 
     visModule->SetKeyboardFunction(&KeyboardFunction);
     visModule->StartLoop();

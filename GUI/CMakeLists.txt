@@ -8,6 +8,7 @@ SET(sources
   glTexture.cpp
   glTools.cpp
   MapWindow.cpp
+  FusionWindow.cpp
   VisualisationModule.cpp
   Window.cpp
   )
@@ -18,6 +19,7 @@ SET(headers
   glTexture.h
   glTools.h
   MapWindow.h
+  FusionWindow.h
   VisualisationModule.h
   Window.h
   )
