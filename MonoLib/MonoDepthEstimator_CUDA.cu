@@ -546,6 +546,16 @@ __global__ void updatePhotoError2d(Matrix3f R, Vector3f T,
         }
         else
         {
+            // float normL1 = 1.0f;
+
+            // float oldError = photo_error[offset];
+            // float obsError = normL1;
+            // int nUpdate = nUpdates[offset];
+
+            // float newError = (nUpdate * oldError + obsError) / (nUpdate + 1);
+
+            // photo_error[offset] = newError;
+            // nUpdates[offset] = nUpdate + 1;
         }
     }
 }
@@ -620,7 +630,7 @@ __global__ void updatePhotoErrorBW(Matrix3f R, Vector3f T,
             float newError = (nUpdate * oldError + obsError) / (nUpdate + 1);
 
             photo_error[offset] = newError;
-            nUpdates[offset] = nUpdate;
+            nUpdates[offset] = nUpdate + 1;
         }
         else
         {
@@ -703,7 +713,7 @@ __global__ void updatePhotoErrorPatch(Matrix3f R, Vector3f T,
             float newError = (nUpdate * oldError + obsError) / (nUpdate + 1);
 
             photo_error[offset] = newError;
-            nUpdates[offset] = nUpdate;
+            nUpdates[offset] = nUpdate + 1;
         }
         else
         {
@@ -1078,10 +1088,10 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
     dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
 
     float thetaStart = 1;
-    float thetaEnd = 0.00001;
+    float thetaEnd = 0.001;
     float thetaDiff = thetaStart - thetaEnd;
     float outerError = 0;
-    iterations = 100;
+    iterations = 150;
 
 
     for (unsigned int i = 0; i < iterations; i++)
@@ -1103,7 +1113,7 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
         optimPyramid->error->UpdateHostFromDevice();
         float lastError = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
 
-        for (unsigned int j = 0; j < 10; j++)
+        for (unsigned int j = 0; j < 35; j++)
         {
 
             ComputeGradient<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),

@@ -58,6 +58,16 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
     float cy = 239.5907;
 
 
+    imgSize.x = 320;
+    imgSize.y = 240;
+    fx *= 0.5f;
+    fy *= 0.5f;
+    cx *= 0.5f;
+    cy *= 0.5f;
+
+
+
+
     intrinsics[0] = fx;
     intrinsics[1] = fy;
     intrinsics[2] = cx;
@@ -106,7 +116,7 @@ void MonoEngine::Process()
         // needsKeyFrame = false;
     // }
 
-    if (framesProcessed > 102)
+    if (framesProcessed > BUFFERSIZE)
         SmoothPhotoBuffer(200);
 
     currTrackerData->trackerPose = currPose;
@@ -186,10 +196,17 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
     cv::Mat testIm(imgSize.y, imgSize.x, CV_16UC1); 
     ORToCVConvert(monoDepthEstimator->currDepthFrame->dataImage->depth, testIm);
 
-
     std::stringstream outPath;
-    outPath << "/home/duncan/Data/P9/SidewaysLong/depth/" << timeStampBuffer[50] << "000000.png";
-    cv::imwrite(outPath.str(), testIm);
+    outPath << "/home/duncan/Data/P9/SidewaysLong/depth2/" << timeStampBuffer[40] << "000000.png";
+
+
+    
+    cv::Mat imUp;
+
+    cv::resize(testIm, imUp, cv::Size(), 2.0f, 2.0f);
+
+
+    cv::imwrite(outPath.str(), imUp);
 
     // cv::namedWindow( "Debug", cv::WINDOW_AUTOSIZE );// Create a window for display.
     // cv::imshow( "Debug", testIm );                   // Show our image inside it.
@@ -239,7 +256,7 @@ void MonoEngine::GetPointCloud(unsigned int &width,
 
 void MonoEngine::SampleFromBufferMid()
 {
-    unsigned int nMid = 50; 
+    unsigned int nMid = 40; 
     ORUChar4TSImage *rgbImage = imageBuffer[nMid];
     Sophus::SE3f kfPose = poseBuffer[nMid];
 

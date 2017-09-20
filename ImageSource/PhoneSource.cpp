@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 PhoneSource::PhoneSource(const std::string& listFile)
 {
@@ -16,7 +17,16 @@ void PhoneSource::GrabNewFrame()
 {
     std::string path =  rgbImagePaths[frameNumber];
     timeStamp = rgbTimeStamps[frameNumber];
-    imLeft = cv::imread(path);
+    cv::Mat imTemp = cv::imread(path);
+
+    cv::Size size;
+    // size.width = 5;
+    // size.height = 5;
+    
+
+
+    // cv::GaussianBlur(imTemp, imLeft, size, 3);
+    cv::resize(imTemp, imLeft, cv::Size(), 0.5f, 0.5f);
 
     frameNumber++;
 }
