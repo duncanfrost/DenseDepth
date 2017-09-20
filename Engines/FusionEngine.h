@@ -11,8 +11,9 @@ class FusionEngine
 {
 public:
     FusionEngine(PhoneSource* source, FileTracker *tracker);
-
     void Process();
+    void MakePointCloud();
+
 
     TrackerData* GetARData()
     {
@@ -25,16 +26,22 @@ public:
     }
 
 private:
-
     TrackerData* currTrackerData;
     FileTracker* tracker;
     PhoneSource* source;
 
     cv::Mat image;
-    Vector2i imgSize;
+    cv::Size imgSize;
+
     int framesProcessed;
 
     long long timeStamp;
     Sophus::SE3f currPose;
     GlobalMap *map;
+
+    float fxInv;
+    float fyInv;
+    float cxInv;
+    float cyInv;
+
 };

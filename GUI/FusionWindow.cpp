@@ -135,12 +135,6 @@ void FusionWindow::DrawMap(void)
 
     DrawCamera(trackerData->trackerPose,false,1,0,0);
 
-    for(unsigned int j=0; j<map->keyframeList.size(); j++)
-    {
-        KeyFrame *kf = map->keyframeList[j];
-        DrawCamera(kf->pose,true,0,0,1);
-    }
-
 
     DrawDenseMap();
 
@@ -228,45 +222,29 @@ void FusionWindow::ProcessKeyboard(unsigned char key, int x, int y)
 
 void FusionWindow::DrawDenseMap()
 {
-    // SetupFrustum();
-    // SetupModelView();
+    SetupFrustum();
+    SetupModelView();
 
-    // Vector3f *refPoints;
-    // Vector4u *colorData;
-    // bool *goodData;
 
-    // Sophus::SE3f invPose;
-    // invPose = MonoEngine::invRefPose;
+    std::vector<MapPoint*> mappoints = fusionEngine->GetMap()->mappoints;
 
-    // massCentre = Eigen::Vector3f(0,0,0);
+    massCentre = Eigen::Vector3f(0,0,0);
 
-    // for (unsigned int y = 0; y < imheight; y++)
-    //     for (unsigned int x = 0; x < imwidth; x++)
-    //     {
-    //         unsigned int index = x + imwidth*y;
+    for (unsigned int i = 0; i < mappoints.size(); i++)
+        {
 
-    //         DenseMono::Vector3f pointRef = refPoint_data[index];
-    //         Eigen::Vector3f pointRefE;
-    //         pointRefE[0] = pointRef[0];
-    //         pointRefE[1] = pointRef[1];
-    //         pointRefE[2] = pointRef[2];
+            MapPoint *mp = mappoints[i];
+            Eigen::Vector3f position = mp->position;
 
-    //         Eigen::Vector3f pointWorld = invPose*pointRefE;
-    //         Vector4u color = color_data[index];
-    //         unsigned char c1 = color[0];
-    //         unsigned char c2 = color[1];
-    //         unsigned char c3 = color[2];
-
-    //         if (std::isnan(pointRef[0]) || std::isnan(pointRef[1]) || std::isnan(pointRef[2]))
-    //             continue;
-    //         massCentre[0] += pointWorld[0];
-    //         massCentre[1] += pointWorld[1];
-    //         massCentre[2] += pointWorld[2];
-    //         glColor3ub(c1,c2,c3);
-    //                 glPointSize(1);
-    //         glBegin(GL_POINTS);
-    //         glVertex3f(pointWorld[0],pointWorld[1],pointWorld[2]);
-    //         glEnd();
-    //     }
-    // massCentre /= (float)(imheight*imwidth);
+            if (std::isnan(position[0]) || std::isnan(position[1]) || std::isnan(position[2]))
+                continue;
+            // massCentre[0] += position[0];
+            // massCentre[1] += position[1];
+            // massCentre[2] += position[2];
+            glColor3ub(mp->c1,mp->c2,mp->c3);
+            glPointSize(1);
+            glBegin(GL_POINTS);
+            glVertex3f(position[0],position[1],position[2]);
+            glEnd();
+        }
 }
