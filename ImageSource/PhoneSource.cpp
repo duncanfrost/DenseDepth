@@ -26,8 +26,11 @@ void PhoneSource::GrabNewFrame()
 
 
     // cv::GaussianBlur(imTemp, imLeft, size, 3);
-    cv::resize(imTemp, imLeft, cv::Size(), 0.25f, 0.25f);
-    cv::GaussianBlur(imLeft, imLeft, size, 3);
+
+    // cv::resize(imTemp, imLeft, cv::Size(), 0.25f, 0.25f);
+    // cv::GaussianBlur(imLeft, imLeft, size, 3);
+
+    imLeft = imTemp;
 
     frameNumber++;
 }

@@ -2,14 +2,14 @@
 #include <GUI/VisualisationModule.h>
 #include <GUI/ARWindow.h>
 #include <GUI/MapWindow.h>
-#include <Engines/MonoEngine.h>
+#include <Engines/FusionEngine.h>
 #include <Engines/FileTracker.h>
 #include <ImageSource/PhoneSource.h>
 
 void Idle(void);
 void KeyboardFunction(unsigned char key, int x, int y);
 VisualisationModule *visModule;
-MonoEngine *engine;
+FusionEngine *engine;
 PhoneSource *source;
 FileTracker *tracker;
 bool paused = false;
@@ -21,11 +21,10 @@ int main(void)
 
     source = new PhoneSource(filename1);
     tracker = new FileTracker(gtFile, FileTracker::ORB);
-    engine = new MonoEngine(source, tracker);
+    engine = new FusionEngine(source, tracker);
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",640,480,engine->GetARData()));
-    visModule->AddWindow(new MapWindow("Map",640,480,engine));
 
     visModule->SetKeyboardFunction(&KeyboardFunction);
     visModule->StartLoop();
@@ -45,17 +44,8 @@ void KeyboardFunction(unsigned char key, int x, int y)
         exit(0);
         break;
 
-    case ' ':
-        engine->SampleFromBufferMid();
-        break;
-
     case 'p':
         paused = !paused;
         break;
-        
-    case 'o':
-        engine->SmoothPhotoBuffer(200);
-        break;
-
     }
 }
