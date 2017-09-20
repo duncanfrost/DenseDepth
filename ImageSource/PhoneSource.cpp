@@ -20,13 +20,14 @@ void PhoneSource::GrabNewFrame()
     cv::Mat imTemp = cv::imread(path);
 
     cv::Size size;
-    // size.width = 5;
-    // size.height = 5;
+    size.width = 3;
+    size.height = 3;
     
 
 
     // cv::GaussianBlur(imTemp, imLeft, size, 3);
-    cv::resize(imTemp, imLeft, cv::Size(), 0.5f, 0.5f);
+    cv::resize(imTemp, imLeft, cv::Size(), 0.25f, 0.25f);
+    cv::GaussianBlur(imLeft, imLeft, size, 3);
 
     frameNumber++;
 }

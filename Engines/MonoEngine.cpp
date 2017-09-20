@@ -58,12 +58,12 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
     float cy = 239.5907;
 
 
-    imgSize.x = 320;
-    imgSize.y = 240;
-    fx *= 0.5f;
-    fy *= 0.5f;
-    cx *= 0.5f;
-    cy *= 0.5f;
+    imgSize.x = 160;
+    imgSize.y = 120;
+    fx *= 0.25f;
+    fy *= 0.25f;
+    cx *= 0.25f;
+    cy *= 0.25f;
 
 
 
@@ -87,6 +87,7 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
     needsKeyFrame = false;
     bufferTop = 0;
     framesProcessed = 0;
+    nMid = BUFFERSIZE/2; 
 }
 
 
@@ -118,6 +119,10 @@ void MonoEngine::Process()
 
     if (framesProcessed > BUFFERSIZE)
         SmoothPhotoBuffer(200);
+
+    if (framesProcessed < nMid)
+        WriteEmpty();
+        
 
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
@@ -197,27 +202,22 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
     ORToCVConvert(monoDepthEstimator->currDepthFrame->dataImage->depth, testIm);
 
     std::stringstream outPath;
-    outPath << "/home/duncan/Data/P9/SidewaysLong/depth2/" << timeStampBuffer[40] << "000000.png";
-
+    outPath << "/home/duncan/Data/P9/SidewaysLong/depth3/" << timeStampBuffer[nMid] << "000000.png";
 
     
     cv::Mat imUp;
-
-    cv::resize(testIm, imUp, cv::Size(), 2.0f, 2.0f);
-
-
+    cv::resize(testIm, imUp, cv::Size(), 4.0f, 4.0f);
     cv::imwrite(outPath.str(), imUp);
+}
 
-    // cv::namedWindow( "Debug", cv::WINDOW_AUTOSIZE );// Create a window for display.
-    // cv::imshow( "Debug", testIm );                   // Show our image inside it.
-    // cv::waitKey(0); 
-    // cv::destroyWindow("Debug");
-
-
-
-
-
-
+void MonoEngine::WriteEmpty()
+{
+    cv::Mat testIm(imgSize.y, imgSize.x, CV_16UC1); 
+    std::stringstream outPath;
+    outPath << "/home/duncan/Data/P9/SidewaysLong/depth3/" << timeStamp << "000000.png";
+    cv::Mat imUp;
+    cv::resize(testIm, imUp, cv::Size(), 4.0f, 4.0f);
+    cv::imwrite(outPath.str(), imUp);
 }
 
 
@@ -256,7 +256,6 @@ void MonoEngine::GetPointCloud(unsigned int &width,
 
 void MonoEngine::SampleFromBufferMid()
 {
-    unsigned int nMid = 40; 
     ORUChar4TSImage *rgbImage = imageBuffer[nMid];
     Sophus::SE3f kfPose = poseBuffer[nMid];
 
@@ -274,8 +273,7 @@ void MonoEngine::SampleFromBufferMid()
     // cv::destroyWindow("Debug");
 
 
-
-    for (unsigned int i = 0; i < BUFFERSIZE; i++)
+    for (int i = 0; i < BUFFERSIZE; i++)
     {
         if (i == nMid)
             continue;

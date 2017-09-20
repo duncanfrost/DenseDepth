@@ -530,10 +530,10 @@ __global__ void updatePhotoError2d(Matrix3f R, Vector3f T,
             float dIx_curr = pixXPlus - pixMid;
             float dIy_curr = pixYPlus - pixMid;
 
-            // float normL1 = PhotoErrorL1(photo_current_OR,photo_ref);
-            float normL1 = PhotoErrorL1Grad(photo_current_OR,photo_ref,
-                                        dIx_ref, dIy_ref,
-                                        dIx_curr, dIy_curr);
+            float normL1 = PhotoErrorL1(photo_current_OR,photo_ref);
+            // float normL1 = PhotoErrorL1Grad(photo_current_OR,photo_ref,
+            //                             dIx_ref, dIy_ref,
+                                        // dIx_curr, dIy_curr);
 
             float oldError = photo_error[offset];
             float obsError = normL1;
@@ -1088,15 +1088,22 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
     dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
 
     float thetaStart = 1;
-    float thetaEnd = 0.001;
+    float thetaEnd = 1e-4;
     float thetaDiff = thetaStart - thetaEnd;
     float outerError = 0;
-    iterations = 150;
+    iterations = 300;
+    float beta = 0.01;
 
 
-    for (unsigned int i = 0; i < iterations; i++)
+    // for (unsigned int i = 0; i < iterations; i++)
+    float theta = 0.2;
+    
+    while (theta > thetaEnd)
     {
-        float theta = thetaStart - ((float)i / (float)(iterations-1))*thetaDiff;
+        // float theta = thetaStart - ((float)i / (float)(iterations-1))*thetaDiff;
+
+        theta = theta*(1-beta);
+
         float innerErrorStart = 0;
 
 
@@ -1113,7 +1120,7 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
         optimPyramid->error->UpdateHostFromDevice();
         float lastError = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
 
-        for (unsigned int j = 0; j < 35; j++)
+        for (unsigned int j = 0; j < 10; j++)
         {
 
             ComputeGradient<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
