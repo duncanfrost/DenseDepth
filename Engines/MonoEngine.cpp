@@ -30,13 +30,13 @@ inline void ORToCV(ORUtils::Image<float> *imageIn, cv::Mat in)
         }
 }
 
-inline void ORToCVConvert(ORUtils::Image<float> *imageIn, cv::Mat in)
+inline void ORToCVConvert(ORUtils::Image<float> *imageIn, cv::Mat in, float mult)
 {
     for (int y = 0; y < imageIn->noDims.y; y++)
         for (int x = 0; x < imageIn->noDims.x; x++)
         {
             int index = x + imageIn->noDims.x*y;
-            in.at<short>(y,x) = 5000*imageIn->GetData(MEMORYDEVICE_CPU)[index]; 
+            in.at<short>(y,x) = mult*imageIn->GetData(MEMORYDEVICE_CPU)[index]; 
         }
 }
 
@@ -210,14 +210,27 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
     SampleFromBufferMid();
     SmoothPhoto(iterations);
 
+
+    //Update images from device
+    monoDepthEstimator->optimPyramid->certainty->UpdateHostFromDevice();
     monoDepthEstimator->currDepthFrame->dataImage->depth->UpdateHostFromDevice();
-
-
     monoDepthEstimator->optimPyramid->nUpdates->UpdateHostFromDevice();
+
+
+
     cv::Mat testIm(imgSize.y, imgSize.x, CV_16UC1); 
     ORToCVConvertUpdates(monoDepthEstimator->currDepthFrame->dataImage->depth,
                          monoDepthEstimator->optimPyramid->nUpdates,
                          testIm);
+
+
+    cv::Mat certIm(imgSize.y, imgSize.x, CV_16UC1);
+    ORToCVConvert(monoDepthEstimator->optimPyramid->certainty,
+                  certIm,1);
+
+
+
+
 
 
     std::stringstream outPath;
@@ -227,6 +240,16 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
     cv::Mat imUp;
     cv::resize(testIm, imUp, cv::Size(), 4.0f, 4.0f);
     cv::imwrite(outPath.str(), imUp);
+
+
+    std::stringstream outPathCert;
+    outPathCert << "/home/duncan/Data/P9/SidewaysLong/cert/" << timeStampBuffer[nMid] << "000000.png";
+    
+    cv::resize(certIm, imUp, cv::Size(), 4.0f, 4.0f);
+    cv::imwrite(outPathCert.str(), imUp);
+
+
+
 }
 
 void MonoEngine::WriteEmpty()

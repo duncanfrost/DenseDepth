@@ -1136,6 +1136,14 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
     dim3 blocks2=getBlocksFor2DProcess(imgSize.x,imgSize.y);
     dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
 
+
+    ComputeCertainty<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+                                                   optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+                                                   optimPyramid->certainty->GetData(MEMORYDEVICE_CUDA),
+                                                   imgSize,
+                                                   optimPyramid->depthSamples);
+
+
     float thetaStart = 1;
     float thetaEnd = 1e-4;
     float thetaDiff = thetaStart - thetaEnd;
