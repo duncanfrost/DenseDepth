@@ -238,9 +238,6 @@ void FusionWindow::DrawDenseMap()
 
             if (std::isnan(position[0]) || std::isnan(position[1]) || std::isnan(position[2]))
                 continue;
-            // massCentre[0] += position[0];
-            // massCentre[1] += position[1];
-            // massCentre[2] += position[2];
             glColor3ub(mp->c1,mp->c2,mp->c3);
             glPointSize(1);
             glBegin(GL_POINTS);
