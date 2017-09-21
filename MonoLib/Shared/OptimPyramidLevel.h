@@ -38,6 +38,10 @@ namespace MonoLib {
         // ORUtils::Image<float> *minError;
 
 
+        //This is per-pixel TOTAL error (including TV term)
+        ORUtils::Image<float> *certainty;
+
+
         //Intermediate variables for debugging purposes
         //=============================================
 
@@ -97,6 +101,7 @@ namespace MonoLib {
                                                 allocateCPU,allocateCUDA);
 
             this->error = new ORUtils::Image<float>(imgSize, allocateCPU, allocateCUDA);
+            this->certainty = new ORUtils::Image<float>(imgSize, allocateCPU, allocateCUDA);
 
             this->minIndices = new ORUtils::Image<int>(imgSize, allocateCPU, allocateCUDA);
 
@@ -124,6 +129,7 @@ namespace MonoLib {
             a->UpdateHostFromDevice();
             d->UpdateHostFromDevice();
             error->UpdateHostFromDevice();
+            certainty->UpdateHostFromDevice();
             minIndices->UpdateHostFromDevice();
             dx->UpdateHostFromDevice();
             dy->UpdateHostFromDevice();
@@ -141,6 +147,7 @@ namespace MonoLib {
             a->UpdateDeviceFromHost();
             d->UpdateDeviceFromHost();
             error->UpdateDeviceFromHost();
+            certainty->UpdateDeviceFromHost();
             minIndices->UpdateDeviceFromHost();
             dx->UpdateDeviceFromHost();
             dy->UpdateDeviceFromHost();
