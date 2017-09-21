@@ -135,8 +135,6 @@ __global__ void Init2DValues_device(float *g_data, Vector4u *imageData,
     float normb = powf(norm,beta);
 
     g_data[offset]=expf(-alpha*normb);
-
-
 }
 
 __global__ void UpdateDQ(float *g_data, float *qx_data,float *qy_data,
@@ -759,6 +757,57 @@ __global__ void MinPhotoErrorInit(float *photo_error,float *d_data,
 }
 
 
+__global__ void ComputeCertainty(float *photo_error,
+                                 int *minIdx_data,
+                                 float *certainty_data,
+                                 Vector2i imgSize,
+                                 int depthSamples)
+{
+    int x = blockIdx.x*blockDim.x+threadIdx.x;
+    int y = blockIdx.y*blockDim.y+threadIdx.y;
+    if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
+    int image_offset=x + y * imgSize.x;
+
+    int minIdx = minIdx_data[image_offset];
+
+
+    int behindCount = 0;
+    for (unsigned int z = 1; z < minIdx; z++)
+    {
+
+        int offset_back = x + y * imgSize.x+ (z-1)* imgSize.x*imgSize.y;
+        float error_back = photo_error[offset_back];
+
+        int offset = x + y * imgSize.x+ z* imgSize.x*imgSize.y;
+        float error= photo_error[offset];
+
+        if (error < error_back)
+            behindCount++;
+    }
+
+    int frontCount = 0;
+    for (unsigned int z = minIdx + 1; z < depthSamples; z++)
+    {
+        int offset_back = x + y * imgSize.x+ (z-1)* imgSize.x*imgSize.y;
+        float error_back = photo_error[offset_back];
+
+        int offset = x + y * imgSize.x+ z* imgSize.x*imgSize.y;
+        float error= photo_error[offset];
+
+        if (error > error_back)
+            frontCount++;
+    }
+
+
+    int count = frontCount < behindCount ? frontCount : behindCount;
+
+    certainty_data[image_offset] = count;
+}
+
+
+
+
+
 
 __global__ void MinPhotoError2d_device(float *photo_error,float *d_data,
                                        float *a_data, int *minIdx_data,
@@ -1223,6 +1272,8 @@ void MonoDepthEstimator_CUDA::InitOptim()
                                                           optimPyramid->qx->GetData(MEMORYDEVICE_CUDA),
                                                           optimPyramid->qy->GetData(MEMORYDEVICE_CUDA),
                                                           imgSize);
+
+
     OptimToDepth(false);
 }
 
