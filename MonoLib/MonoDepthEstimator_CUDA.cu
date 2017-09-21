@@ -801,7 +801,7 @@ __global__ void ComputeCertainty(float *photo_error,
 
     int count = frontCount < behindCount ? frontCount : behindCount;
 
-    certainty_data[image_offset] = count;
+    certainty_data[image_offset] = behindCount + frontCount;
 }
 
 
@@ -1137,11 +1137,11 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
     dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
 
 
-    ComputeCertainty<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
-                                                   optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
-                                                   optimPyramid->certainty->GetData(MEMORYDEVICE_CUDA),
-                                                   imgSize,
-                                                   optimPyramid->depthSamples);
+    // ComputeCertainty<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+    //                                                optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+    //                                                optimPyramid->certainty->GetData(MEMORYDEVICE_CUDA),
+    //                                                imgSize,
+    //                                                optimPyramid->depthSamples);
 
 
     float thetaStart = 1;
