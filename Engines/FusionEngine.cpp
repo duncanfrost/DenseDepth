@@ -1,5 +1,6 @@
 #include "FusionEngine.h"
 #include <ORUtils/MathTypes.h>
+#include "ActiveFunctions.h"
 
 FusionEngine::FusionEngine(PhoneSource* source, FileTracker* tracker)
 {
@@ -52,12 +53,7 @@ void FusionEngine::Process()
 
     std::cout << "FrameNumber: " << count << std::endl;
 
-    bool frameWindow1 = count > 750 && count < 1200;
-    bool minFrames = count > 150;
-    bool modFrames = count % 20 == 0;
-    bool frameWindow2 = count > 1300 && count < 1600;
-
-    if (minFrames && modFrames && !frameWindow1 && !frameWindow2)
+    if (FusionActive(count))
         MakePointCloud();
 
     framesProcessed++;
