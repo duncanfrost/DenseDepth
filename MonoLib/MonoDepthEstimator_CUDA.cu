@@ -1137,7 +1137,7 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
     float thetaDiff = thetaStart - thetaEnd;
     float outerError = 0;
     iterations = 300;
-    float beta = 0.01;
+    float beta = 0.005;
 
 
     // for (unsigned int i = 0; i < iterations; i++)

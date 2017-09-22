@@ -27,7 +27,7 @@ void PhoneSource::GrabNewFrame(bool downsample)
     if (downsample)
     {
         cv::resize(imTemp, imLeft, cv::Size(), 0.25f, 0.25f);
-        // cv::GaussianBlur(imLeft, imLeft, size, 3);
+        cv::GaussianBlur(imLeft, imLeft, size, 3);
     }
     else
         imLeft = imTemp;

@@ -132,8 +132,8 @@ void FusionWindow::DrawMap(void)
     glEnable(GL_DEPTH_TEST);
 
 
-    // mse3ViewerFromWorld = trackerData->trackerPose;
-    DrawCamera(trackerData->trackerPose,false,1,0,0);
+    mse3ViewerFromWorld = trackerData->trackerPose;
+    // DrawCamera(trackerData->trackerPose,false,1,0,0);
 
 
 
