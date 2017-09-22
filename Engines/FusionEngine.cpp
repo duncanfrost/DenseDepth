@@ -8,10 +8,8 @@ FusionEngine::FusionEngine(PhoneSource* source, FileTracker* tracker)
     currTrackerData = new TrackerData();
     map = new GlobalMap();
 
-
     imgSize.width = 160;
     imgSize.height = 120;
-
 
     Vector4f intrinsics;
     float fx = (683.8249/640)*imgSize.width;
@@ -32,6 +30,7 @@ FusionEngine::FusionEngine(PhoneSource* source, FileTracker* tracker)
     cyInv = -1.0f*fyInv*cy;
 
     framesProcessed = 0;
+    source->SetFrameNumber(1);
 }
 
 
@@ -40,8 +39,9 @@ void FusionEngine::Process()
     source->GrabNewFrame(false);
     image = source->Image();
     timeStamp = source->TimeStamp();
-
     long long count = source->FrameNumber();
+    if (count > 1639)
+        return;
 
 
     long long timeOut;
@@ -50,14 +50,14 @@ void FusionEngine::Process()
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
 
-    std::cout << "Frames processed: " << framesProcessed << std::endl;
+    std::cout << "FrameNumber: " << count << std::endl;
 
-    bool frameWindow1 = framesProcessed > 750 && framesProcessed < 1200;
-    bool minFrames = framesProcessed > 150;
-    bool modFrames = framesProcessed % 20 == 0;
-    // bool frameWindow1 = framesProcessed > 750 && framesProcessed < 1200;
+    bool frameWindow1 = count > 750 && count < 1200;
+    bool minFrames = count > 150;
+    bool modFrames = count % 20 == 0;
+    bool frameWindow2 = count > 1300 && count < 1600;
 
-    if (minFrames && modFrames && !frameWindow1)
+    if (minFrames && modFrames && !frameWindow1 && !frameWindow2)
         MakePointCloud();
 
     framesProcessed++;

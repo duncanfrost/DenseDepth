@@ -12,6 +12,11 @@ public:
 
     void GrabNewFrame(bool downsample);
 
+    void SetFrameNumber(unsigned int number)
+    {
+        frameNumber = number;
+    }
+
     cv::Mat Image()
     {
         return imLeft;
