@@ -31,7 +31,7 @@ FusionEngine::FusionEngine(PhoneSource* source, FileTracker* tracker)
     cyInv = -1.0f*fyInv*cy;
 
     framesProcessed = 0;
-    source->SetFrameNumber(1);
+    source->SetFrameNumber(0);
 }
 
 
@@ -40,6 +40,7 @@ void FusionEngine::Process()
     source->GrabNewFrame(false);
     image = source->Image();
     timeStamp = source->TimeStamp();
+
     long long count = source->FrameNumber();
     if (count > 1639)
         return;
@@ -51,10 +52,11 @@ void FusionEngine::Process()
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
 
-    std::cout << "FrameNumber: " << count << std::endl;
-
     if (FusionActive(count))
+    {
+        std::cout << "Fusion active" << std::endl;
         MakePointCloud();
+    }
 
     framesProcessed++;
 }
@@ -63,8 +65,13 @@ void FusionEngine::MakePointCloud()
 {
     std::stringstream inPath;
     inPath << "/home/duncan/Data/P9/SidewaysLong/depth3/" << timeStamp << "000000.png";
-
     cv::Mat depthRaw = cv::imread(inPath.str(), CV_LOAD_IMAGE_ANYDEPTH );
+
+    if (depthRaw.rows == 0)
+    {
+        return;
+    }
+
     cv::Mat depth;
     cv::resize(depthRaw, depth, imgSize);
 
@@ -77,17 +84,17 @@ void FusionEngine::MakePointCloud()
 
 
 
-    std::stringstream certPath;
-    certPath << "/home/duncan/Data/P9/SidewaysLong/cert/" << timeStamp << "000000.png";
-    cv::Mat certRaw = cv::imread(certPath.str(), CV_LOAD_IMAGE_ANYDEPTH );
-    cv::Mat certIm;
-    cv::resize(certRaw, certIm, imgSize);
+    // std::stringstream certPath;
+    // certPath << "/home/duncan/Data/P9/SidewaysLong/cert/" << timeStamp << "000000.png";
+    // cv::Mat certRaw = cv::imread(certPath.str(), CV_LOAD_IMAGE_ANYDEPTH );
+    // cv::Mat certIm;
+    // cv::resize(certRaw, certIm, imgSize);
     
-    cv::Mat certFloat; 
-    certIm.convertTo(certFloat, CV_32FC1); 
+    // cv::Mat certFloat; 
+    // certIm.convertTo(certFloat, CV_32FC1); 
 
-    certFloat = certFloat / 5000;
-    certFloat = certFloat - 10;
+    // certFloat = certFloat / 5000;
+    // certFloat = certFloat - 10;
 
     // std::cout << certFloat  << std::endl;
     // exit(1);
@@ -100,7 +107,7 @@ void FusionEngine::MakePointCloud()
         for (int x = 0; x < depthFloat.cols; x++)
         {
             float depth = depthFloat.at<float>(y,x) / 5000;
-            float cert = certFloat.at<float>(y,x);
+            // float cert = certFloat.at<float>(y,x);
 
             if (depth < 0.3)
                 continue;

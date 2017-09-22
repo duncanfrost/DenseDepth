@@ -1,5 +1,6 @@
 #include "MonoEngine.h"
 #include <ORUtils/MathTypes.h>
+#include "ActiveFunctions.h"
 
 Sophus::SE3f MonoEngine::invRefPose;
 
@@ -112,7 +113,6 @@ void MonoEngine::Process()
 
     long long count = source->FrameNumber();
 
-    std::cout << "Timestamp: " << timeStamp << std::endl;
 
     long long timeOut;
     currPose = tracker->PoseAtTime(count, timeOut);
@@ -130,11 +130,14 @@ void MonoEngine::Process()
         // needsKeyFrame = false;
     // }
 
-    if (framesProcessed > BUFFERSIZE)
+    if (SampleActive(count))
+    {
+        // std::cout << "Sampling: " << timeStampBuffer[nMid] << std::endl;
         SmoothPhotoBuffer(200);
-
-    if (framesProcessed < nMid)
-        WriteEmpty();
+    }
+        
+    // if (framesProcessed < nMid)
+    //     WriteEmpty();
         
 
     currTrackerData->trackerPose = currPose;
@@ -346,8 +349,6 @@ void MonoEngine::SampleFromBufferMid()
 void MonoEngine::SaveToBuffer(ORUChar4TSImage *inputRGBImage,
                               Sophus::SE3f inputPose)
 {
-    std::cout << "Frames processed: " << framesProcessed << std::endl;
-
     ORUChar4TSImage *lastImage = imageBuffer[BUFFERSIZE - 1];
 
     for (int i = BUFFERSIZE-1; i > 0; i--)
