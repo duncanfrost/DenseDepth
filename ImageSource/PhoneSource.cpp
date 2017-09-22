@@ -13,7 +13,7 @@ PhoneSource::PhoneSource(const std::string& listFile)
     frameNumber = 0;
 }
 
-void PhoneSource::GrabNewFrame()
+void PhoneSource::GrabNewFrame(bool downsample)
 {
     std::string path =  rgbImagePaths[frameNumber];
     timeStamp = rgbTimeStamps[frameNumber];
@@ -24,13 +24,13 @@ void PhoneSource::GrabNewFrame()
     size.height = 3;
     
 
-
-    // cv::GaussianBlur(imTemp, imLeft, size, 3);
-
-    // cv::resize(imTemp, imLeft, cv::Size(), 0.25f, 0.25f);
-    // cv::GaussianBlur(imLeft, imLeft, size, 3);
-
-    imLeft = imTemp;
+    if (downsample)
+    {
+        cv::resize(imTemp, imLeft, cv::Size(), 0.25f, 0.25f);
+        cv::GaussianBlur(imLeft, imLeft, size, 3);
+    }
+    else
+        imLeft = imTemp;
 
     frameNumber++;
 }

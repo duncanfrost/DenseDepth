@@ -37,13 +37,12 @@ FusionEngine::FusionEngine(PhoneSource* source, FileTracker* tracker)
 
 void FusionEngine::Process()
 {
-    source->GrabNewFrame();
+    source->GrabNewFrame(false);
     image = source->Image();
     timeStamp = source->TimeStamp();
 
     long long count = source->FrameNumber();
 
-    std::cout << "Timestamp: " << timeStamp << std::endl;
 
     long long timeOut;
     currPose = tracker->PoseAtTime(count, timeOut);
@@ -51,7 +50,14 @@ void FusionEngine::Process()
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
 
-    if (framesProcessed > 150 && framesProcessed % 30 == 0 )
+    std::cout << "Frames processed: " << framesProcessed << std::endl;
+
+    bool frameWindow1 = framesProcessed > 750 && framesProcessed < 1200;
+    bool minFrames = framesProcessed > 150;
+    bool modFrames = framesProcessed % 20 == 0;
+    // bool frameWindow1 = framesProcessed > 750 && framesProcessed < 1200;
+
+    if (minFrames && modFrames && !frameWindow1)
         MakePointCloud();
 
     framesProcessed++;
@@ -72,14 +78,35 @@ void FusionEngine::MakePointCloud()
     cv::Mat depthFloat; 
     depth.convertTo(depthFloat, CV_32FC1); 
 
+
+
+
+    std::stringstream certPath;
+    certPath << "/home/duncan/Data/P9/SidewaysLong/cert/" << timeStamp << "000000.png";
+    cv::Mat certRaw = cv::imread(certPath.str(), CV_LOAD_IMAGE_ANYDEPTH );
+    cv::Mat certIm;
+    cv::resize(certRaw, certIm, imgSize);
+    
+    cv::Mat certFloat; 
+    certIm.convertTo(certFloat, CV_32FC1); 
+
+    certFloat = certFloat / 5000;
+    certFloat = certFloat - 10;
+
+    // std::cout << certFloat  << std::endl;
+    // exit(1);
+
+    
+
     Sophus::SE3f invPose = currPose.inverse();
 
     for (int y = 0; y < depthFloat.rows; y++)
         for (int x = 0; x < depthFloat.cols; x++)
         {
             float depth = depthFloat.at<float>(y,x) / 5000;
+            float cert = certFloat.at<float>(y,x);
 
-            if (depth < 0.0001)
+            if (depth < 0.3)
                 continue;
             cv::Vec3b color = imageResized.at<cv::Vec3b>(y,x);
 

@@ -10,7 +10,7 @@ public:
 
     PhoneSource(const std::string& listFile);
 
-    void GrabNewFrame();
+    void GrabNewFrame(bool downsample);
 
     cv::Mat Image()
     {

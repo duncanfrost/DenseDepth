@@ -36,7 +36,7 @@ inline void ORToCVConvert(ORUtils::Image<float> *imageIn, cv::Mat in, float mult
         for (int x = 0; x < imageIn->noDims.x; x++)
         {
             int index = x + imageIn->noDims.x*y;
-            in.at<short>(y,x) = mult*imageIn->GetData(MEMORYDEVICE_CPU)[index]; 
+            in.at<short>(y,x) = mult*(imageIn->GetData(MEMORYDEVICE_CPU)[index] + 10);
         }
 }
 
@@ -81,8 +81,6 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
     float cx = (317.6438/640)*imgSize.x;
     float cy = (239.5907/480)*imgSize.y;
 
-
-
     intrinsics[0] = fx;
     intrinsics[1] = fy;
     intrinsics[2] = cx;
@@ -108,7 +106,7 @@ MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
 
 void MonoEngine::Process()
 {
-    source->GrabNewFrame();
+    source->GrabNewFrame(true);
     image = source->Image();
     timeStamp = source->TimeStamp();
 
@@ -224,9 +222,26 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
                          testIm);
 
 
+    float minVal = 999;
+
+    for (int y = 0; y < monoDepthEstimator->optimPyramid->certainty->noDims.y; y++)
+    {
+        for (int x = 0; x < monoDepthEstimator->optimPyramid->certainty->noDims.x; x++)
+        {
+            int index = x + monoDepthEstimator->optimPyramid->certainty->noDims.x*y;
+            float val = monoDepthEstimator->optimPyramid->certainty->GetData(MEMORYDEVICE_CPU)[index];
+            if (val < minVal)
+                minVal = val;
+        }
+    }
+        
+    std::cout << "MIN VAL: " << minVal << std::endl;
+
     cv::Mat certIm(imgSize.y, imgSize.x, CV_16UC1);
     ORToCVConvert(monoDepthEstimator->optimPyramid->certainty,
-                  certIm,1);
+                  certIm,5000);
+
+    
 
 
 

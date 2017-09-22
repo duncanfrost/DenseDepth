@@ -768,40 +768,28 @@ __global__ void ComputeCertainty(float *photo_error,
     if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
     int image_offset=x + y * imgSize.x;
 
-    int minIdx = minIdx_data[image_offset];
 
-
-    int behindCount = 0;
-    for (unsigned int z = 1; z < minIdx; z++)
+    float c = 0;
+    for (unsigned int z = 0; z < depthSamples-2; z++)
     {
-
-        int offset_back = x + y * imgSize.x+ (z-1)* imgSize.x*imgSize.y;
-        float error_back = photo_error[offset_back];
-
         int offset = x + y * imgSize.x+ z* imgSize.x*imgSize.y;
         float error= photo_error[offset];
 
-        if (error < error_back)
-            behindCount++;
+        int offset_front = x + y * imgSize.x+ (z+1)* imgSize.x*imgSize.y;
+        float error_front = photo_error[offset_front];
+
+
+        int offset_front2 = x + y * imgSize.x+ (z+2)* imgSize.x*imgSize.y;
+        float error_front2 = photo_error[offset_front2];
+
+        float grad = error - error_front;
+        float grad_front = error_front2 - error_front;
+
+        float grad2 = grad_front - grad;
+        c += grad2;
     }
 
-    int frontCount = 0;
-    for (unsigned int z = minIdx + 1; z < depthSamples; z++)
-    {
-        int offset_back = x + y * imgSize.x+ (z-1)* imgSize.x*imgSize.y;
-        float error_back = photo_error[offset_back];
-
-        int offset = x + y * imgSize.x+ z* imgSize.x*imgSize.y;
-        float error= photo_error[offset];
-
-        if (error > error_back)
-            frontCount++;
-    }
-
-
-    int count = frontCount < behindCount ? frontCount : behindCount;
-
-    certainty_data[image_offset] = behindCount + frontCount;
+    certainty_data[image_offset] = c;
 }
 
 
@@ -1137,11 +1125,11 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
     dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
 
 
-    // ComputeCertainty<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
-    //                                                optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
-    //                                                optimPyramid->certainty->GetData(MEMORYDEVICE_CUDA),
-    //                                                imgSize,
-    //                                                optimPyramid->depthSamples);
+    ComputeCertainty<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+                                                   optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+                                                   optimPyramid->certainty->GetData(MEMORYDEVICE_CUDA),
+                                                   imgSize,
+                                                   optimPyramid->depthSamples);
 
 
     float thetaStart = 1;
