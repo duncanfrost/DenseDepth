@@ -1,6 +1,6 @@
 inline bool SampleActive(int count)
 {
-    bool minFrames = count > 50;
+    bool minFrames = count > 300;
     bool modFrames = count % 20 == 0;
 
     return (minFrames && modFrames);

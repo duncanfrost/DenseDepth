@@ -9,8 +9,8 @@ FusionEngine::FusionEngine(PhoneSource* source, FileTracker* tracker)
     currTrackerData = new TrackerData();
     map = new GlobalMap();
 
-    imgSize.width = 160;
-    imgSize.height = 120;
+    imgSize.width = 640;
+    imgSize.height = 480;
 
     Vector4f intrinsics;
     float fx = (683.8249/640)*imgSize.width;
@@ -31,7 +31,7 @@ FusionEngine::FusionEngine(PhoneSource* source, FileTracker* tracker)
     cyInv = -1.0f*fyInv*cy;
 
     framesProcessed = 0;
-    source->SetFrameNumber(0);
+    source->SetFrameNumber(100);
 }
 
 
@@ -42,8 +42,8 @@ void FusionEngine::Process()
     timeStamp = source->TimeStamp();
 
     long long count = source->FrameNumber();
-    if (count > 1700)
-        return;
+    // if (count > 1700)
+    //     return;
 
 
     long long timeOut;
@@ -52,11 +52,11 @@ void FusionEngine::Process()
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
 
-    std::cout << "Count: " << count << std::endl;
+    // std::cout << "Count: " << count << std::endl;
 
     if (true)
     {
-        std::cout << "Fusion active" << std::endl;
+        // std::cout << "Fusion active" << std::endl;
         MakePointCloud();
     }
 
@@ -70,16 +70,19 @@ void FusionEngine::MakePointCloud()
     //     return;
 
     std::stringstream inPath;
-    inPath << "/home/duncan/Data/P9/Office/depth3/" << timeStamp << "000000.png";
+    inPath << "/home/duncan/Data/P9/Office3/depth3/" << timeStamp << "000000.png";
+    // std::cout << "Fusing: " << map->mappoints.size() << std::endl;
 
-    std::cout << "Path:"  << std::endl;
-    std::cout << inPath.str()  << std::endl;
+    // std::cout << "Path:"  << std::endl;
+    // std::cout << inPath.str()  << std::endl;
     cv::Mat depthRaw = cv::imread(inPath.str(), CV_LOAD_IMAGE_ANYDEPTH );
 
     if (depthRaw.rows == 0)
     {
+        std::cout << "No image" << std::endl;
         return;
     }
+    std::cout << "Image!!" << std::endl;
 
     cv::Mat depth;
     cv::resize(depthRaw, depth, imgSize);
@@ -91,6 +94,8 @@ void FusionEngine::MakePointCloud()
     depth.convertTo(depthFloat, CV_32FC1); 
 
 
+
+    // std::cout << depthFloat << std::endl;
 
 
     // std::stringstream certPath;
@@ -108,12 +113,13 @@ void FusionEngine::MakePointCloud()
     // std::cout << certFloat  << std::endl;
     // exit(1);
 
+
     
 
     Sophus::SE3f invPose = currPose.inverse();
 
-    for (int y = 0; y < depthFloat.rows; y++)
-        for (int x = 0; x < depthFloat.cols; x++)
+    for (int y = 0; y < depthFloat.rows; y+= 8)
+        for (int x = 0; x < depthFloat.cols; x+= 8)
         {
             float depth = depthFloat.at<float>(y,x) / 5000;
             // float cert = certFloat.at<float>(y,x);
@@ -135,5 +141,4 @@ void FusionEngine::MakePointCloud()
 
             map->mappoints.push_back(mp);
         }
-
 }

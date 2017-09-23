@@ -83,7 +83,7 @@ void PhoneSource::StereoPathsFromListFile(std::vector<std::string> &imagePaths,
             }
 
             std::stringstream fullPath;
-            fullPath << listDir << folder << timestamp << "000000.png";
+            fullPath << listDir << folder << timestamp << "000000.bmp";
 
             imagePaths.push_back(fullPath.str());
             timeStamps.push_back(timestamp);

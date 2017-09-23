@@ -17,8 +17,8 @@ bool paused = false;
 
 int main(void)
 {
-    std::string filename1 = "/home/duncan/Data/P9/Office/log.txt";
-    std::string gtFile = "/home/duncan/Data/P9/Office/CameraTrajectory.txt";
+    std::string filename1 = "/home/duncan/Data/P9/Office3/log.txt";
+    std::string gtFile = "/home/duncan/Data/P9/Office3/CameraTrajectory.txt";
 
     source = new PhoneSource(filename1);
     tracker = new FileTracker(gtFile, FileTracker::ORB);
