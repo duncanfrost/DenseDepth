@@ -789,7 +789,10 @@ __global__ void ComputeCertainty(float *photo_error,
         c += grad2;
     }
 
-    certainty_data[image_offset] = c;
+    float val = expf(-c/3);
+    if (val > 1) val = 1;
+
+    certainty_data[image_offset] = val;
 }
 
 
@@ -1125,11 +1128,11 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
     dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
 
 
-    ComputeCertainty<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
-                                                   optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
-                                                   optimPyramid->certainty->GetData(MEMORYDEVICE_CUDA),
-                                                   imgSize,
-                                                   optimPyramid->depthSamples);
+    // ComputeCertainty<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+    //                                                optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+    //                                                optimPyramid->g->GetData(MEMORYDEVICE_CUDA),
+    //                                                imgSize,
+    //                                                optimPyramid->depthSamples);
 
 
     float thetaStart = 1;
@@ -1137,7 +1140,7 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
     float thetaDiff = thetaStart - thetaEnd;
     float outerError = 0;
     iterations = 300;
-    float beta = 0.005;
+    float beta = 0.002;
 
 
     // for (unsigned int i = 0; i < iterations; i++)

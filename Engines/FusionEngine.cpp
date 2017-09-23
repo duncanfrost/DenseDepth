@@ -42,7 +42,7 @@ void FusionEngine::Process()
     timeStamp = source->TimeStamp();
 
     long long count = source->FrameNumber();
-    if (count > 1639)
+    if (count > 1700)
         return;
 
 
@@ -52,7 +52,9 @@ void FusionEngine::Process()
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
 
-    if (FusionActive(count))
+    std::cout << "Count: " << count << std::endl;
+
+    if (true)
     {
         std::cout << "Fusion active" << std::endl;
         MakePointCloud();
@@ -63,8 +65,15 @@ void FusionEngine::Process()
 
 void FusionEngine::MakePointCloud()
 {
+
+    // if (framesProcessed % 20 != 0)
+    //     return;
+
     std::stringstream inPath;
-    inPath << "/home/duncan/Data/P9/SidewaysLong/depth3/" << timeStamp << "000000.png";
+    inPath << "/home/duncan/Data/P9/Office/depth3/" << timeStamp << "000000.png";
+
+    std::cout << "Path:"  << std::endl;
+    std::cout << inPath.str()  << std::endl;
     cv::Mat depthRaw = cv::imread(inPath.str(), CV_LOAD_IMAGE_ANYDEPTH );
 
     if (depthRaw.rows == 0)

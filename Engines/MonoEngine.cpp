@@ -252,7 +252,7 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
 
 
     std::stringstream outPath;
-    outPath << "/home/duncan/Data/P9/SidewaysLong/depth3/" << timeStampBuffer[nMid] << "000000.png";
+    outPath << "/home/duncan/Data/P9/Office/depth3/" << timeStampBuffer[nMid] << "000000.png";
 
     
     cv::Mat imUp;
@@ -261,7 +261,7 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
 
 
     std::stringstream outPathCert;
-    outPathCert << "/home/duncan/Data/P9/SidewaysLong/cert/" << timeStampBuffer[nMid] << "000000.png";
+    outPathCert << "/home/duncan/Data/P9/Office/cert/" << timeStampBuffer[nMid] << "000000.png";
     
     cv::resize(certIm, imUp, cv::Size(), 4.0f, 4.0f);
     cv::imwrite(outPathCert.str(), imUp);
@@ -274,7 +274,7 @@ void MonoEngine::WriteEmpty()
 {
     cv::Mat testIm(imgSize.y, imgSize.x, CV_16UC1); 
     std::stringstream outPath;
-    outPath << "/home/duncan/Data/P9/SidewaysLong/depth3/" << timeStamp << "000000.png";
+    outPath << "/home/duncan/Data/P9/Office/depth3/" << timeStamp << "000000.png";
     cv::Mat imUp;
     cv::resize(testIm, imUp, cv::Size(), 4.0f, 4.0f);
     cv::imwrite(outPath.str(), imUp);
