@@ -70,6 +70,6 @@ protected:
     void DrawMap(void);
     void DrawDenseMap();
     unsigned int interestLevel;
-    bool updateDenseMaps;
+    bool freeCam;
     unsigned int imwidth, imheight;
 };

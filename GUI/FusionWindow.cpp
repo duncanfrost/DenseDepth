@@ -19,7 +19,7 @@ FusionWindow::FusionWindow(std::string title, int width, int height, FusionEngin
     massCentre = Eigen::Vector3f(0,0,0);
     mouseUp = true;
 
-    updateDenseMaps = true;
+    freeCam = false;
 
     SetInitCamPose();
 }
@@ -132,8 +132,10 @@ void FusionWindow::DrawMap(void)
     glEnable(GL_DEPTH_TEST);
 
 
-    mse3ViewerFromWorld = trackerData->trackerPose;
-    // DrawCamera(trackerData->trackerPose,false,1,0,0);
+    if(freeCam)
+        DrawCamera(trackerData->trackerPose,false,1,0,0);
+    else
+        mse3ViewerFromWorld = trackerData->trackerPose;
 
 
 
@@ -217,7 +219,7 @@ void FusionWindow::ProcessKeyboard(unsigned char key, int x, int y)
         poseUpdateKeyboard[0] = -0.1f;
 
     if (key == 't')
-        updateDenseMaps = !updateDenseMaps;
+        freeCam = !freeCam;
 
     Window::ProcessKeyboard(key,x,y);
 }
