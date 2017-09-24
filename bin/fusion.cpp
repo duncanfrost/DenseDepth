@@ -6,6 +6,8 @@
 #include <Engines/FusionEngine.h>
 #include <Engines/FileTracker.h>
 #include <ImageSource/PhoneSource.h>
+#include <thread>
+#include <unistd.h>
 
 void Idle(void);
 void KeyboardFunction(unsigned char key, int x, int y);
@@ -34,10 +36,14 @@ int main(void)
 
 void Idle(void)
 {
+
     if (!paused)
         engine->Process();
     visModule->DrawWindows();
+
 }
+
+
 
 void KeyboardFunction(unsigned char key, int x, int y)
 {
@@ -48,6 +54,7 @@ void KeyboardFunction(unsigned char key, int x, int y)
 
     case 'p':
         paused = !paused;
+        std::cout << "Toggle paused: " << paused << std::endl;
         break;
     }
 }

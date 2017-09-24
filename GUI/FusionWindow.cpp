@@ -236,12 +236,15 @@ void FusionWindow::DrawDenseMap()
 
     for (unsigned int i = 0; i < mappoints.size(); i++)
         {
-
             MapPoint *mp = mappoints[i];
             Eigen::Vector3f position = mp->position;
 
-            if (std::isnan(position[0]) || std::isnan(position[1]) || std::isnan(position[2]))
-                continue;
+            // Eigen::Vector3f positionCam = mse3ViewerFromWorld * position;
+            // // if (positionCam[2] < 0)
+            //     continue;
+
+            // if (std::isnan(position[0]) || std::isnan(position[1]) || std::isnan(position[2]))
+            //     continue;
             glColor3ub(mp->c1,mp->c2,mp->c3);
             glPointSize(1);
             glBegin(GL_POINTS);

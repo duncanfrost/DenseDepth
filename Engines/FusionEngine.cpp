@@ -79,10 +79,8 @@ void FusionEngine::MakePointCloud()
 
     if (depthRaw.rows == 0)
     {
-        std::cout << "No image" << std::endl;
         return;
     }
-    std::cout << "Image!!" << std::endl;
 
     cv::Mat depth;
     cv::resize(depthRaw, depth, imgSize);
@@ -90,8 +88,14 @@ void FusionEngine::MakePointCloud()
     cv::Mat imageResized;
     cv::resize(image, imageResized, imgSize);
 
-    cv::Mat depthFloat; 
-    depth.convertTo(depthFloat, CV_32FC1); 
+    cv::Mat depthFloatRaw; 
+    depth.convertTo(depthFloatRaw, CV_32FC1); 
+
+    cv::Mat depthFloatRaw2;
+    cv::medianBlur(depthFloatRaw, depthFloatRaw2, 5);
+
+    cv::Mat depthFloat;
+    cv::medianBlur(depthFloatRaw2, depthFloat, 3);
 
 
 
@@ -113,18 +117,59 @@ void FusionEngine::MakePointCloud()
     // std::cout << certFloat  << std::endl;
     // exit(1);
 
+    float min = 999;
+    float max = 0;
 
-    
+    float mean = 0;
+    int count = 0;
 
+    for (int y = 0; y < depthFloat.rows; y++)
+        for (int x = 0; x < depthFloat.cols; x++)
+        {
+            float depth = depthFloat.at<float>(y,x) / 5000;
+
+            if (depth > 2 || depth < 0.5)
+                continue;
+
+            mean += depth;
+            count++;
+        }
+
+
+    mean /= (float)count;
+
+    float var = 0;
+    for (int y = 0; y < depthFloat.rows; y++)
+        for (int x = 0; x < depthFloat.cols; x++)
+        {
+            float depth = depthFloat.at<float>(y,x) / 5000;
+
+            if (depth > 2 || depth < 0.5)
+                continue;
+
+
+            var += (depth - mean)*(depth-mean);
+        }
+
+
+
+
+    std::cout << "Var: " << var << std::endl;
+
+    if (var < 1000)
+        return;
+    // std::cout << "Depths: " << min << " - " << max << std::endl;
+
+    // map->mappoints.clear();
     Sophus::SE3f invPose = currPose.inverse();
 
-    for (int y = 0; y < depthFloat.rows; y+= 8)
-        for (int x = 0; x < depthFloat.cols; x+= 8)
+    for (int y = 20; y < depthFloat.rows-20; y+= 12)
+        for (int x = 20; x < depthFloat.cols-20; x+= 12)
         {
             float depth = depthFloat.at<float>(y,x) / 5000;
             // float cert = certFloat.at<float>(y,x);
 
-            if (depth < 0.3)
+            if (depth < 0.5 || depth > 2)
                 continue;
             cv::Vec3b color = imageResized.at<cv::Vec3b>(y,x);
 
