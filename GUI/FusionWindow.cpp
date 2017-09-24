@@ -237,6 +237,10 @@ void FusionWindow::DrawDenseMap()
     for (unsigned int i = 0; i < mappoints.size(); i++)
         {
             MapPoint *mp = mappoints[i];
+
+            if (mp->age > 10 && !freeCam)
+                continue;
+
             Eigen::Vector3f position = mp->position;
 
             // Eigen::Vector3f positionCam = mse3ViewerFromWorld * position;
@@ -246,7 +250,8 @@ void FusionWindow::DrawDenseMap()
             // if (std::isnan(position[0]) || std::isnan(position[1]) || std::isnan(position[2]))
             //     continue;
             glColor3ub(mp->c1,mp->c2,mp->c3);
-            glPointSize(1);
+            // glColor3ub(50,50,50);
+            glPointSize(0.1);
             glBegin(GL_POINTS);
             glVertex3f(position[0],position[1],position[2]);
             glEnd();

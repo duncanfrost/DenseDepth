@@ -163,8 +163,17 @@ void FusionEngine::MakePointCloud()
     // map->mappoints.clear();
     Sophus::SE3f invPose = currPose.inverse();
 
-    for (int y = 20; y < depthFloat.rows-20; y+= 12)
-        for (int x = 20; x < depthFloat.cols-20; x+= 12)
+
+    for (unsigned int i = 0; i < map->mappoints.size(); i++)
+    {
+        MapPoint *mp = map->mappoints[i];
+        mp->age++;
+    }
+
+
+
+    for (int y = 20; y < depthFloat.rows-20; y+= 3)
+        for (int x = 20; x < depthFloat.cols-20; x+= 3)
         {
             float depth = depthFloat.at<float>(y,x) / 5000;
             // float cert = certFloat.at<float>(y,x);
@@ -177,6 +186,7 @@ void FusionEngine::MakePointCloud()
             mp->c1 = color[2];
             mp->c2 = color[1];
             mp->c3 = color[0];
+            mp->age = 0;
 
             float pX = x * fxInv + cxInv;
             float pY = y * fyInv + cyInv;

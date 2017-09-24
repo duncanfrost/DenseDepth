@@ -9,6 +9,8 @@ struct MapPoint
     unsigned char c3;
 
     Eigen::Vector3f position;
+
+    int age;
 };
 
 struct GlobalMap
