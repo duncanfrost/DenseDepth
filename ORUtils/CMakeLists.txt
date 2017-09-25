@@ -6,9 +6,11 @@ SET(sources
   FileUtils.cpp
   KeyValueConfig.cpp
   SE3Pose.cpp
+  CUDAImage.cpp
   )
 
 SET(headers
+  CUDAImage.h
   Cholesky.h
   CUDADefines.h
   CUDAPrimitives.h
