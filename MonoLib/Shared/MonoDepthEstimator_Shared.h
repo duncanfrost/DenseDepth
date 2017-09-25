@@ -361,42 +361,6 @@ inline void TVComputeDivPixel(float *p1, float *p2, float *divergence,
 }
 
 _CPU_AND_GPU_CODE_
-inline void TVSmoothPixel(float *u, float *divergence, float *nim,
-                          float lambda, Vector2i imgSize, int x, int y)
-{
-	int locId = x + imgSize.x * y;
-	float tau=0.02;
-	float theta=1.0;
-	float lt=lambda*tau;
-
-	float imPix = u[locId];
-	float imPixOrig = nim[locId];
-	float div = divergence[locId];
-
-	float v = imPix + tau*div;
-
-	float term1 = (v-lt)*(v-imPixOrig>lt);
-	float term2 = (v+lt)*(v-imPixOrig<-lt);
-	float term3 = (abs_agnostic(v-imPixOrig)<=lt);
-
-
-	float imPixNew = term1 + term2 + imPixOrig*term3;
-	float uNew = imPixNew + theta*(imPixNew-imPix);
-	u[locId] = uNew;
-}
-
-_CPU_AND_GPU_CODE_
-inline void ApplyUpdatesPixel(float error, float newError, float newDepth,
-                              float update, float *depth, float *dp)
-{
-	if (newError < error && abs_agnostic(update) > 1e-2) {
-		*depth = newDepth;
-		*dp *= 1.1f;
-	}
-	else *dp *= 0.9f;
-}
-
-_CPU_AND_GPU_CODE_
 inline float depthFromIndex(int i,float zmin, float depthIncrement)
 {
 	float idepth = zmin + depthIncrement*i;
