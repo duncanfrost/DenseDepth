@@ -4,27 +4,8 @@
 #include <ORUtils/PixelPrimitives.h>
 #include <ORUtils/Image.h>
 
-// #include "../../ViewLib/Common/Intrinsics.h"
 #include <iostream>
 #include <iomanip>
-
-
-#define UNZERO(val) ((val) < 0 ? ((val) > -1e-8f ? -1e-8f : (val)) : ((val) < 1e-8f ? 1e-8f : (val)))
-#define SUCC_VAR_INC_FAC 1.01f // before an ekf-update, the variance is increased by this factor.
-#define MIN_EPL_LENGTH_SQUARED 1.0f * 1.0f
-#define MAX_DIFF_CONSTANT 40.0f * 40.0f
-#define MAX_DIFF_GRAD_MULT 0.5f * 0.5f
-
-// this is the distance of the sample points used for the stereo descriptor.
-#define GRADIENT_SAMPLE_DIST 1.0f
-
-#define MAX_PHOTO_ERROR 255.0f * 255.0f;
-
-#define HUBER_D 2.0f
-#define VAR_WEIGHT 1.0f
-#define DEPTH_COVAR 0.001f
-#define CAM_PIX_NOISE2 4.0f*4.0f
-#define STEREO_EPL_VAR_FAC 2.0f
 
 _CPU_AND_GPU_CODE_
 inline float GetCombinedError(float *photo_error,
@@ -161,10 +142,10 @@ inline float colourToIntensity(Vector4f colour)
 _CPU_AND_GPU_CODE_
 inline float abs_agnostic(float a)
 {
-	if (a >= 0)
-		return a;
-	else
-		return -a;
+    if (a >= 0)
+        return a;
+    else
+        return -a;
 }
 
 _CPU_AND_GPU_CODE_
@@ -179,6 +160,6 @@ inline float max_agnostic(float a, float b)
 _CPU_AND_GPU_CODE_
 inline float depthFromIndex(int i,float zmin, float depthIncrement)
 {
-	float idepth = zmin + depthIncrement*i;
-	return 1/idepth;
+    float idepth = zmin + depthIncrement*i;
+    return 1/idepth;
 }
