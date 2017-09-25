@@ -40,7 +40,7 @@ public:
 
     void GetPointCloud(unsigned int &width,
                        unsigned int &height, Vector3f **points,
-                       Vector4u **colorData, bool **goodData);
+                       Vector4u **colorData);
     void SampleFromBufferMid();
 
 private:

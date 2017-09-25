@@ -22,7 +22,6 @@ namespace MonoLib {
         ORUtils::Image<float> *depth;
         ORUtils::Image<float> *gtDepth;
         ORUtils::Image<Vector3f> *pointRef;
-        ORUtils::MemoryBlock<bool> *good;
 
 
 
@@ -44,7 +43,6 @@ namespace MonoLib {
             this->gtDepth = new ORUtils::Image<float>(imgSize, allocateCPU, allocateCUDA);
                         
             this->pointRef = new ORUtils::Image<Vector3f>(imgSize, allocateCPU, allocateCUDA);
-            this->good = new ORUtils::Image<bool>(imgSize, allocateCPU, allocateCUDA);
         }
 
         ~MonoPyramidLevel()
@@ -102,7 +100,6 @@ namespace MonoLib {
 
             float *depth_data = depth->GetData(MEMORYDEVICE_CPU);
             Vector3f *pointRefs = pointRef->GetData(MEMORYDEVICE_CPU);
-            bool *goodData= good->GetData(MEMORYDEVICE_CPU);
 
             for (unsigned int y = 0; y < height; y++)
                 for (unsigned int x = 0; x < width; x++)
@@ -113,7 +110,6 @@ namespace MonoLib {
                     float pY = y * fyInv + cyInv;
 
                     float depth = depth_data[index];
-                    goodData[index] = true;
                     pointRefs[index] = depth * Vector3f(pX,pY,1);
                 }
         }
@@ -226,13 +222,11 @@ namespace MonoLib {
         {
             gtDepth->UpdateHostFromDevice();
             pointRef->UpdateHostFromDevice();
-            good->UpdateHostFromDevice();
             depth->UpdateHostFromDevice();
         }
 
         void UpdateDeviceFromHost()
         {
-            good->UpdateDeviceFromHost();
             depth->UpdateDeviceFromHost();
             gtDepth->UpdateDeviceFromHost();
             pointRef->UpdateDeviceFromHost();

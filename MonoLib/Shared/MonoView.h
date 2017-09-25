@@ -1,4 +1,5 @@
 // Copyright 2014-2017 Oxford University Innovation Limited and the authors of InfiniTAM
+
 #pragma once
 // #include "Pyramid.h"
 // #include "ImagePyramidLevel.h"
@@ -42,11 +43,6 @@ namespace MonoLib
         void Init()
         {
             dataImage->Init();
-        }
-
-        void DebugDisplay()
-        {
-            dataImage->DebugDisplay();
         }
 
         void UpdateHostFromDevice()

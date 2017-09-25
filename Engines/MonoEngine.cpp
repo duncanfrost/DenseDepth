@@ -293,7 +293,7 @@ void MonoEngine::MakePointCloud(bool useRawDepth)
 
 void MonoEngine::GetPointCloud(unsigned int &width,
                                unsigned int &height, Vector3f **points,
-                               Vector4u **colorData, bool **goodData)
+                               Vector4u **colorData)
 {
 
     this->MakePointCloud(useRawDepth);
@@ -302,7 +302,6 @@ void MonoEngine::GetPointCloud(unsigned int &width,
         monoDepthEstimator->currDepthFrame->dataImage;
 
     *points = dataPyramidLevel->pointRef->GetData(MEMORYDEVICE_CPU);
-    *goodData = dataPyramidLevel->good->GetData(MEMORYDEVICE_CPU);
     *colorData = monoDepthEstimator->currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CPU);
 
     // monoDepthEstimator->currDepthFrame->colorImageData->UpdateHostFromDevice();

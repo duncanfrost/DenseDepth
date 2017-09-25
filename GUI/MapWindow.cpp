@@ -236,12 +236,11 @@ void MapWindow::DrawDenseMap()
 
     Vector3f *refPoints;
     Vector4u *colorData;
-    bool *goodData;
 
     if (updateDenseMaps)
     {
         monoEngine->GetPointCloud(imwidth,imheight,&refPoints,
-                                  &colorData, &goodData);
+                                  &colorData);
 
         std::memcpy(refPoint_data,refPoints,imwidth*imheight*sizeof(DenseMono::Vector3f));
         std::memcpy(color_data,colorData,imwidth*imheight*4*sizeof(unsigned char));
