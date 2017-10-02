@@ -55,7 +55,7 @@ void KeyboardFunction(unsigned char key, int x, int y)
         
     case 'o':
         engine->SmoothPhotoBuffer(200);
+        engine->WritePhotoErrors("/home/duncan/photo.bin");
         break;
-
     }
 }

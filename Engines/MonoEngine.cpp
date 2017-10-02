@@ -366,3 +366,9 @@ void MonoEngine::SaveToBuffer(ORUChar4TSImage *inputRGBImage,
     if (bufferTop < BUFFERSIZE)
         bufferTop++;
 }
+
+
+void MonoEngine::WritePhotoErrors(std::string path)
+{
+    monoDepthEstimator->WritePhotoErrors(path);
+}

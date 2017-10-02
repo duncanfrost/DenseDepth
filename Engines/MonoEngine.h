@@ -42,6 +42,7 @@ public:
                        unsigned int &height, Vector3f **points,
                        Vector4u **colorData);
     void SampleFromBufferMid();
+    void WritePhotoErrors(std::string path);
 
 private:
 
@@ -55,6 +56,7 @@ private:
     void ConvertToOR(cv::Mat inImage, ORUChar4TSImage *outImage);
 
     void WriteEmpty();
+
 
 
     TrackerData* currTrackerData;
