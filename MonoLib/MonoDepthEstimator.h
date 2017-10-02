@@ -217,10 +217,6 @@ namespace MonoLib {
         virtual void UpdatePhotoError(ORUtils::SE3Pose refToTracker,
                                       ORUtils::TimeStampedImage<Vector4u> *frame) = 0;
 
-        virtual void UpdatePhotoError(ORUtils::SE3Pose refToTracker,
-                                      ORUtils::TimeStampedImage<unsigned char> *frame) = 0;
-
-
         virtual void RunTVOptimisation(unsigned int iterations) = 0;
         virtual void InitOptim() = 0;
         virtual void SmoothDTAM() = 0;

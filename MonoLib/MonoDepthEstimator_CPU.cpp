@@ -183,11 +183,6 @@ void MonoDepthEstimator_CPU::UpdatePhotoError(ORUtils::SE3Pose refToTracker,
     monoLevel->nUpdate++;
 }
 
-void MonoDepthEstimator_CPU::UpdatePhotoError(ORUtils::SE3Pose refToTracker,
-                                              ORUtils::TimeStampedImage<unsigned char> *frame)
-{
-}
-
 
 void MonoDepthEstimator_CPU::DisplayPhotoVolume(int x, int y)
 {
