@@ -16,7 +16,7 @@ bool paused = false;
 
 int main(void)
 {
-    std::string filename1 = "/home/duncan/Data/P9/Office3/log.txt";
+    std::string filename1 = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/rgb.txt";
     std::string gtFile = "/home/duncan/Data/P9/Office3/CameraTrajectory.txt";
 
     source = new TUMSource(filename1);

@@ -12,8 +12,8 @@ public:
     TUMSource(const std::string& listFile);
 
 private:
-    void StereoPathsFromListFile(std::vector<std::string> &imagePaths,
-                                 std::vector<long long> &timeStamps,
-                                 std::string listPath,
-                                 ImageType imageType);
+    void PathsFromListFile(std::vector<std::string> &imagePaths,
+                           std::vector<long long> &timeStamps,
+                           std::string listPath,
+                           ImageType imageType);
 };

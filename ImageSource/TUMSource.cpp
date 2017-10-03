@@ -4,18 +4,18 @@
 #include <fstream>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <iomanip>
 
 TUMSource::TUMSource(const std::string& listFile)
     : ImageSource(listFile)
 {
-    StereoPathsFromListFile(rgbImagePaths, rgbTimeStamps, listFile, LEFT);
-    StereoPathsFromListFile(stereoImagePaths, stereoTimeStamps, listFile, RIGHT);
+    PathsFromListFile(rgbImagePaths, rgbTimeStamps, listFile, LEFT);
 }
 
-void TUMSource::StereoPathsFromListFile(std::vector<std::string> &imagePaths,
-                                          std::vector<long long> &timeStamps,
-                                          std::string listPath,
-                                          ImageType imageType)
+void TUMSource::PathsFromListFile(std::vector<std::string> &imagePaths,
+                                  std::vector<long long> &timeStamps,
+                                  std::string listPath,
+                                  ImageType imageType)
 {
     imagePaths.clear();
     std::ifstream listFile(listPath.c_str());
@@ -37,30 +37,25 @@ void TUMSource::StereoPathsFromListFile(std::vector<std::string> &imagePaths,
         if (line[0] == '#')
             continue;
 
-        long long timestamp;
+        double timestampRaw;
         std::string path;
 
         std::istringstream iss(line);
 
         //Full paths are the root directory joined with whatever is in the listfile
-        if (iss >> timestamp)
+        if (iss >> timestampRaw)
         {
-            std::string folder;
-            switch(imageType)
-            {
-            case LEFT:
-                folder = "cam1/";
-                break;
-            case RIGHT:
-                folder = "cam0/";
-                break;
-            case DEPTH:
-                folder = "estdepth/";
-                break;
-            }
 
+            long long timestamp = timestampRaw * 1e6;
+
+            std::string imagePath;
+            iss >> imagePath;
+
+            
             std::stringstream fullPath;
-            fullPath << listDir << folder << timestamp << "000000.bmp";
+            fullPath << listDir << imagePath;
+
+            std::cout << fullPath.str() << std::endl;
 
             imagePaths.push_back(fullPath.str());
             timeStamps.push_back(timestamp);
