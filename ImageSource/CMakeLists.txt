@@ -5,11 +5,13 @@ INCLUDE(${PROJECT_SOURCE_DIR}/cmake/UseCUDA.cmake)
 SET(sources
   ImageSource.cpp
   PhoneSource.cpp
+  TUMSource.cpp
   )
 
 SET(headers
   ImageSource.h
   PhoneSource.h
+  TUMSource.h
   )
 
 
