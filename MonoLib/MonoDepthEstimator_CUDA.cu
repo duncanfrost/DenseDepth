@@ -104,7 +104,7 @@ __global__ void InitVolumeValues_device(float *photo_error,
     for (int z = 0; z < depthSamples; z++)
     {
         int offset = x + y * imgSize.x+ z* imgSize.x*imgSize.y;
-        photo_error[offset] = 1;
+        photo_error[offset] = 0;
         nUpdates[offset] = 0;
     }
 }
@@ -944,6 +944,33 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
     float outerError = 0;
     iterations = 300;
     float beta = 0.002;
+
+
+    optimPyramid->photoErrors->UpdateHostFromDevice();
+
+    double totalError = 0;
+    long count = 0;
+
+    for (int y = 0; y < imgSize.y; y++)
+        for (int x = 0; x < imgSize.x; x++)
+            for (int z = 0; z < optimPyramid->depthSamples; z++)
+            {
+                int offset = x + y * imgSize.x+ z* imgSize.x*imgSize.y;
+                float error = optimPyramid->photoErrors->GetData(MEMORYDEVICE_CPU)[offset];
+                totalError += error;
+
+                count += 1;
+            }
+
+
+    totalError /= (double)count;
+
+
+    // std::cout << "Average error: " << totalError << std::endl;
+    // exit(1);
+    
+
+
 
 
     // for (unsigned int i = 0; i < iterations; i++)
