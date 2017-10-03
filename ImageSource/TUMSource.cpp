@@ -7,15 +7,13 @@
 #include <iomanip>
 
 TUMSource::TUMSource(const std::string& listFile)
-    : ImageSource(listFile)
 {
-    PathsFromListFile(rgbImagePaths, rgbTimeStamps, listFile, LEFT);
+    PathsFromListFile(rgbImagePaths, rgbTimeStamps, listFile);
 }
 
 void TUMSource::PathsFromListFile(std::vector<std::string> &imagePaths,
                                   std::vector<long long> &timeStamps,
-                                  std::string listPath,
-                                  ImageType imageType)
+                                  std::string listPath)
 {
     imagePaths.clear();
     std::ifstream listFile(listPath.c_str());

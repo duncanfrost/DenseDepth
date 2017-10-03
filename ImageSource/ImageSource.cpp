@@ -5,7 +5,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-ImageSource::ImageSource(const std::string& listFile)
+ImageSource::ImageSource()
 {
     frameNumber = 0;
 }

@@ -6,9 +6,8 @@
 class ImageSource
 {
 public:
-    enum ImageType {LEFT, RIGHT, DEPTH};
 
-    ImageSource(const std::string& listFile);
+    ImageSource();
 
     void GrabNewFrame(bool downsample);
 

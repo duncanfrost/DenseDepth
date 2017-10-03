@@ -7,13 +7,10 @@
 class TUMSource : public ImageSource
 {
 public:
-    enum ImageType {LEFT, RIGHT, DEPTH};
-
     TUMSource(const std::string& listFile);
 
 private:
     void PathsFromListFile(std::vector<std::string> &imagePaths,
                            std::vector<long long> &timeStamps,
-                           std::string listPath,
-                           ImageType imageType);
+                           std::string listPath);
 };
