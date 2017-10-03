@@ -10,29 +10,6 @@ PhoneSource::PhoneSource(const std::string& listFile)
 {
     StereoPathsFromListFile(rgbImagePaths, rgbTimeStamps, listFile, LEFT);
     StereoPathsFromListFile(stereoImagePaths, stereoTimeStamps, listFile, RIGHT);
-
-}
-
-void PhoneSource::GrabNewFrame(bool downsample)
-{
-    std::string path =  rgbImagePaths[frameNumber];
-    timeStamp = rgbTimeStamps[frameNumber];
-    cv::Mat imTemp = cv::imread(path);
-
-    cv::Size size;
-    size.width = 3;
-    size.height = 3;
-    
-
-    if (downsample)
-    {
-        cv::resize(imTemp, imLeft, cv::Size(), 0.25f, 0.25f);
-        cv::GaussianBlur(imLeft, imLeft, size, 3);
-    }
-    else
-        imLeft = imTemp;
-
-    frameNumber++;
 }
 
 void PhoneSource::StereoPathsFromListFile(std::vector<std::string> &imagePaths,

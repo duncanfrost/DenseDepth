@@ -2,7 +2,7 @@
 #include <MonoLib/Shared/TrackerData.h>
 #include <MonoLib/Shared/Map.h>
 #include <opencv2/opencv.hpp>
-#include <ImageSource/PhoneSource.h>
+#include <ImageSource/ImageSource.h>
 #include "FileTracker.h"
 #include <sophus/se3.hpp>
 #include <ORUtils/ImageTypes.h>
@@ -13,7 +13,7 @@
 class MonoEngine
 {
 public:
-    MonoEngine(PhoneSource* source, FileTracker *tracker);
+    MonoEngine(ImageSource* source, FileTracker *tracker);
 
     void AddKeyFrameManual()
     {
@@ -61,7 +61,7 @@ private:
 
     TrackerData* currTrackerData;
     FileTracker* tracker;
-    PhoneSource* source;
+    ImageSource* source;
     cv::Mat image;
     Vector2i imgSize;
     ORUChar4TSImage *orImage;

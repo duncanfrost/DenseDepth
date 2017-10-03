@@ -11,8 +11,6 @@ public:
 
     PhoneSource(const std::string& listFile);
 
-    void GrabNewFrame(bool downsample);
-
 private:
     void StereoPathsFromListFile(std::vector<std::string> &imagePaths,
                                  std::vector<long long> &timeStamps,

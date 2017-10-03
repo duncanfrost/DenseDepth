@@ -63,7 +63,7 @@ inline void ORToCVConvertUpdates(ORUtils::Image<float> *imageIn,
 
 
 
-MonoEngine::MonoEngine(PhoneSource* source, FileTracker* tracker)
+MonoEngine::MonoEngine(ImageSource* source, FileTracker* tracker)
 {
     this->source = source;
     this->tracker = tracker;
