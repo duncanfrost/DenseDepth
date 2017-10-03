@@ -8,7 +8,7 @@
 #include <ORUtils/ImageTypes.h>
 #include <MonoLib/MonoDepthEstimator_CUDA.h>
 
-#define BUFFERSIZE 10
+#define BUFFERSIZE 100
 
 class MonoEngine
 {

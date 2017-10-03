@@ -165,7 +165,7 @@ void MonoEngine::AddKeyFrame(ORUChar4TSImage *inImage, Sophus::SE3f inPose)
     monoDepthEstimator->SetRefImage(inImage);
     invRefPose = kf->pose.inverse();
 
-    monoDepthEstimator->SetLimitsManual(0.5,2);
+    monoDepthEstimator->SetLimitsManual(0.5,3);
     hasReferenceFrame = true;
 }
 
