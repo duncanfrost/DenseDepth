@@ -130,7 +130,7 @@ void MonoEngine::Process()
         // needsKeyFrame = false;
     // }
 
-    if (SampleActive(count))
+    if (SampleActive(count, BUFFERSIZE))
     {
         // std::cout << "Sampling: " << timeStampBuffer[nMid] << std::endl;
         SmoothPhotoBuffer(200);
