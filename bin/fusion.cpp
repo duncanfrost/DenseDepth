@@ -4,7 +4,7 @@
 #include <GUI/FusionWindow.h>
 #include <GUI/MapWindow.h>
 #include <Engines/FusionEngine.h>
-#include <Engines/FileTracker.h>
+#include <Tracking/FileTracker.h>
 #include <ImageSource/PhoneSource.h>
 #include <thread>
 #include <unistd.h>

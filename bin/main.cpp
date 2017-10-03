@@ -3,7 +3,7 @@
 #include <GUI/ARWindow.h>
 #include <GUI/MapWindow.h>
 #include <Engines/MonoEngine.h>
-#include <Engines/FileTracker.h>
+#include <Tracking/FileTracker.h>
 #include <ImageSource/PhoneSource.h>
 
 void Idle(void);
