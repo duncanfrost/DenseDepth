@@ -3,7 +3,7 @@
 #include <GUI/ARWindow.h>
 #include <GUI/MapWindow.h>
 #include <Engines/MonoEngine.h>
-#include <Tracking/ORBFileTracker.h>
+#include <Tracking/TUMFileTracker.h>
 #include <ImageSource/TUMSource.h>
 
 void Idle(void);
@@ -17,10 +17,12 @@ bool paused = false;
 int main(void)
 {
     std::string filename1 = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/rgb.txt";
-    std::string gtFile = "/home/duncan/Data/TUM/rgbd_dataset_freiburg1_desk2/groundtruth.txt";
+
+
+    std::string poseDirectory = "/home/duncan/Data/TUM/rgbd_dataset_freiburg1_desk2/";
 
     source = new TUMSource(filename1);
-    tracker = new ORBFileTracker(gtFile);
+    tracker = new TUMFileTracker(poseDirectory, "groundtruth.txt");
     engine = new MonoEngine(source, tracker);
 
     visModule = new VisualisationModule(&Idle);

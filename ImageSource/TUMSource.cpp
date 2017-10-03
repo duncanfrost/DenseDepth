@@ -55,7 +55,7 @@ void TUMSource::PathsFromListFile(std::vector<std::string> &imagePaths,
             std::stringstream fullPath;
             fullPath << listDir << imagePath;
 
-            std::cout << fullPath.str() << std::endl;
+            // std::cout << fullPath.str() << std::endl;
 
             imagePaths.push_back(fullPath.str());
             timeStamps.push_back(timestamp);
