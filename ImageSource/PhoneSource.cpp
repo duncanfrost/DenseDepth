@@ -6,11 +6,11 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 PhoneSource::PhoneSource(const std::string& listFile)
+    : ImageSource(listFile)
 {
     StereoPathsFromListFile(rgbImagePaths, rgbTimeStamps, listFile, LEFT);
     StereoPathsFromListFile(stereoImagePaths, stereoTimeStamps, listFile, RIGHT);
 
-    frameNumber = 0;
 }
 
 void PhoneSource::GrabNewFrame(bool downsample)

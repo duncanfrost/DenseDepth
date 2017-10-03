@@ -3,10 +3,12 @@ SET(targetname ImageSource)
 INCLUDE(${PROJECT_SOURCE_DIR}/cmake/UseCUDA.cmake)
 
 SET(sources
+  ImageSource.cpp
   PhoneSource.cpp
   )
 
 SET(headers
+  ImageSource.h
   PhoneSource.h
   )
 
