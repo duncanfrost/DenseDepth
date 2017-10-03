@@ -115,7 +115,7 @@ void MonoEngine::Process()
 
 
     long long timeOut;
-    currPose = tracker->PoseAtTime(count, timeOut);
+    currPose = tracker->PoseAtTime(timeStamp, count, timeOut);
 
     ConvertToOR(image, orImage);
 

@@ -7,8 +7,11 @@
 class FileTracker
 {
 public:
-    Sophus::SE3f PoseAtTime(long long time, long long &timeOut);
+    Sophus::SE3f PoseAtTime(long long time,
+                            long long frameCount,
+                            long long &timeOut);
 
 protected:
     std::vector<std::pair<long long, Sophus::SE3f> > timedPoses;
+    bool useFrameCount;
 };

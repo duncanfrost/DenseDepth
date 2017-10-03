@@ -8,6 +8,7 @@
 ORBFileTracker::ORBFileTracker(const std::string &poseFilePath)
 {
     InitORB(poseFilePath);
+    useFrameCount = true;
 }
 
 void ORBFileTracker::InitORB(const std::string &poseFilePath)

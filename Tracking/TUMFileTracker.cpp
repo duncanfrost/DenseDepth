@@ -10,6 +10,7 @@
 TUMFileTracker::TUMFileTracker(const std::string &directory, const std::string &listName)
 {
     Init(directory, listName);
+    useFrameCount = false;
 }
 
 void TUMFileTracker::Init(const std::string &directory, const std::string &listName)

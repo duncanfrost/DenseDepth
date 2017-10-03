@@ -47,7 +47,7 @@ void FusionEngine::Process()
 
 
     long long timeOut;
-    currPose = tracker->PoseAtTime(count, timeOut);
+    currPose = tracker->PoseAtTime(timeStamp, count, timeOut);
 
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
