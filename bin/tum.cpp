@@ -4,13 +4,13 @@
 #include <GUI/MapWindow.h>
 #include <Engines/MonoEngine.h>
 #include <Engines/FileTracker.h>
-#include <ImageSource/PhoneSource.h>
+#include <ImageSource/TUMSource.h>
 
 void Idle(void);
 void KeyboardFunction(unsigned char key, int x, int y);
 VisualisationModule *visModule;
 MonoEngine *engine;
-PhoneSource *source;
+TUMSource *source;
 FileTracker *tracker;
 bool paused = false;
 
@@ -19,7 +19,7 @@ int main(void)
     std::string filename1 = "/home/duncan/Data/P9/Office3/log.txt";
     std::string gtFile = "/home/duncan/Data/P9/Office3/CameraTrajectory.txt";
 
-    source = new PhoneSource(filename1);
+    source = new TUMSource(filename1);
     tracker = new FileTracker(gtFile, FileTracker::ORB);
     engine = new MonoEngine(source, tracker);
 
