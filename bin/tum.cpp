@@ -17,10 +17,10 @@ bool paused = false;
 int main(void)
 {
     std::string filename1 = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/rgb.txt";
-    std::string gtFile = "/home/duncan/Data/P9/Office3/CameraTrajectory.txt";
+    std::string gtFile = "/home/duncan/Data/TUM/rgbd_dataset_freiburg1_desk2/groundtruth.txt";
 
     source = new TUMSource(filename1);
-    tracker = new FileTracker(gtFile, FileTracker::ORB);
+    tracker = new FileTracker(gtFile);
     engine = new MonoEngine(source, tracker);
 
     visModule = new VisualisationModule(&Idle);
