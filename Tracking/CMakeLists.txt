@@ -3,10 +3,12 @@ SET(targetname Tracking)
 INCLUDE(${PROJECT_SOURCE_DIR}/cmake/UseCUDA.cmake)
 
 SET(sources
+  ORBFileTracker.cpp
   FileTracker.cpp
   )
 
 SET(headers
+  ORBFileTracker.h
   FileTracker.h
   )
 

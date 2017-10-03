@@ -4,7 +4,7 @@
 #include <GUI/FusionWindow.h>
 #include <GUI/MapWindow.h>
 #include <Engines/FusionEngine.h>
-#include <Tracking/FileTracker.h>
+#include <Tracking/ORBFileTracker.h>
 #include <ImageSource/PhoneSource.h>
 #include <thread>
 #include <unistd.h>
@@ -23,7 +23,7 @@ int main(void)
     std::string gtFile = "/home/duncan/Data/P9/Office3/CameraTrajectory.txt";
 
     source = new PhoneSource(filename1);
-    tracker = new FileTracker(gtFile);
+    tracker = new ORBFileTracker(gtFile);
     engine = new FusionEngine(source, tracker);
 
     visModule = new VisualisationModule(&Idle);

@@ -3,7 +3,7 @@
 #include <GUI/ARWindow.h>
 #include <GUI/MapWindow.h>
 #include <Engines/MonoEngine.h>
-#include <Tracking/FileTracker.h>
+#include <Tracking/ORBFileTracker.h>
 #include <ImageSource/PhoneSource.h>
 
 void Idle(void);
@@ -20,7 +20,7 @@ int main(void)
     std::string gtFile = "/home/duncan/Data/P9/Office3/CameraTrajectory.txt";
 
     source = new PhoneSource(filename1);
-    tracker = new FileTracker(gtFile);
+    tracker = new ORBFileTracker(gtFile);
     engine = new MonoEngine(source, tracker);
 
     visModule = new VisualisationModule(&Idle);
