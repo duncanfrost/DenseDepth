@@ -71,8 +71,6 @@ void TUMFileTracker::Init(const std::string &directory, const std::string &listN
 
         pose = pose * firstPose.inverse();
 
-        std::cout << "Timestamp: " << std::setprecision(15) << timestampRaw << std::endl;
-
         long long timestamp = timestampRaw * 1e6;
 
         timedPoses.push_back(std::make_pair(timestamp,pose));
