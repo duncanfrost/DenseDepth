@@ -29,9 +29,11 @@ inline float SumError(float *data, Vector2i imgSize)
     return error;
 }
 
-__device__ int clamp(int in, int max)
+
+template <typename T>
+__device__ T clamp(T in, T max)
 {
-    int out = in;
+    T out = in;
     if (in > max - 1)
         out = max - 1;
     if (in < 0)
@@ -40,20 +42,10 @@ __device__ int clamp(int in, int max)
     return out;
 }
 
-__device__ float clamp(float in, float max)
+template <typename T>
+__device__ T HuberNorm(T x, T eps)
 {
-    float out = in;
-    if (in > max - 1)
-        out = max - 1;
-    if (in < 0)
-        out = 0;
-
-    return out;
-}
-
-__device__ float HuberNorm(float x, float eps)
-{
-    float absX = abs(x); 
+    T absX = abs(x); 
 
     if (absX <= eps)
         return absX*absX / (2 * eps);
@@ -509,19 +501,6 @@ __global__ void updatePhotoError2d(Matrix3f R, Vector3f T,
 
             photo_error[offset] = newError;
             nUpdates[offset] = nUpdate + 1;
-        }
-        else
-        {
-            // float normL1 = 1.0f;
-
-            // float oldError = photo_error[offset];
-            // float obsError = normL1;
-            // int nUpdate = nUpdates[offset];
-
-            // float newError = (nUpdate * oldError + obsError) / (nUpdate + 1);
-
-            // photo_error[offset] = newError;
-            // nUpdates[offset] = nUpdate + 1;
         }
     }
 }
