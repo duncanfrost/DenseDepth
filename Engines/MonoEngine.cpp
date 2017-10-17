@@ -1,67 +1,9 @@
 #include "MonoEngine.h"
 #include <ORUtils/MathTypes.h>
 #include "ActiveFunctions.h"
+#include "ORConvert.h"
 
 Sophus::SE3f MonoEngine::invRefPose;
-
-inline ORUtils::SE3Pose SophusToOR(Sophus::SE3f pose)
-{
-    ORUtils::SE3Pose out;
-
-    Matrix4f mat;
-    
-    for (unsigned int r = 0; r < 4; r++)
-        for (unsigned int c = 0; c < 4; c++)
-        {
-            mat.at(c,r) = pose.matrix()(r,c);
-        }
-
-    out.SetM(mat);
-    
-    return out;
-}
-
-inline void ORToCV(ORUtils::Image<float> *imageIn, cv::Mat in)
-{
-    for (int y = 0; y < imageIn->noDims.y; y++)
-        for (int x = 0; x < imageIn->noDims.x; x++)
-        {
-            int index = x + imageIn->noDims.x*y;
-            in.at<float>(y,x) = imageIn->GetData(MEMORYDEVICE_CPU)[index]; 
-        }
-}
-
-inline void ORToCVConvert(ORUtils::Image<float> *imageIn, cv::Mat in, float mult)
-{
-    for (int y = 0; y < imageIn->noDims.y; y++)
-        for (int x = 0; x < imageIn->noDims.x; x++)
-        {
-            int index = x + imageIn->noDims.x*y;
-            in.at<short>(y,x) = mult*(imageIn->GetData(MEMORYDEVICE_CPU)[index] + 10);
-        }
-}
-
-inline void ORToCVConvertUpdates(ORUtils::Image<float> *imageIn,
-                                 ORUtils::MemoryBlock<int> *updates,
-                                 cv::Mat in)
-{
-    for (int y = 0; y < imageIn->noDims.y; y++)
-        for (int x = 0; x < imageIn->noDims.x; x++)
-        {
-            int index = x + imageIn->noDims.x*y;
-            int noUpdates = updates->GetData(MEMORYDEVICE_CPU)[index];
-
-            // std::cout << noUpdates << std::endl;
-
-            short val = 0; 
-            if (noUpdates > 0.5*BUFFERSIZE)
-                val = 5000*imageIn->GetData(MEMORYDEVICE_CPU)[index];
-
-            in.at<short>(y,x) = val; 
-        }
-}
-
-
 
 MonoEngine::MonoEngine(ImageSource* source, FileTracker* tracker)
 {
@@ -239,12 +181,6 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
                   certIm,5000);
 
     
-
-
-
-
-
-
     std::stringstream outPath;
     outPath << "/home/duncan/Data/P9/Office3/depth3/" << timeStampBuffer[nMid] << "000000.png";
 
@@ -314,17 +250,6 @@ void MonoEngine::SampleFromBufferMid()
 
 
     AddKeyFrame(rgbImage, kfPose);
-
-
-    // monoDepthEstimator->optimPyramid->g->UpdateHostFromDevice();
-    // cv::Mat testIm(imgSize.y, imgSize.x, CV_32FC1); 
-    // ORToCV(monoDepthEstimator->optimPyramid->g, testIm);
-    // std::cout << testIm << std::endl;
-    // cv::namedWindow( "Debug", cv::WINDOW_AUTOSIZE );// Create a window for display.
-    // cv::imshow( "Debug", testIm );                   // Show our image inside it.
-    // cv::waitKey(0); 
-    // cv::destroyWindow("Debug");
-
 
     for (int i = 0; i < BUFFERSIZE; i++)
     {

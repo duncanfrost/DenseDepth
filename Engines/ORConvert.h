@@ -1,0 +1,58 @@
+#include <ORUtils/MathTypes.h>
+#include <sophus/se3.hpp>
+#include <opencv2/opencv.hpp>
+
+inline ORUtils::SE3Pose SophusToOR(Sophus::SE3f pose)
+{
+    ORUtils::SE3Pose out;
+
+    Matrix4f mat;
+    
+    for (unsigned int r = 0; r < 4; r++)
+        for (unsigned int c = 0; c < 4; c++)
+        {
+            mat.at(c,r) = pose.matrix()(r,c);
+        }
+
+    out.SetM(mat);
+    
+    return out;
+}
+
+inline void ORToCV(ORUtils::Image<float> *imageIn, cv::Mat in)
+{
+    for (int y = 0; y < imageIn->noDims.y; y++)
+        for (int x = 0; x < imageIn->noDims.x; x++)
+        {
+            int index = x + imageIn->noDims.x*y;
+            in.at<float>(y,x) = imageIn->GetData(MEMORYDEVICE_CPU)[index]; 
+        }
+}
+
+inline void ORToCVConvert(ORUtils::Image<float> *imageIn, cv::Mat in, float mult)
+{
+    for (int y = 0; y < imageIn->noDims.y; y++)
+        for (int x = 0; x < imageIn->noDims.x; x++)
+        {
+            int index = x + imageIn->noDims.x*y;
+            in.at<short>(y,x) = mult*(imageIn->GetData(MEMORYDEVICE_CPU)[index] + 10);
+        }
+}
+
+inline void ORToCVConvertUpdates(ORUtils::Image<float> *imageIn,
+                                 ORUtils::MemoryBlock<int> *updates,
+                                 cv::Mat in)
+{
+    for (int y = 0; y < imageIn->noDims.y; y++)
+        for (int x = 0; x < imageIn->noDims.x; x++)
+        {
+            int index = x + imageIn->noDims.x*y;
+            int noUpdates = updates->GetData(MEMORYDEVICE_CPU)[index];
+
+            short val = 0; 
+            if (noUpdates > 0.5*BUFFERSIZE)
+                val = 5000*imageIn->GetData(MEMORYDEVICE_CPU)[index];
+
+            in.at<short>(y,x) = val; 
+        }
+}
