@@ -231,36 +231,8 @@ __global__ void UpdateQ(float *qx_data,float *qy_data,
     qy_data[image_offset] = qy_out;
 }
 
-
 __global__ void ComputeDivQ(float *qx_data,float *qy_data,
                             float *divQ_data, Vector2i imgSize)
-{
-    int x = blockIdx.x*blockDim.x+threadIdx.x;
-    int y = blockIdx.y*blockDim.y+threadIdx.y;
-    if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
-    int image_offset = x + y * imgSize.x;
-
-    int x_minus = clamp(x-1,imgSize.x);
-    int y_minus = clamp(y-1,imgSize.y);
-
-    int offset_x_minus = x_minus + y * imgSize.x;
-    int offset_y_minus = x + y_minus * imgSize.x;
-
-    float qx_mid = qx_data[image_offset];
-    float qx_left = qx_data[offset_x_minus];
-
-    float qy_mid = qy_data[image_offset];
-    float qy_up = qy_data[offset_y_minus];
-
-
-    float divQ = qy_mid - qy_up;
-    divQ += qx_mid - qx_left ;
-
-    divQ_data[image_offset] = divQ;
-}
-
-__global__ void ComputeDivQZeroBorder(float *qx_data,float *qy_data,
-                                      float *divQ_data, Vector2i imgSize)
 {
     int x = blockIdx.x*blockDim.x+threadIdx.x;
     int y = blockIdx.y*blockDim.y+threadIdx.y;
@@ -961,10 +933,10 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
                                                   imgSize, sigma_q, tvSettings.epsilon);
 
 
-            ComputeDivQZeroBorder<<<blocks2,threadsPerBlock2>>>(optimPyramid->qx->GetData(MEMORYDEVICE_CUDA),
-                                                                optimPyramid->qy->GetData(MEMORYDEVICE_CUDA),
-                                                                optimPyramid->divQ->GetData(MEMORYDEVICE_CUDA),
-                                                                imgSize);
+            ComputeDivQ<<<blocks2,threadsPerBlock2>>>(optimPyramid->qx->GetData(MEMORYDEVICE_CUDA),
+                                                      optimPyramid->qy->GetData(MEMORYDEVICE_CUDA),
+                                                      optimPyramid->divQ->GetData(MEMORYDEVICE_CUDA),
+                                                      imgSize);
 
 
 
@@ -1072,34 +1044,6 @@ void MonoDepthEstimator_CUDA::SmoothDTAM()
         //                                        tvSettings.theta);
     // }
 }
-
-__global__ void SetGT_device(float *gtDepth, float *depth,
-                             float *mu, Vector2i imgSize)
-{
-    int x = blockIdx.x*blockDim.x+threadIdx.x;
-    int y = blockIdx.y*blockDim.y+threadIdx.y;
-    if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
-    int image_offset=x + y * imgSize.x;
-
-    depth[image_offset] = 1.0f/gtDepth[image_offset];
-    mu[image_offset] = 1.0f/gtDepth[image_offset];
-}
-
-void MonoDepthEstimator_CUDA::SetGT()
-{
-    // MonoLib::MonoPyramidLevel *monoLevel = currDepthFrame->dataImage;
-    // Vector2i imgSize = monoLevel->depth->noDims;
-
-    // dim3 blocks2=getBlocksFor2DProcess(imgSize.x,imgSize.y);
-    // dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
-    //	SetGT_device<<<blocks2,threadsPerBlock2>>>(depthImage->GetData(MEMORYDEVICE_CUDA),
-    //	                                           monoLevel->a->GetData(MEMORYDEVICE_CUDA),
-    //	                                           monoLevel->d->GetData(MEMORYDEVICE_CUDA),
-    //	                                           imgSize);
-
-}
-
-
 
 void MonoDepthEstimator_CUDA::DisplayPhotoVolume(int x, int y)
 {

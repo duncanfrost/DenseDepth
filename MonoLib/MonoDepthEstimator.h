@@ -75,7 +75,6 @@ namespace MonoLib {
         }
 
         virtual ~MonoDepthEstimator() {}
-        virtual void SetGT() = 0;
 
         virtual void ReinitOptim() {}
         virtual void SetRefImage(ORUChar4TSImage *frame)

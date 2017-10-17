@@ -36,7 +36,6 @@ namespace MonoLib {
         void UpdateForPointCloud() {}
 
         float EvaluateGT() { return 1e10f; }
-        void SetGT() {}
         void DisplayPhotoVolume(int x, int y);
         void MeasureError() {};
     };

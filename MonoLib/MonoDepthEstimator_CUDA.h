@@ -29,7 +29,6 @@ namespace MonoLib {
         void SmoothDTAM();
         void DisplayPhotoVolume(int x, int y);
 
-        void SetGT();
         void MeasureError();
     };
 }
