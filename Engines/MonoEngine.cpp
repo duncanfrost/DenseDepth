@@ -112,8 +112,6 @@ void MonoEngine::Process()
     timeStamp = source->TimeStamp();
 
     long long count = source->FrameNumber();
-
-
     long long timeOut;
     currPose = tracker->PoseAtTime(timeStamp, count, timeOut);
 
@@ -132,12 +130,8 @@ void MonoEngine::Process()
 
     if (SampleActive(count, BUFFERSIZE))
     {
-        // std::cout << "Sampling: " << timeStampBuffer[nMid] << std::endl;
         SmoothPhotoBuffer(200);
     }
-        
-    // if (framesProcessed < nMid)
-    //     WriteEmpty();
         
 
     currTrackerData->trackerPose = currPose;
