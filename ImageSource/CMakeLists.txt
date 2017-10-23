@@ -3,6 +3,7 @@ SET(targetname ImageSource)
 INCLUDE(${PROJECT_SOURCE_DIR}/cmake/UseCUDA.cmake)
 
 SET(sources
+  DepthSource.cpp
   ImageSource.cpp
   PhoneSource.cpp
   TUMSource.cpp
@@ -10,6 +11,7 @@ SET(sources
   )
 
 SET(headers
+  DepthSource.h
   ImageSource.h
   PhoneSource.h
   TUMSource.h

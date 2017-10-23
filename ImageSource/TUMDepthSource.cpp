@@ -6,7 +6,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iomanip>
 
-TUMDepthSource::TUMDepthSource(const std::string& listFile, const std::string& depthListFile)
+TUMDepthSource::TUMDepthSource(const std::string& depthListFile)
 {
     PathsFromListFile(depthImagePaths, depthTimeStamps, depthListFile);
 }

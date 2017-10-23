@@ -7,7 +7,7 @@
 class TUMDepthSource : public DepthSource
 {
 public:
-    TUMDepthSource(const std::string& listFile, const std::string& depthListFile);
+    TUMDepthSource(const std::string& depthListFile);
 
 private:
     void PathsFromListFile(std::vector<std::string> &imagePaths,

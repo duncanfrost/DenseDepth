@@ -5,12 +5,14 @@
 #include <Engines/MonoEngine.h>
 #include <Tracking/TUMFileTracker.h>
 #include <ImageSource/TUMSource.h>
+#include <ImageSource/TUMDepthSource.h>
 
 void Idle(void);
 void KeyboardFunction(unsigned char key, int x, int y);
 VisualisationModule *visModule;
 MonoEngine *engine;
 TUMSource *source;
+TUMDepthSource *depthSource;
 FileTracker *tracker;
 bool paused = false;
 
@@ -23,6 +25,7 @@ int main(void)
     std::string poseDirectory = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/";
 
     source = new TUMSource(filename1, filename2);
+    depthSource = new TUMDepthSource(filename2);
     tracker = new TUMFileTracker(poseDirectory, "groundtruth.txt");
 
     MonoEngine::Settings settings;
