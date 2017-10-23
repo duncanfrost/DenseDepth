@@ -6,13 +6,12 @@ using namespace MonoLib;
 
 inline dim3 getBlocksFor2DProcess(int _width,int _height)
 {
-	return dim3((_width + 16 - 1) / 16, (_height + 16 - 1) / 16);
-
+    return dim3((_width + 16 - 1) / 16, (_height + 16 - 1) / 16);
 }
 
 inline dim3 getThreadsFor2DProcess(int _width,int _height)
 {
-	return dim3(16,16);
+    return dim3(16,16);
 }
 
 
@@ -463,7 +462,7 @@ __global__ void updatePhotoError2d(Matrix3f R, Vector3f T,
             float normL1 = PhotoErrorL1(photo_current_OR,photo_ref);
             // float normL1 = PhotoErrorL1Grad(photo_current_OR,photo_ref,
             //                             dIx_ref, dIy_ref,
-                                        // dIx_curr, dIy_curr);
+            // dIx_curr, dIy_curr);
 
             float oldError = photo_error[offset];
             float obsError = normL1;
@@ -625,7 +624,7 @@ __global__ void MinErrorNaiveFit_device(float *photo_error,float *d_data,
     float errorPlus = GetCombinedError(photo_error, d_value,
                                        x,y,minIdx+1,theta,lambda,increment,imgSize);
     float errorMinus = GetCombinedError(photo_error, d_value,
-                                       x,y,minIdx-1,theta,lambda,increment,imgSize);
+                                        x,y,minIdx-1,theta,lambda,increment,imgSize);
 
 
     Vector3f errors = Vector3f(errorMinus, minError, errorPlus);
@@ -823,16 +822,16 @@ void MonoDepthEstimator_CUDA::UpdatePhotoError(ORUtils::SE3Pose refToTracker,
     dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x ,imgSize.y);
 
     updatePhotoError2d<<<blocks2,threadsPerBlock2>>>(refToTracker.GetR(),
-                                                        refToTracker.GetT(),
-                                                        monoLevel->intrinsics,
-                                                        imgSize,
-                                                        optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
-                                                        optimPyramid->nUpdates->GetData(MEMORYDEVICE_CUDA),
-                                                        frame->GetData(MEMORYDEVICE_CUDA),
-                                                        currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CUDA),
-                                                        optimPyramid->depthSamples,
-                                                        optimPyramid->minIDepth,
-                                                        depthIncrement);
+                                                     refToTracker.GetT(),
+                                                     monoLevel->intrinsics,
+                                                     imgSize,
+                                                     optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+                                                     optimPyramid->nUpdates->GetData(MEMORYDEVICE_CUDA),
+                                                     frame->GetData(MEMORYDEVICE_CUDA),
+                                                     currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CUDA),
+                                                     optimPyramid->depthSamples,
+                                                     optimPyramid->minIDepth,
+                                                     depthIncrement);
     monoLevel->nUpdate++;
 
     cudaThreadSynchronize();
@@ -1008,10 +1007,10 @@ void MonoDepthEstimator_CUDA::InitOptim()
     dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x ,imgSize.y);
 
     MinPhotoErrorInit<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
-                                                         optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
-                                                         optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
-                                                         optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
-                                                         imgSize, optimPyramid->depthSamples);
+                                                    optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                    optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
+                                                    optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+                                                    imgSize, optimPyramid->depthSamples);
 
     InitSmoothingParameters<<<blocks2,threadsPerBlock2>>>(optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
                                                           optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
@@ -1034,14 +1033,14 @@ void MonoDepthEstimator_CUDA::SmoothDTAM()
 
     // for (unsigned int i = 0; i < 1; i++)
     // {
-        // UpdateDQ<<<blocks2,threadsPerBlock2>>>(optimPyramid->g->GetData(MEMORYDEVICE_CUDA),
-        //                                        optimPyramid->qx->GetData(MEMORYDEVICE_CUDA),
-        //                                        optimPyramid->qy->GetData(MEMORYDEVICE_CUDA),
-        //                                        optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
-        //                                        optimPyramid->a->GetData(MEMORYDEVICE_CUDA), imgSize,
-        //                                        optimPyramid->minIDepth,optimPyramid->maxIDepth,
-        //                                        tvSettings.epsilon, tvSettings.sigma_q,tvSettings.sigma_d,
-        //                                        tvSettings.theta);
+    // UpdateDQ<<<blocks2,threadsPerBlock2>>>(optimPyramid->g->GetData(MEMORYDEVICE_CUDA),
+    //                                        optimPyramid->qx->GetData(MEMORYDEVICE_CUDA),
+    //                                        optimPyramid->qy->GetData(MEMORYDEVICE_CUDA),
+    //                                        optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+    //                                        optimPyramid->a->GetData(MEMORYDEVICE_CUDA), imgSize,
+    //                                        optimPyramid->minIDepth,optimPyramid->maxIDepth,
+    //                                        tvSettings.epsilon, tvSettings.sigma_q,tvSettings.sigma_d,
+    //                                        tvSettings.theta);
     // }
 }
 
@@ -1059,7 +1058,7 @@ void MonoDepthEstimator_CUDA::DisplayPhotoVolume(int x, int y)
     
 
 __global__ void ComputeTVError_device(float *d_data, float *error_data, Vector2i
-                                    imgSize, float eps)
+                                      imgSize, float eps)
 {
     int x = blockIdx.x*blockDim.x+threadIdx.x;
     int y = blockIdx.y*blockDim.y+threadIdx.y;

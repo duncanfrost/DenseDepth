@@ -13,7 +13,16 @@
 class MonoEngine
 {
 public:
-    MonoEngine(ImageSource* source, FileTracker *tracker);
+
+    struct Settings
+    {
+        float fx;
+        float fy;
+        float cx;
+        float cy;
+    };
+
+    MonoEngine(ImageSource* source, FileTracker *tracker, Settings settings);
 
     void AddKeyFrameManual()
     {

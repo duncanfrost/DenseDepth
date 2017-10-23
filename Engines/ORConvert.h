@@ -56,3 +56,25 @@ inline void ORToCVConvertUpdates(ORUtils::Image<float> *imageIn,
             in.at<short>(y,x) = val; 
         }
 }
+
+
+inline void MonoEngine::ConvertToOR(cv::Mat inImage, ORUChar4TSImage *outImage)
+{
+    for (int y = 0; y < inImage.rows; y++)
+    {
+        for (int x = 0; x < inImage.cols; x++)
+        {
+            cv::Vec3b val = inImage.at<cv::Vec3b>(y,x);
+            Vector4u orVal;
+            orVal[0] = val[2];
+            orVal[1] = val[1];
+            orVal[2] = val[0];
+            orVal[3] = 0;
+
+            int index = x + inImage.cols*y;
+            outImage->GetData(MEMORYDEVICE_CPU)[index] = orVal;
+        }
+    }
+
+    outImage->UpdateDeviceFromHost();
+}

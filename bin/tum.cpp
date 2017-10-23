@@ -24,7 +24,14 @@ int main(void)
 
     source = new TUMSource(filename1, filename2);
     tracker = new TUMFileTracker(poseDirectory, "groundtruth.txt");
-    engine = new MonoEngine(source, tracker);
+
+    MonoEngine::Settings settings;
+    settings.fx = 520.908620;
+    settings.fy = 521.007327;
+    settings.cx = 325.141442;
+    settings.cy = 249.701764;
+
+    engine = new MonoEngine(source, tracker, settings);
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",640,480,engine->GetARData()));

@@ -21,7 +21,14 @@ int main(void)
 
     source = new PhoneSource(filename1);
     tracker = new ORBFileTracker(gtFile);
-    engine = new MonoEngine(source, tracker);
+
+
+    MonoEngine::Settings settings;
+    settings.fx = 683.8249;
+    settings.fy = 683.6179;
+    settings.cx = 317.6438;
+    settings.cy = 239.5907;
+    engine = new MonoEngine(source, tracker, settings);
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",640,480,engine->GetARData()));

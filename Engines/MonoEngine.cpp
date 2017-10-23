@@ -5,7 +5,7 @@
 
 Sophus::SE3f MonoEngine::invRefPose;
 
-MonoEngine::MonoEngine(ImageSource* source, FileTracker* tracker)
+MonoEngine::MonoEngine(ImageSource* source, FileTracker* tracker, MonoEngine::Settings settings)
 {
     this->source = source;
     this->tracker = tracker;
@@ -19,10 +19,10 @@ MonoEngine::MonoEngine(ImageSource* source, FileTracker* tracker)
     imgSize.y = 120;
 
     Vector4f intrinsics;
-    float fx = (683.8249/640)*imgSize.x;
-    float fy = (683.6179/480)*imgSize.y;
-    float cx = (317.6438/640)*imgSize.x;
-    float cy = (239.5907/480)*imgSize.y;
+    float fx = (settings.fx/640)*imgSize.x;
+    float fy = (settings.fy/480)*imgSize.y;
+    float cx = (settings.cx/640)*imgSize.x;
+    float cy = (settings.cy/480)*imgSize.y;
 
     intrinsics[0] = fx;
     intrinsics[1] = fy;
@@ -105,26 +105,6 @@ void MonoEngine::AddKeyFrame(ORUChar4TSImage *inImage, Sophus::SE3f inPose)
     hasReferenceFrame = true;
 }
 
-void MonoEngine::ConvertToOR(cv::Mat inImage, ORUChar4TSImage *outImage)
-{
-    for (int y = 0; y < inImage.rows; y++)
-    {
-        for (int x = 0; x < inImage.cols; x++)
-        {
-            cv::Vec3b val = inImage.at<cv::Vec3b>(y,x);
-            Vector4u orVal;
-            orVal[0] = val[2];
-            orVal[1] = val[1];
-            orVal[2] = val[0];
-            orVal[3] = 0;
-
-            int index = x + inImage.cols*y;
-            outImage->GetData(MEMORYDEVICE_CPU)[index] = orVal;
-        }
-    }
-
-    outImage->UpdateDeviceFromHost();
-}
 
 void MonoEngine::Sample()
 {
