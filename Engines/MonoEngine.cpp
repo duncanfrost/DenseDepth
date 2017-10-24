@@ -5,18 +5,22 @@
 
 Sophus::SE3f MonoEngine::invRefPose;
 
-MonoEngine::MonoEngine(ImageSource* source, FileTracker* tracker, MonoEngine::Settings settings)
+MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
+                       FileTracker *tracker, Settings settings)
 {
     this->source = source;
     this->tracker = tracker;
+    this->depthSource = depthSource;
+
+    
     currTrackerData = new TrackerData();
     map = new GlobalMap();
 
     imgSize.x = 640;
     imgSize.y = 480;
 
-    imgSize.x = 160;
-    imgSize.y = 120;
+    // imgSize.x = 160;
+    // imgSize.y = 120;
 
     Vector4f intrinsics;
     float fx = (settings.fx/640)*imgSize.x;
@@ -49,12 +53,13 @@ MonoEngine::MonoEngine(ImageSource* source, FileTracker* tracker, MonoEngine::Se
 
 void MonoEngine::Process()
 {
-    source->GrabNewFrame(true);
+    source->GrabNewFrame();
     image = source->Image();
     timeStamp = source->TimeStamp();
-
     long long count = source->FrameNumber();
     long long timeOut;
+
+
     currPose = tracker->PoseAtTime(timeStamp, count, timeOut);
 
     ConvertToOR(image, orImage);
@@ -74,6 +79,8 @@ void MonoEngine::Process()
     {
         SmoothPhotoBuffer(200);
     }
+
+    std::cout << "Framenumber: " << count << std::endl;
         
 
     currTrackerData->trackerPose = currPose;
@@ -134,47 +141,55 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
     monoDepthEstimator->optimPyramid->nUpdates->UpdateHostFromDevice();
 
 
+    long long timestamp = timeStampBuffer[nMid];
 
-    cv::Mat testIm(imgSize.y, imgSize.x, CV_16UC1); 
-    ORToCVConvertUpdates(monoDepthEstimator->currDepthFrame->dataImage->depth,
-                         monoDepthEstimator->optimPyramid->nUpdates,
-                         testIm);
+    if (depthSource != NULL)
+        depthSource->GetDepthForTimeStamp(timestamp);
+    else
+        std::cout << "No depth source" << std::endl;
 
 
-    float minVal = 999;
 
-    for (int y = 0; y < monoDepthEstimator->optimPyramid->certainty->noDims.y; y++)
-    {
-        for (int x = 0; x < monoDepthEstimator->optimPyramid->certainty->noDims.x; x++)
-        {
-            int index = x + monoDepthEstimator->optimPyramid->certainty->noDims.x*y;
-            float val = monoDepthEstimator->optimPyramid->certainty->GetData(MEMORYDEVICE_CPU)[index];
-            if (val < minVal)
-                minVal = val;
-        }
-    }
+    // cv::Mat testIm(imgSize.y, imgSize.x, CV_16UC1); 
+    // // ORToCVConvertUpdates(monoDepthEstimator->currDepthFrame->dataImage->depth,
+    //                      monoDepthEstimator->optimPyramid->nUpdates,
+                         // testIm);
+
+
+    // float minVal = 999;
+
+    // for (int y = 0; y < monoDepthEstimator->optimPyramid->certainty->noDims.y; y++)
+    // {
+    //     for (int x = 0; x < monoDepthEstimator->optimPyramid->certainty->noDims.x; x++)
+    //     {
+    //         int index = x + monoDepthEstimator->optimPyramid->certainty->noDims.x*y;
+    //         float val = monoDepthEstimator->optimPyramid->certainty->GetData(MEMORYDEVICE_CPU)[index];
+    //         if (val < minVal)
+    //             minVal = val;
+    //     }
+    // }
         
-    std::cout << "MIN VAL: " << minVal << std::endl;
+    // std::cout << "MIN VAL: " << minVal << std::endl;
 
-    cv::Mat certIm(imgSize.y, imgSize.x, CV_16UC1);
-    ORToCVConvert(monoDepthEstimator->optimPyramid->certainty,
-                  certIm,5000);
-
-    
-    std::stringstream outPath;
-    outPath << "/home/duncan/Data/P9/Office3/depth3/" << timeStampBuffer[nMid] << "000000.png";
+    // cv::Mat certIm(imgSize.y, imgSize.x, CV_16UC1);
+    // ORToCVConvert(monoDepthEstimator->optimPyramid->certainty,
+    //               certIm,5000);
 
     
-    cv::Mat imUp;
-    cv::resize(testIm, imUp, cv::Size(), 4.0f, 4.0f);
-    cv::imwrite(outPath.str(), imUp);
+    // std::stringstream outPath;
+    // outPath << "/home/duncan/Data/P9/Office3/depth3/" << timeStampBuffer[nMid] << "000000.png";
 
-
-    std::stringstream outPathCert;
-    outPathCert << "/home/duncan/Data/P9/Office3/cert/" << timeStampBuffer[nMid] << "000000.png";
     
-    cv::resize(certIm, imUp, cv::Size(), 4.0f, 4.0f);
-    cv::imwrite(outPathCert.str(), imUp);
+    // cv::Mat imUp;
+    // cv::resize(testIm, imUp, cv::Size(), 4.0f, 4.0f);
+    // cv::imwrite(outPath.str(), imUp);
+
+
+    // std::stringstream outPathCert;
+    // outPathCert << "/home/duncan/Data/P9/Office3/cert/" << timeStampBuffer[nMid] << "000000.png";
+    
+    // cv::resize(certIm, imUp, cv::Size(), 4.0f, 4.0f);
+    // cv::imwrite(outPathCert.str(), imUp);
 
 
 
@@ -229,6 +244,7 @@ void MonoEngine::SampleFromBufferMid()
     Sophus::SE3f kfPose = poseBuffer[nMid];
 
 
+
     AddKeyFrame(rgbImage, kfPose);
 
     for (int i = 0; i < BUFFERSIZE; i++)
@@ -242,6 +258,8 @@ void MonoEngine::SampleFromBufferMid()
         inputRGBImage->UpdateDeviceFromHost();
         monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), inputRGBImage);
     }
+
+
 }
 
 void MonoEngine::SaveToBuffer(ORUChar4TSImage *inputRGBImage,
@@ -256,12 +274,20 @@ void MonoEngine::SaveToBuffer(ORUChar4TSImage *inputRGBImage,
         timeStampBuffer[i] = timeStampBuffer[i-1];
     }
 
+
+
     //No need to do this for the pose buffer
     imageBuffer[0] = lastImage;
     imageBuffer[0]->SetFrom(inputRGBImage, MEMCPYDIR_CPU_TO_CPU);
 
     poseBuffer[0] = inputPose;
     timeStampBuffer[0] = timeStamp;
+
+    std::cout << "Timestamp here: " << timeStamp << std::endl;
+    std::cout << "mid timestamp:" << timeStampBuffer[nMid] << std::endl;
+    std::cout << "Nmid: " << nMid << std::endl;
+
+
     if (bufferTop < BUFFERSIZE)
         bufferTop++;
 }

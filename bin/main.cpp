@@ -28,7 +28,7 @@ int main(void)
     settings.fy = 683.6179;
     settings.cx = 317.6438;
     settings.cy = 239.5907;
-    engine = new MonoEngine(source, tracker, settings);
+    engine = new MonoEngine(source, NULL, tracker, settings);
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",640,480,engine->GetARData()));

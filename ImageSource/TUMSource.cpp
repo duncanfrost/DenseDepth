@@ -9,7 +9,6 @@
 TUMSource::TUMSource(const std::string& listFile, const std::string& depthListFile)
 {
     PathsFromListFile(rgbImagePaths, rgbTimeStamps, listFile);
-    PathsFromListFile(depthImagePaths, depthTimeStamps, depthListFile);
 }
 
 void TUMSource::PathsFromListFile(std::vector<std::string> &imagePaths,

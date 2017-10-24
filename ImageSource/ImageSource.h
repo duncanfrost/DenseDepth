@@ -9,7 +9,7 @@ public:
 
     ImageSource();
 
-    void GrabNewFrame(bool downsample);
+    void GrabNewFrame();
 
     void SetFrameNumber(unsigned int number)
     {
@@ -19,6 +19,11 @@ public:
     cv::Mat Image()
     {
         return imLeft;
+    }
+
+    cv::Mat RightImage()
+    {
+        return imRight;
     }
 
     long long TimeStamp()
@@ -33,10 +38,8 @@ public:
 
 protected:
     std::vector<std::string> stereoImagePaths;
-    std::vector<std::string> depthImagePaths;
     std::vector<std::string> rgbImagePaths;
     std::vector<long long> stereoTimeStamps;
-    std::vector<long long> depthTimeStamps;
     std::vector<long long> rgbTimeStamps;
 
     cv::Mat imLeft;

@@ -3,12 +3,13 @@
 #include <MonoLib/Shared/Map.h>
 #include <opencv2/opencv.hpp>
 #include <ImageSource/ImageSource.h>
+#include <ImageSource/DepthSource.h>
 #include <Tracking/FileTracker.h>
 #include <sophus/se3.hpp>
 #include <ORUtils/ImageTypes.h>
 #include <MonoLib/MonoDepthEstimator_CUDA.h>
 
-#define BUFFERSIZE 300
+#define BUFFERSIZE 150
 
 class MonoEngine
 {
@@ -22,7 +23,8 @@ public:
         float cy;
     };
 
-    MonoEngine(ImageSource* source, FileTracker *tracker, Settings settings);
+    MonoEngine(ImageSource* source, DepthSource* depthSource,
+               FileTracker *tracker, Settings settings);
 
     void AddKeyFrameManual()
     {
@@ -71,6 +73,7 @@ private:
     TrackerData* currTrackerData;
     FileTracker* tracker;
     ImageSource* source;
+    DepthSource* depthSource;
     cv::Mat image;
     Vector2i imgSize;
     ORUChar4TSImage *orImage;

@@ -37,7 +37,7 @@ FusionEngine::FusionEngine(PhoneSource* source, FileTracker* tracker)
 
 void FusionEngine::Process()
 {
-    source->GrabNewFrame(false);
+    source->GrabNewFrame();
     image = source->Image();
     timeStamp = source->TimeStamp();
 

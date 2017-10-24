@@ -10,25 +10,12 @@ ImageSource::ImageSource()
     frameNumber = 0;
 }
 
-void ImageSource::GrabNewFrame(bool downsample)
+void ImageSource::GrabNewFrame()
 {
     std::string path =  rgbImagePaths[frameNumber];
     timeStamp = rgbTimeStamps[frameNumber];
     cv::Mat imTemp = cv::imread(path);
-
-    cv::Size size;
-    size.width = 3;
-    size.height = 3;
-    
-
-    if (downsample)
-    {
-        cv::resize(imTemp, imLeft, cv::Size(), 0.25f, 0.25f);
-        cv::GaussianBlur(imLeft, imLeft, size, 3);
-    }
-    else
-        imLeft = imTemp;
-
+    imLeft = imTemp;
     frameNumber++;
 }
 
