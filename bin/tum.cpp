@@ -24,7 +24,7 @@ int main(void)
 
     std::string poseDirectory = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/";
 
-    source = new TUMSource(filename1, filename2);
+    source = new TUMSource(filename1);
     depthSource = new TUMDepthSource(filename2);
     tracker = new TUMFileTracker(poseDirectory, "groundtruth.txt");
 

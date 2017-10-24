@@ -6,7 +6,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iomanip>
 
-TUMSource::TUMSource(const std::string& listFile, const std::string& depthListFile)
+TUMSource::TUMSource(const std::string& listFile)
 {
     PathsFromListFile(rgbImagePaths, rgbTimeStamps, listFile);
 }

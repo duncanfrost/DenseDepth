@@ -7,7 +7,7 @@
 class TUMSource : public ImageSource
 {
 public:
-    TUMSource(const std::string& listFile, const std::string& depthListFile);
+    TUMSource(const std::string& listFile);
 
 private:
     void PathsFromListFile(std::vector<std::string> &imagePaths,
