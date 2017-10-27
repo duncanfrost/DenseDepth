@@ -78,6 +78,8 @@ void MonoEngine::Process()
     if (SampleActive(count, BUFFERSIZE))
     {
         SmoothPhotoBuffer(200);
+        // WritePhotoErrors("/home/duncan/photo.bin");
+        // exit(1);
     }
 
     std::cout << "Framenumber: " << count << std::endl;
