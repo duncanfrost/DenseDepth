@@ -33,13 +33,32 @@ int main(void)
     std::cout << "Image size: " << imgSize << std::endl;
     monoDepthEstimator = new MonoLib::MonoDepthEstimator_CUDA(imgSize, intrinsics);
 
-    for (int y = 0; y < 10; y++)
-    {
-        for (int x = 0; x < 10; x++)
+    // for (int y = 0; y < 10; y++)
+    // {
+    //     for (int x = 0; x < 10; x++)
+    //     {
+    //         unsigned char pix = imIn.at<unsigned char>(y,x);
+    //         std::cout << (int)pix << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
+
+    std::cout<< "Size: " << monoDepthEstimator->optimPyramid->d->noDims << std::endl;
+
+    for (int y = 0; y < imgSize.y; y++)
+        for (int x = 0; x < imgSize.x; x++)
         {
             unsigned char pix = imIn.at<unsigned char>(y,x);
-            std::cout << (int)pix << " ";
+
+            unsigned int index = x + imgSize.x * y;
+            float val = (float)pix / 256;
+
+            // std::cout << (int)pix << "->" << val << std::endl;
+            monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index] = val;
         }
-        std::cout << std::endl;
-    }
+
+
+
+
+
 }
