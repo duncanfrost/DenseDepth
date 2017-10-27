@@ -22,6 +22,7 @@ namespace MonoLib {
                               ORUtils::TimeStampedImage<Vector4u> *frame);
 
         void RunTVOptimisation(unsigned int iterations) {}
+        void RunTVL1Optimisation(unsigned int iterations) {}
 
         void InitOptim(){}
         void SmoothDTAM(){}

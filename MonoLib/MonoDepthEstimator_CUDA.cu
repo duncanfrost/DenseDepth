@@ -1295,3 +1295,7 @@ void MonoDepthEstimator_CUDA::SmoothL1()
     std::cout << "Here2" << std::endl;
 
 }
+
+void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
+{
+}
