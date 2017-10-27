@@ -18,6 +18,7 @@ namespace MonoLib {
 
 
         //Stuff for TV smoothing
+        ORUtils::Image<float> *p;
         ORUtils::Image<float> *qx, *qy;
         ORUtils::Image<float> *g;
 
@@ -102,13 +103,13 @@ namespace MonoLib {
 
             this->error = new ORUtils::Image<float>(imgSize, allocateCPU, allocateCUDA);
             this->certainty = new ORUtils::Image<float>(imgSize, allocateCPU, allocateCUDA);
-
             this->minIndices = new ORUtils::Image<int>(imgSize, allocateCPU, allocateCUDA);
 
 
             this->dx = new ORUtils::Image<float>(imgSize, allocateCPU, allocateCUDA);
             this->dy = new ORUtils::Image<float>(imgSize, allocateCPU, allocateCUDA);
             this->divQ = new ORUtils::Image<float>(imgSize, allocateCPU, allocateCUDA);
+            this->p = new ORUtils::Image<float>(imgSize, allocateCPU, allocateCUDA);
             // this->minError = new ORUtils::Image<float>(imgSize, allocateCPU, allocateCUDA);
 
 
@@ -121,6 +122,7 @@ namespace MonoLib {
 
         void UpdateHostFromDevice()
         {
+            p->UpdateHostFromDevice();
             qx->UpdateHostFromDevice();
             qy->UpdateHostFromDevice();
             g->UpdateHostFromDevice();
@@ -139,6 +141,7 @@ namespace MonoLib {
 
         void UpdateDeviceFromHost()
         {
+            p->UpdateDeviceFromHost();
             qx->UpdateDeviceFromHost();
             qy->UpdateDeviceFromHost();
             g->UpdateDeviceFromHost();
