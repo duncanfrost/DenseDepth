@@ -196,6 +196,26 @@ __global__ void UpdateD(float *d_data, float *divQ_data,
 
 }
 
+__global__ void UpdateDL1(float *d_data, float *divQ_data,
+                          float *a_data, float *p_data,
+                          float sigma, float tau, float lambda,
+                          Vector2i imgSize)
+{
+    int x = blockIdx.x*blockDim.x+threadIdx.x;
+    int y = blockIdx.y*blockDim.y+threadIdx.y;
+    if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
+    int image_offset = x + y * imgSize.x;
+
+
+    float divQ = divQ_data[image_offset];
+    float d_in = d_data[image_offset];
+    float p = p_data[image_offset];
+
+    float d_out = d_in + tau*divQ - lambda*(tau*p);
+    d_data[image_offset] = d_out;
+}
+
+
 __global__ void UpdateQ(float *qx_data,float *qy_data,
                         float *dx_data,float *dy_data,
                         float *g_data, 
@@ -257,6 +277,30 @@ __global__ void UpdateQL1(float *qx_data,float *qy_data,
 
     qx_data[image_offset] = qx_out;
     qy_data[image_offset] = qy_out;
+}
+
+__global__ void UpdatePL1(float *p_data,
+                          float *d_data,float *a_data,
+                          Vector2i imgSize, float sigma,
+                          float lambda)
+{
+    int x = blockIdx.x*blockDim.x+threadIdx.x;
+    int y = blockIdx.y*blockDim.y+threadIdx.y;
+    if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
+
+    int image_offset = x + y * imgSize.x;
+
+    float p = p_data[image_offset];
+    float d = d_data[image_offset];
+    float a = a_data[image_offset];
+
+    float p_out = p + sigma*lambda*(d - a);
+
+    float norm_p = abs(p_out);
+    float norm = max_agnostic(1, norm_p);
+    p_out /= norm;
+
+    p_data[image_offset] = p_out;
 }
 
 
@@ -770,6 +814,37 @@ __global__ void ComputeFullError_device(float *d_data, float *error_data,
     error_data[image_offset] = totalError;
 }
 
+__global__ void ComputeL1Error(float *d_data,
+                               float *a_data,
+                               float *error_data,
+                               Vector2i imgSize,
+                               float lambda)
+{
+    int x = blockIdx.x*blockDim.x+threadIdx.x;
+    int y = blockIdx.y*blockDim.y+threadIdx.y;
+    if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
+    int image_offset=x + y * imgSize.x;
+
+    int x_plus = clamp(x+1, imgSize.x);
+    int y_plus = clamp(y+1, imgSize.y);
+    // //Gradient from matrix A
+
+    float grad_d_x=d_data[x_plus + imgSize.x * y] - d_data[x + imgSize.x * y];
+    float grad_d_y=d_data[x + imgSize.x * y_plus] - d_data[x + imgSize.x * y];
+
+    float grad_norm = (grad_d_x*grad_d_x + grad_d_y*grad_d_y);
+    float absNorm=sqrtf(grad_norm);
+
+    float d = d_data[image_offset];
+    float a = a_data[image_offset];
+
+    float diff = fabs(d - a);
+
+    float totalError = absNorm + lambda * diff;
+    error_data[image_offset] = totalError;
+}
+
+
 
 
 
@@ -1163,6 +1238,7 @@ void MonoDepthEstimator_CUDA::SmoothL1()
 {
 
     //D is the same as u
+    //A is the same as f_in
     std::cout << "Here" << std::endl;
 
     Vector2i imgSize = optimPyramid->d->noDims;
@@ -1172,8 +1248,9 @@ void MonoDepthEstimator_CUDA::SmoothL1()
     float L2=1.0;
     float tau=0.00051;
     float sigma=1.0/(L2*tau);
+    float lambda = 0.5;
 
-    for (unsigned int j = 0; j < 10; j++)
+    for (unsigned int j = 0; j < 100; j++)
     {
 
         ComputeGradient<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
@@ -1186,6 +1263,32 @@ void MonoDepthEstimator_CUDA::SmoothL1()
                                                 optimPyramid->dx->GetData(MEMORYDEVICE_CUDA),
                                                 optimPyramid->dy->GetData(MEMORYDEVICE_CUDA),
                                                 imgSize, sigma);
+
+        UpdatePL1<<<blocks2,threadsPerBlock2>>>(optimPyramid->p->GetData(MEMORYDEVICE_CUDA),
+                                                optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
+                                                imgSize, sigma, lambda);
+
+        ComputeDivQ<<<blocks2,threadsPerBlock2>>>(optimPyramid->qx->GetData(MEMORYDEVICE_CUDA),
+                                                  optimPyramid->qy->GetData(MEMORYDEVICE_CUDA),
+                                                  optimPyramid->divQ->GetData(MEMORYDEVICE_CUDA),
+                                                  imgSize);
+
+        UpdateDL1<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                optimPyramid->divQ->GetData(MEMORYDEVICE_CUDA),
+                                                optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
+                                                optimPyramid->p->GetData(MEMORYDEVICE_CUDA),
+                                                sigma, tau, lambda, imgSize);
+
+        ComputeL1Error<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                     optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
+                                                     optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
+                                                     imgSize, lambda);
+
+
+        optimPyramid->error->UpdateHostFromDevice();
+        float error = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
+        std::cout << "Error: " << error << std::endl;
 
     }
     
