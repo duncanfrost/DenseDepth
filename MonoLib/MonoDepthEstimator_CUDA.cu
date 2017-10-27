@@ -1126,3 +1126,10 @@ void MonoDepthEstimator_CUDA::OptimToDepth(bool useRawDepth)
     OptimToDepth_device<<<blocks2,threadsPerBlock2>>>(data, monoLevel->depth->GetData(MEMORYDEVICE_CUDA),
                                                       optimPyramid->minIDepth,optimPyramid->maxIDepth, imgSize);
 }
+
+
+
+void MonoDepthEstimator_CUDA::SmoothL1()
+{
+    std::cout << "Here" << std::endl;
+}

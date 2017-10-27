@@ -18,7 +18,7 @@ int main(void)
 
     std::cout<< imIn.channels() << std::endl;
 
-    MonoLib::MonoDepthEstimator *monoDepthEstimator;
+    MonoLib::MonoDepthEstimator_CUDA *monoDepthEstimator;
 
     Vector2i imgSize;
     imgSize.x = imIn.cols;
@@ -56,6 +56,8 @@ int main(void)
             // std::cout << (int)pix << "->" << val << std::endl;
             monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index] = val;
         }
+
+    monoDepthEstimator->SmoothL1();
 
 
 

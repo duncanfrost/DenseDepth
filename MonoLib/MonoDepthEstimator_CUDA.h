@@ -22,6 +22,8 @@ namespace MonoLib {
         void UpdatePhotoError(ORUtils::SE3Pose refToTracker,
                               ORUtils::TimeStampedImage<Vector4u> *frame);
 
+        void SmoothL1();
+
         void OptimToDepth(bool useRawDepth);
 
         void RunTVOptimisation(unsigned int iterations);
