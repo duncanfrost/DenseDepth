@@ -11,3 +11,5 @@ target_link_libraries(main ${INTERN_LIBS} ${EXTERN_LIBS})
 target_link_libraries(fusion ${INTERN_LIBS} ${EXTERN_LIBS})
 target_link_libraries(tum ${INTERN_LIBS} ${EXTERN_LIBS})
 target_link_libraries(smooth ${INTERN_LIBS} ${EXTERN_LIBS})
+
+configure_file(../data/noisyLena.png noisyLena.png COPYONLY)
