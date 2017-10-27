@@ -1248,9 +1248,9 @@ void MonoDepthEstimator_CUDA::SmoothL1()
     float L2=1.0;
     float tau=0.00051;
     float sigma=1.0/(L2*tau);
-    float lambda = 0.5;
+    float lambda = 0.8;
 
-    for (unsigned int j = 0; j < 100; j++)
+    for (unsigned int j = 0; j < 1200; j++)
     {
 
         ComputeGradient<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),

@@ -60,11 +60,23 @@ int main(void)
 
     monoDepthEstimator->optimPyramid->a->UpdateDeviceFromHost();
     monoDepthEstimator->optimPyramid->d->UpdateDeviceFromHost();
-
     monoDepthEstimator->SmoothL1();
 
+    monoDepthEstimator->optimPyramid->d->UpdateHostFromDevice();
 
+    cv::Mat imOut = imIn.clone();
+    for (int y = 0; y < imgSize.y; y++)
+        for (int x = 0; x < imgSize.x; x++)
+        {
+            unsigned int index = x + imgSize.x * y;
+            float val = monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
+            unsigned char pix = val * 256;
+            imOut.at<unsigned char>(y,x) = pix;
+        }
 
+    cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    cv::imshow( "Display window", imOut );                   // Show our image inside it.
+    cv::waitKey(0);                                          // Wait for a keystroke in the window
 
 
 }
