@@ -230,6 +230,36 @@ __global__ void UpdateQ(float *qx_data,float *qy_data,
     qy_data[image_offset] = qy_out;
 }
 
+__global__ void UpdateQL1(float *qx_data,float *qy_data,
+                          float *dx_data,float *dy_data,
+                          Vector2i imgSize, float sigma_q)
+{
+    int x = blockIdx.x*blockDim.x+threadIdx.x;
+    int y = blockIdx.y*blockDim.y+threadIdx.y;
+    if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
+
+    int image_offset = x + y * imgSize.x;
+
+    float qx = qx_data[image_offset];
+    float qy = qy_data[image_offset];
+
+    float dx = dx_data[image_offset];
+    float dy = dy_data[image_offset];
+
+    float qx_out = qx + sigma_q * dx;
+    float qy_out = qy + sigma_q * dy;
+
+    float norm_q = sqrt(qx_out*qx_out + qy_out*qy_out);
+    float norm = max_agnostic(1, norm_q);
+    qx_out /= norm;
+    qy_out /= norm;
+
+
+    qx_data[image_offset] = qx_out;
+    qy_data[image_offset] = qy_out;
+}
+
+
 __global__ void ComputeDivQ(float *qx_data,float *qy_data,
                             float *divQ_data, Vector2i imgSize)
 {
@@ -1131,5 +1161,34 @@ void MonoDepthEstimator_CUDA::OptimToDepth(bool useRawDepth)
 
 void MonoDepthEstimator_CUDA::SmoothL1()
 {
+
+    //D is the same as u
     std::cout << "Here" << std::endl;
+
+    Vector2i imgSize = optimPyramid->d->noDims;
+    dim3 blocks2=getBlocksFor2DProcess(imgSize.x,imgSize.y);
+    dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
+
+    float L2=1.0;
+    float tau=0.00051;
+    float sigma=1.0/(L2*tau);
+
+    for (unsigned int j = 0; j < 10; j++)
+    {
+
+        ComputeGradient<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                      imgSize, 
+                                                      optimPyramid->dx->GetData(MEMORYDEVICE_CUDA),
+                                                      optimPyramid->dy->GetData(MEMORYDEVICE_CUDA));
+
+        UpdateQL1<<<blocks2,threadsPerBlock2>>>(optimPyramid->qx->GetData(MEMORYDEVICE_CUDA),
+                                                optimPyramid->qy->GetData(MEMORYDEVICE_CUDA),
+                                                optimPyramid->dx->GetData(MEMORYDEVICE_CUDA),
+                                                optimPyramid->dy->GetData(MEMORYDEVICE_CUDA),
+                                                imgSize, sigma);
+
+    }
+    
+    std::cout << "Here2" << std::endl;
+
 }
