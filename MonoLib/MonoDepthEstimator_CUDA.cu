@@ -1332,7 +1332,6 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
 
     totalError /= (double)count;
 
-    float beta = 0.002;
     float theta = 0.2;
 
     float L2=1.0;
@@ -1341,8 +1340,6 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
     
     while (theta > thetaEnd)
     {
-        // float theta = thetaStart - ((float)i / (float)(iterations-1))*thetaDiff;
-
         theta = theta*(1-beta);
 
         float innerErrorStart = 0;
