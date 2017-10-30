@@ -215,7 +215,7 @@ void optimize(cv::Mat &S,
     //std::cout << "\t compute S " << t.elapsed() << " sec" << std::endl;    
 }
 
-std::vector<cv::Mat> minimizeL0Gradient(const cv::Mat &src){
+cv::Mat minimizeL0Gradient(const cv::Mat &src){
     int rows = src.rows;
     int cols = src.cols;
     std::vector<cv::Mat> src_channels;
@@ -231,7 +231,6 @@ std::vector<cv::Mat> minimizeL0Gradient(const cv::Mat &src){
 
     // initialize
     cv::Mat S, H, V, grad_x, grad_y;
-    std::vector<cv::Mat> S_mats;
     float beta = beta0;
     int count = 0;    
     S = cv::Mat(rows, cols, CV_32FC1);
@@ -242,6 +241,8 @@ std::vector<cv::Mat> minimizeL0Gradient(const cv::Mat &src){
     init(rows, cols);
 
     // main loop
+
+    cv::Mat SOut;
     while(beta < beta_max){
         // minimize L0 gradient
         for(int i=0; i<num_of_channels; i++){
@@ -255,11 +256,11 @@ std::vector<cv::Mat> minimizeL0Gradient(const cv::Mat &src){
             cv::convertScaleAbs(S_channels[i], S_U8_channels[i], 255.0);
         }        
         cv::merge(S_U8_channels, S);        
-        S_mats.push_back(S.clone());
+        SOut = S.clone();
         if(count >= iter_max){
             break;
         }
         //std::cout << "iteration: " << t.elapsed() << " sec" << std::endl;
     }
-    return S_mats;
+    return SOut;
 }
