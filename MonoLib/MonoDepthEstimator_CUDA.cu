@@ -1354,7 +1354,7 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
         optimPyramid->error->UpdateHostFromDevice();
         float lastError = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
 
-        for (unsigned int j = 0; j < 100; j++)
+        for (unsigned int j = 0; j < 50; j++)
         {
             ComputeGradient<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
                                                           imgSize, 
