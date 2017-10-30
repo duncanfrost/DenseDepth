@@ -19,8 +19,8 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
     // imgSize.x = 640;
     // imgSize.y = 480;
 
-    imgSize.x = 160;
-    imgSize.y = 120;
+    imgSize.x = 320;
+    imgSize.y = 240;
 
     Vector4f intrinsics;
     float fx = (settings.fx/640)*imgSize.x;
@@ -156,6 +156,21 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
     else
         std::cout << "No depth source" << std::endl;
 
+
+    cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
+    monoDepthEstimator->optimPyramid->d->UpdateHostFromDevice();
+    for (int y = 0; y < imgSize.y; y++)
+        for (int x = 0; x < imgSize.x; x++)
+        {
+            unsigned int index = x + imgSize.x * y;
+            float val = monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
+            unsigned char pix = val * 256;
+            imOut.at<unsigned char>(y,x) = pix;
+        }
+
+    cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    cv::imshow( "Display window", imOut );                   // Show our image inside it.
+    cv::waitKey(0);                                          // Wait for a keystroke in the window
 
     paused = true;
 
