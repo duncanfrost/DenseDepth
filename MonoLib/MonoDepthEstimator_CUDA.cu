@@ -1335,7 +1335,7 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
     float theta = 0.2;
 
     float L2=1.0;
-    float tau=0.00051;
+    float tau=0.000051;
     float sigma=1.0/(L2*tau);
     
     while (theta > thetaEnd)
@@ -1354,7 +1354,7 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
         optimPyramid->error->UpdateHostFromDevice();
         float lastError = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
 
-        for (unsigned int j = 0; j < 10; j++)
+        for (unsigned int j = 0; j < 100; j++)
         {
             ComputeGradient<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
                                                           imgSize, 
@@ -1391,7 +1391,7 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
 
             optimPyramid->error->UpdateHostFromDevice();
             float error = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
-            std::cout << "Error: " << error << std::endl;
+            std::cout << "Error: " << error << "   Theta: " << theta << " / " << thetaEnd << "\n";
         }
                                               
 

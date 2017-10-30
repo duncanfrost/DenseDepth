@@ -132,7 +132,8 @@ void MonoEngine::Sample()
 
 void MonoEngine::SmoothPhoto(int iterations)
 {
-    monoDepthEstimator->RunTVOptimisation(iterations);
+    // monoDepthEstimator->RunTVOptimisation(iterations);
+    monoDepthEstimator->RunTVL1Optimisation(iterations);
 }
 
 void MonoEngine::SmoothPhotoBuffer(int iterations)
@@ -154,6 +155,8 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
     else
         std::cout << "No depth source" << std::endl;
 
+
+    paused = true;
 
 
     // cv::Mat testIm(imgSize.y, imgSize.x, CV_16UC1); 
