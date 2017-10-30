@@ -5,7 +5,7 @@ std::string input_file, out_dir, config_file;
 
 // optimization params
 float lambda = 0.01;
-float beta_max = 500;
+float beta_max = 5;
 float kappa = 2;
 bool exact = false;
 int iter_max = 1000;
@@ -223,6 +223,8 @@ cv::Mat minimizeL0Gradient(const cv::Mat &src, const cv::Mat &smooth){
     cv::split(smooth, smooth_channels);
 
     int num_of_channels = src_channels.size();    
+
+    std::cout << "Number of channels: " << num_of_channels << std::endl;
     std::vector<cv::Mat> S_channels(num_of_channels), I_channels(num_of_channels), S_U8_channels(num_of_channels);
     for(int i=0; i<num_of_channels; i++){
         src_channels[i].convertTo(I_channels[i], CV_32FC1);

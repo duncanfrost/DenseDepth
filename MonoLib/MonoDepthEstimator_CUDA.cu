@@ -1440,7 +1440,17 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
     float L2=1.0;
     float tau=0.000051;
     float sigma=1.0/(L2*tau);
+
+
     
+    MinErrorTrueFit_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+                                                         optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                         optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
+                                                         optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+                                                         optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
+                                                         imgSize,
+                                                         optimPyramid->depthSamples, theta, tvSettings.epsilon,
+                                                         tvSettings.lambda);
     while (theta > thetaEnd)
     {
         theta = theta*(1-beta);
@@ -1452,6 +1462,7 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
 
         optimPyramid->d->UpdateHostFromDevice();
         optimPyramid->a->UpdateHostFromDevice();
+        cv::Mat dInU = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
         for (int y = 0; y < imgSize.y; y++)
             for (int x = 0; x < imgSize.x; x++)
             {
@@ -1461,19 +1472,30 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
                 float aPix = optimPyramid->a->GetData(MEMORYDEVICE_CPU)[index];
                 dCV.at<float>(y,x) = dPix;
                 aCV.at<float>(y,x) = aPix;
+                dInU.at<unsigned char>(y,x) = dPix*255;
             }
             
 
+        cv::namedWindow( "Before", cv::WINDOW_AUTOSIZE );// Create a window for display.
+        cv::imshow( "Before", dInU );                   // Show our image inside it.
+        cv::waitKey(0);                                          // Wait for a keystroke in the window
 
 
         cv::Mat dOut = minimizeL0Gradient(aCV,dCV);
+        cv::Mat dOutU = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
         for (int y = 0; y < imgSize.y; y++)
             for (int x = 0; x < imgSize.x; x++)
             {
                 unsigned int index = x + imgSize.x * y;
                 float dPix = dOut.at<float>(y,x); 
                 optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index] = dPix;
+                dOutU.at<unsigned char>(y,x) = dPix*255;
             }
+
+
+        cv::namedWindow( "After", cv::WINDOW_AUTOSIZE );// Create a window for display.
+        cv::imshow( "After", dOutU );                   // Show our image inside it.
+        cv::waitKey(0);                                          // Wait for a keystroke in the window
 
                                               
 
