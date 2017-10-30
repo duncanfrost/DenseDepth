@@ -36,6 +36,6 @@ int main(void)
 
     engine = new MonoEngine(source, depthSource, tracker, settings);
 
-    for (unsigned int i = 0 i < 300)
+    for (unsigned int i = 0; i < 300; i++)
         engine->Process();
 }
