@@ -251,10 +251,10 @@ std::vector<cv::Mat> minimizeL0Gradient(const cv::Mat &src){
         beta = beta*kappa;
         std::cout << "iteration #" << count++ << " beta: " << beta << std::endl;
 
-        for(int i=0; i<num_of_channels; i++){
-            cv::convertScaleAbs(S_channels[i], S_U8_channels[i], 255.0);
-        }        
-        cv::merge(S_U8_channels, S);        
+        // for(int i=0; i<num_of_channels; i++){
+        //     cv::convertScaleAbs(S_channels[i], S_U8_channels[i], 255.0);
+        // }        
+        cv::merge(S_channels, S);        
         S_mats.push_back(S.clone());
         if(count >= iter_max){
             break;
