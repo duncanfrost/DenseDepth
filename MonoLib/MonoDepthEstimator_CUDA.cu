@@ -1411,3 +1411,119 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
 
     OptimToDepth(false);
 }
+
+void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
+{
+    // Same as smmoth L1 except 
+    InitOptim();
+    MonoLib::MonoPyramidLevel *monoLevel = currDepthFrame->dataImage;
+
+    Vector2i imgSize = monoLevel->depth->noDims;
+    dim3 blocks2=getBlocksFor2DProcess(imgSize.x,imgSize.y);
+    dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
+
+    float thetaStart = 1;
+    float thetaEnd = 1e-4;
+    float thetaDiff = thetaStart - thetaEnd;
+    float outerError = 0;
+    iterations = 300;
+    float beta = 0.002;
+
+    optimPyramid->photoErrors->UpdateHostFromDevice();
+
+    double totalError = 0;
+    long count = 0;
+
+    for (int y = 0; y < imgSize.y; y++)
+        for (int x = 0; x < imgSize.x; x++)
+            for (int z = 0; z < optimPyramid->depthSamples; z++)
+            {
+                int offset = x + y * imgSize.x+ z* imgSize.x*imgSize.y;
+                float error = optimPyramid->photoErrors->GetData(MEMORYDEVICE_CPU)[offset];
+                totalError += error;
+
+                count += 1;
+            }
+
+
+    totalError /= (double)count;
+
+    float theta = 0.2;
+
+    float L2=1.0;
+    float tau=0.000051;
+    float sigma=1.0/(L2*tau);
+    
+    while (theta > thetaEnd)
+    {
+        theta = theta*(1-beta);
+
+        float innerErrorStart = 0;
+
+        ComputeFullError_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                              optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
+                                                              optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+                                                              optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+                                                              imgSize, tvSettings.epsilon, tvSettings.lambda); 
+
+
+        optimPyramid->error->UpdateHostFromDevice();
+        float lastError = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
+
+        for (unsigned int j = 0; j < 20; j++)
+        {
+            ComputeGradient<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                          imgSize, 
+                                                          optimPyramid->dx->GetData(MEMORYDEVICE_CUDA),
+                                                          optimPyramid->dy->GetData(MEMORYDEVICE_CUDA));
+
+            UpdateQL1<<<blocks2,threadsPerBlock2>>>(optimPyramid->qx->GetData(MEMORYDEVICE_CUDA),
+                                                    optimPyramid->qy->GetData(MEMORYDEVICE_CUDA),
+                                                    optimPyramid->dx->GetData(MEMORYDEVICE_CUDA),
+                                                    optimPyramid->dy->GetData(MEMORYDEVICE_CUDA),
+                                                    imgSize, sigma);
+
+            UpdatePL1<<<blocks2,threadsPerBlock2>>>(optimPyramid->p->GetData(MEMORYDEVICE_CUDA),
+                                                    optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                    optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
+                                                    imgSize, sigma, tvSettings.lambda);
+
+            ComputeDivQ<<<blocks2,threadsPerBlock2>>>(optimPyramid->qx->GetData(MEMORYDEVICE_CUDA),
+                                                      optimPyramid->qy->GetData(MEMORYDEVICE_CUDA),
+                                                      optimPyramid->divQ->GetData(MEMORYDEVICE_CUDA),
+                                                      imgSize);
+
+            UpdateDL1<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                    optimPyramid->divQ->GetData(MEMORYDEVICE_CUDA),
+                                                    optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
+                                                    optimPyramid->p->GetData(MEMORYDEVICE_CUDA),
+                                                    sigma, tau, tvSettings.lambda, imgSize);
+
+            ComputeL1Error<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                         optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
+                                                         optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
+                                                         imgSize, tvSettings.lambda);
+
+
+            optimPyramid->error->UpdateHostFromDevice();
+            float error = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
+            std::cout << "Error: " << error << "   Theta: " << theta << " / " << thetaEnd << "\n";
+        }
+                                              
+
+
+        MinErrorTrueFit_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+                                                             optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                             optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
+                                                             optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+                                                             optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
+                                                             imgSize,
+                                                             optimPyramid->depthSamples, theta, tvSettings.epsilon,
+                                                             tvSettings.lambda);
+
+        optimPyramid->error->UpdateHostFromDevice();
+        outerError = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
+    }
+
+    OptimToDepth(false);
+}

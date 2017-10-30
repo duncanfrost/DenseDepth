@@ -133,8 +133,9 @@ void MonoEngine::Sample()
 
 void MonoEngine::SmoothPhoto(int iterations)
 {
-    monoDepthEstimator->RunTVOptimisation(iterations);
+    // monoDepthEstimator->RunTVOptimisation(iterations);
     // monoDepthEstimator->RunTVL1Optimisation(iterations);
+    monoDepthEstimator->RunTVL0Optimisation(iterations);
 }
 
 void MonoEngine::SmoothPhotoBuffer(int iterations)

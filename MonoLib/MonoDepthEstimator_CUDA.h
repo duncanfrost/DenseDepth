@@ -28,6 +28,7 @@ namespace MonoLib {
 
         void RunTVOptimisation(unsigned int iterations);
         void RunTVL1Optimisation(unsigned int iterations);
+        void RunTVL0Optimisation(unsigned int iterations);
         void InitOptim();
         void SmoothDTAM();
         void DisplayPhotoVolume(int x, int y);
