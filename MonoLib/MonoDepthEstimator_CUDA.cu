@@ -1429,7 +1429,7 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
     float thetaDiff = thetaStart - thetaEnd;
     float outerError = 0;
     iterations = 300;
-    float beta = 0.002;
+    float beta = 0.1;
 
     optimPyramid->photoErrors->UpdateHostFromDevice();
     cv::Mat dCV = cv::Mat(imgSize.y, imgSize.x, CV_32FC1);
@@ -1466,7 +1466,14 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
 
 
 
-        minimizeL0Gradient(dCV);
+        cv::Mat dOut = minimizeL0Gradient(aCV,dCV);
+        for (int y = 0; y < imgSize.y; y++)
+            for (int x = 0; x < imgSize.x; x++)
+            {
+                unsigned int index = x + imgSize.x * y;
+                float dPix = dOut.at<float>(y,x); 
+                optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index] = dPix;
+            }
 
                                               
 
