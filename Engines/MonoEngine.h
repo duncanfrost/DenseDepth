@@ -45,6 +45,11 @@ public:
         return map;
     }
 
+    void TogglePaused()
+    {
+        paused = !paused;
+    }
+
     static Sophus::SE3f invRefPose;
     void SmoothPhoto(int iterations);
     void SmoothPhotoBuffer(int iterations);
@@ -97,6 +102,7 @@ private:
 
 
     void Sample();
+    bool paused;
 
 
 

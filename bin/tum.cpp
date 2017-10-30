@@ -14,7 +14,6 @@ MonoEngine *engine;
 TUMSource *source;
 TUMDepthSource *depthSource;
 FileTracker *tracker;
-bool paused = false;
 
 int main(void)
 {
@@ -46,8 +45,7 @@ int main(void)
 
 void Idle(void)
 {
-    if (!paused)
-        engine->Process();
+    engine->Process();
     visModule->DrawWindows();
 }
 
@@ -63,7 +61,7 @@ void KeyboardFunction(unsigned char key, int x, int y)
         break;
 
     case 'p':
-        paused = !paused;
+        engine->TogglePaused();
         break;
         
     case 'o':

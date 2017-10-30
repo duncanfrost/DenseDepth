@@ -48,11 +48,15 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
     bufferTop = 0;
     framesProcessed = 0;
     nMid = BUFFERSIZE/2; 
+    paused = false;
 }
 
 
 void MonoEngine::Process()
 {
+    if (paused)
+        return;
+
     source->GrabNewFrame();
     image = source->Image();
     timeStamp = source->TimeStamp();
