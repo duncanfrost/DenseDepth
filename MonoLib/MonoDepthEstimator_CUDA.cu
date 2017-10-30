@@ -1481,7 +1481,10 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
         cv::waitKey(0);                                          // Wait for a keystroke in the window
 
 
-        cv::Mat dOut = minimizeL0Gradient(aCV,dCV);
+
+        std::vector<cv::Mat> S_mats = minimizeL0Gradient(dCV);
+        cv::Mat dOut = S_mats.back();
+
         cv::Mat dOutU = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
         for (int y = 0; y < imgSize.y; y++)
             for (int x = 0; x < imgSize.x; x++)
@@ -1491,6 +1494,9 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
                 optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index] = dPix;
                 dOutU.at<unsigned char>(y,x) = dPix*255;
             }
+
+        // std::cout << dOut << std::endl;
+        // exit(1);
 
 
         cv::namedWindow( "After", cv::WINDOW_AUTOSIZE );// Create a window for display.
