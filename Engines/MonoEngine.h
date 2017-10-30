@@ -73,6 +73,8 @@ private:
 
     void WriteEmpty();
 
+    cv::Mat PreProcessImage(cv::Mat image);
+
 
 
     TrackerData* currTrackerData;

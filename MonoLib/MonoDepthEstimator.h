@@ -24,7 +24,7 @@ namespace MonoLib {
             TVParameters()
             {
                 //Weighting between regulariser and photometric cost
-                lambda=0.1f;
+                lambda=0.3f;
 
                 // Step sizes for gradient ascent/descent 
                 sigma_d = 0.01;

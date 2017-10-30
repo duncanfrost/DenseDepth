@@ -16,11 +16,11 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
     currTrackerData = new TrackerData();
     map = new GlobalMap();
 
-    imgSize.x = 640;
-    imgSize.y = 480;
+    // imgSize.x = 640;
+    // imgSize.y = 480;
 
-    // imgSize.x = 160;
-    // imgSize.y = 120;
+    imgSize.x = 160;
+    imgSize.y = 120;
 
     Vector4f intrinsics;
     float fx = (settings.fx/640)*imgSize.x;
@@ -58,7 +58,8 @@ void MonoEngine::Process()
         return;
 
     source->GrabNewFrame();
-    image = source->Image();
+    cv::Mat rawImage = source->Image();
+    image = PreProcessImage(rawImage);
     timeStamp = source->TimeStamp();
     long long count = source->FrameNumber();
     long long timeOut;
@@ -305,4 +306,16 @@ void MonoEngine::SaveToBuffer(ORUChar4TSImage *inputRGBImage,
 void MonoEngine::WritePhotoErrors(std::string path)
 {
     monoDepthEstimator->WritePhotoErrors(path);
+}
+
+cv::Mat MonoEngine::PreProcessImage(cv::Mat image)
+{
+    cv::Size outSize;
+    outSize.width = imgSize.x;
+    outSize.height = imgSize.y;
+    
+    cv::Mat imOut;
+    cv::resize(image, imOut, outSize);
+
+    return imOut;
 }
