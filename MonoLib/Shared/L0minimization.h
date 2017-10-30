@@ -4,8 +4,8 @@
 std::string input_file, out_dir, config_file;
 
 // optimization params
-float lambda = 0.01;
-float beta_max = 10000;
+float lambda = 0.00001;
+float beta_max = 500;
 float kappa = 2;
 float beta0 = 2*lambda;
 bool exact = false;
@@ -215,18 +215,21 @@ void optimize(cv::Mat &S,
     //std::cout << "\t compute S " << t.elapsed() << " sec" << std::endl;    
 }
 
-std::vector<cv::Mat> minimizeL0Gradient(const cv::Mat &src){
+std::vector<cv::Mat> minimizeL0Gradient(const cv::Mat &src, const cv::Mat &smooth){
     int rows = src.rows;
     int cols = src.cols;
     std::vector<cv::Mat> src_channels;
     cv::split(src, src_channels);
+    std::vector<cv::Mat> smooth_channels;
+    cv::split(smooth, smooth_channels);
 
     int num_of_channels = src_channels.size();    
     std::vector<cv::Mat> S_channels(num_of_channels), I_channels(num_of_channels), S_U8_channels(num_of_channels);
     for(int i=0; i<num_of_channels; i++){
         src_channels[i].convertTo(I_channels[i], CV_32FC1);
+        smooth_channels[i].convertTo(S_channels[i], CV_32FC1);
         // I_channels[i] *= 1./255;
-        I_channels[i].copyTo(S_channels[i]);            
+        // I_channels[i].copyTo(S_channels[i]);            
     }
 
     // initialize

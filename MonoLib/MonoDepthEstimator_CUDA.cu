@@ -1476,13 +1476,13 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
             }
             
 
-        cv::namedWindow( "Before", cv::WINDOW_AUTOSIZE );// Create a window for display.
-        cv::imshow( "Before", dInU );                   // Show our image inside it.
-        cv::waitKey(0);                                          // Wait for a keystroke in the window
+        // cv::namedWindow( "Before", cv::WINDOW_AUTOSIZE );// Create a window for display.
+        // cv::imshow( "Before", dInU );                   // Show our image inside it.
+        // cv::waitKey(0);                                          // Wait for a keystroke in the window
 
 
 
-        std::vector<cv::Mat> S_mats = minimizeL0Gradient(dCV);
+        std::vector<cv::Mat> S_mats = minimizeL0Gradient(aCV,dCV);
         cv::Mat dOut = S_mats.back();
 
         cv::Mat dOutU = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
@@ -1495,13 +1495,14 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
                 dOutU.at<unsigned char>(y,x) = dPix*255;
             }
 
+        optimPyramid->d->UpdateDeviceFromHost();
         // std::cout << dOut << std::endl;
         // exit(1);
 
 
-        cv::namedWindow( "After", cv::WINDOW_AUTOSIZE );// Create a window for display.
-        cv::imshow( "After", dOutU );                   // Show our image inside it.
-        cv::waitKey(0);                                          // Wait for a keystroke in the window
+        // cv::namedWindow( "After", cv::WINDOW_AUTOSIZE );// Create a window for display.
+        // cv::imshow( "After", dOutU );                   // Show our image inside it.
+        // cv::waitKey(0);                                          // Wait for a keystroke in the window
 
                                               
 
