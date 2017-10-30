@@ -314,8 +314,16 @@ cv::Mat MonoEngine::PreProcessImage(cv::Mat image)
     outSize.width = imgSize.x;
     outSize.height = imgSize.y;
     
+    cv::Mat imResized;
+    cv::resize(image, imResized, outSize);
+
+    cv::Size kernelSize;
+    kernelSize.width = 3;
+    kernelSize.height = 3;
+
     cv::Mat imOut;
-    cv::resize(image, imOut, outSize);
+    cv::GaussianBlur(imResized, imOut, kernelSize, 3);
+
 
     return imOut;
 }
