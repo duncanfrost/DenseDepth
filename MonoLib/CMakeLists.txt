@@ -16,7 +16,7 @@ SET(headers
   Shared/DenseMonoMath.h
   Shared/Intrinsics.h
   Shared/Keyframe.h
-  Shared/L0minimization.cpp
+  Shared/L0minimization.h
   Shared/Map.h
   Shared/MonoDepthEstimator_Shared.h
   Shared/MonoPyramidLevel.h
