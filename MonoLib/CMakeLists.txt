@@ -13,11 +13,15 @@ SET(headers
   MonoDepthEstimator.h
   MonoDepthEstimatorFactory.h
   MonoDepthEstimator_CUDA.h
-  Shared/MonoDepthEstimator_Shared.h
-  Shared/MonoView.h
-  Shared/MonoPyramidLevel.h
-  Shared/OptimPyramidLevel.h
+  Shared/DenseMonoMath.h
+  Shared/Intrinsics.h
   Shared/Keyframe.h
+  Shared/L0minimization.cpp
+  Shared/Map.h
+  Shared/MonoDepthEstimator_Shared.h
+  Shared/MonoPyramidLevel.h
+  Shared/MonoView.h
+  Shared/OptimPyramidLevel.h
   Shared/TrackerData.h
   )
 
