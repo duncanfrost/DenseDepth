@@ -8,6 +8,7 @@
 #include <sophus/se3.hpp>
 #include <ORUtils/ImageTypes.h>
 #include <MonoLib/MonoDepthEstimator_CUDA.h>
+#include <rmd/depthmap.h>
 
 #define BUFFERSIZE 150
 
@@ -31,7 +32,7 @@ public:
         needsKeyFrame = true;
     }
     
-    void AddKeyFrame(ORUChar4TSImage *inImage, Sophus::SE3f inPose);
+    void AddKeyFrame(cv::Mat inImage, Sophus::SE3f inPose);
 
     void Process();
 
@@ -64,7 +65,7 @@ private:
 
     void MakePointCloud(bool useRawDepth);
 
-    void SaveToBuffer(ORUChar4TSImage *inputRGBImage,
+    void SaveToBuffer(cv::Mat inputRGBImage,
                       Sophus::SE3f inputPose);
 
 
@@ -92,12 +93,13 @@ private:
     Sophus::SE3f currPose;
     GlobalMap *map;
     MonoLib::MonoDepthEstimator *monoDepthEstimator;
+    rmd::Depthmap *depthMap;
 
     bool hasReferenceFrame;
     bool useRawDepth;
     bool needsKeyFrame;
 
-    ORUChar4TSImage *imageBuffer[BUFFERSIZE];
+    cv::Mat imageBuffer[BUFFERSIZE];
     Sophus::SE3f poseBuffer[BUFFERSIZE];
     unsigned int timeStampBuffer[BUFFERSIZE];
 
