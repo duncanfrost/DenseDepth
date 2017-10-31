@@ -33,6 +33,7 @@ public:
     }
     
     void AddKeyFrame(cv::Mat inImage, Sophus::SE3f inPose);
+    void AddKeyFrame_Remode(cv::Mat inImage, Sophus::SE3f inPose);
 
     void Process();
 
@@ -54,11 +55,13 @@ public:
     static Sophus::SE3f invRefPose;
     void SmoothPhoto(int iterations);
     void SmoothPhotoBuffer(int iterations);
+    void SmoothPhotoRemode(int iterations);
 
     void GetPointCloud(unsigned int &width,
                        unsigned int &height, Vector3f **points,
                        Vector4u **colorData);
     void SampleFromBufferMid();
+    void SampleFromBufferMid_Remode();
     void WritePhotoErrors(std::string path);
 
 private:

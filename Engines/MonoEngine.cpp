@@ -68,6 +68,11 @@ void MonoEngine::Process()
 
     currPose = tracker->PoseAtTime(timeStamp, count, timeOut);
 
+
+
+    
+    Eigen::Quaternionf q = currPose.unit_quaternion();
+    std::cout << q.x() << " " << q.y() << " " << q.z() << " " << q.w() << " " << std::endl;
     // ConvertToOR(image, orImage);
 
 
@@ -102,26 +107,36 @@ void MonoEngine::AddKeyFrame(cv::Mat inImage, Sophus::SE3f inPose)
 {
     std::cout << "About to make new keyframe" << std::endl;
 
-
-    std::cout << "In Image: " << inImage << std::endl;
-    // Vector4u data = inImage->GetData(MEMORYDEVICE_CPU)[0];
-    // std::cout << "Data: " << (int)data[0] << std::endl;
-
-
     KeyFrame *kf = new KeyFrame();
     kf->pose = inPose;
     map->keyframeList.push_back(kf);
 
-
     ConvertToOR(inImage, orImage);
-
-
 
     orImage->UpdateDeviceFromHost();
     monoDepthEstimator->SetRefImage(orImage);
     invRefPose = kf->pose.inverse();
 
     monoDepthEstimator->SetLimitsManual(0.5,2);
+    hasReferenceFrame = true;
+}
+
+void MonoEngine::AddKeyFrame_Remode(cv::Mat inImage, Sophus::SE3f inPose)
+{
+    std::cout << "About to make new keyframe" << std::endl;
+
+    KeyFrame *kf = new KeyFrame();
+    kf->pose = inPose;
+    map->keyframeList.push_back(kf);
+
+
+
+    Eigen::Quaternionf q = inPose.unit_quaternion();
+    Eigen::Vector3f t =  inPose.translation();
+    rmd::SE3<float> rmdPose(q.w(), q.x(), q.y(), q.z(), t[0], t[1], t[2]);
+    depthMap->setReferenceImage(inImage, rmdPose, 0.5f, 2.0f);
+
+
     hasReferenceFrame = true;
 }
 
@@ -230,9 +245,6 @@ void MonoEngine::SampleFromBufferMid()
 {
     // ORUChar4TSImage *rgbImage = imageBuffer[nMid];
     Sophus::SE3f kfPose = poseBuffer[nMid];
-
-
-
     AddKeyFrame(imageBuffer[nMid], kfPose);
 
     for (int i = 0; i < BUFFERSIZE; i++)
@@ -244,7 +256,28 @@ void MonoEngine::SampleFromBufferMid()
         Sophus::SE3f inPose = trackingPose*invRefPose;
         cv::Mat inputRGBImage = imageBuffer[i];
 
+        ConvertToOR(inputRGBImage, orImage);
+        orImage->UpdateDeviceFromHost();
+        monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), orImage);
+    }
 
+
+}
+
+void MonoEngine::SampleFromBufferMid_Remode()
+{
+    // ORUChar4TSImage *rgbImage = imageBuffer[nMid];
+    Sophus::SE3f kfPose = poseBuffer[nMid];
+    AddKeyFrame(imageBuffer[nMid], kfPose);
+
+    for (int i = 0; i < BUFFERSIZE; i++)
+    {
+        if (i == nMid)
+            continue;
+        // std::cout << "Sampling: " << i << std::endl;
+        Sophus::SE3f trackingPose = poseBuffer[i];
+        Sophus::SE3f inPose = trackingPose*invRefPose;
+        cv::Mat inputRGBImage = imageBuffer[i];
 
         ConvertToOR(inputRGBImage, orImage);
         orImage->UpdateDeviceFromHost();
@@ -253,6 +286,7 @@ void MonoEngine::SampleFromBufferMid()
 
 
 }
+
 
 void MonoEngine::SaveToBuffer(cv::Mat inputRGBImage,
                               Sophus::SE3f inputPose)
@@ -308,4 +342,37 @@ cv::Mat MonoEngine::PreProcessImage(cv::Mat image)
 
 
     return imOut;
+}
+
+void MonoEngine::SmoothPhotoRemode(int iterations)
+{
+    SampleFromBufferMid();
+    SmoothPhoto(iterations);
+
+
+    long long timestamp = timeStampBuffer[nMid];
+
+    if (depthSource != NULL)
+        depthSource->GetDepthForTimeStamp(timestamp);
+    else
+        std::cout << "No depth source" << std::endl;
+
+
+    cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
+    monoDepthEstimator->optimPyramid->d->UpdateHostFromDevice();
+    for (int y = 0; y < imgSize.y; y++)
+        for (int x = 0; x < imgSize.x; x++)
+        {
+            unsigned int index = x + imgSize.x * y;
+            float val = monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
+            unsigned char pix = val * 256;
+            imOut.at<unsigned char>(y,x) = pix;
+        }
+
+    cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    cv::imshow( "Display window", imOut );                   // Show our image inside it.
+    cv::waitKey(0);                                          // Wait for a keystroke in the window
+
+    paused = true;
+
 }
