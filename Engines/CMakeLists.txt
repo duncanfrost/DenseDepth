@@ -4,11 +4,13 @@ INCLUDE(${PROJECT_SOURCE_DIR}/cmake/UseCUDA.cmake)
 
 SET(sources
   MonoEngine.cpp
+  RMDEngine.cpp
   FusionEngine.cpp
   )
 
 SET(headers
   MonoEngine.h
+  RMDEngine.h
   FusionEngine.h
   )
 
