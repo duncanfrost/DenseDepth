@@ -69,7 +69,6 @@ private:
 
 
 
-    void ConvertToOR(cv::Mat inImage, ORUChar4TSImage *outImage);
 
     void WriteEmpty();
 

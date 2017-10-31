@@ -58,7 +58,7 @@ inline void ORToCVConvertUpdates(ORUtils::Image<float> *imageIn,
 }
 
 
-inline void MonoEngine::ConvertToOR(cv::Mat inImage, ORUChar4TSImage *outImage)
+inline void ConvertToOR(cv::Mat inImage, ORUChar4TSImage *outImage)
 {
     for (int y = 0; y < inImage.rows; y++)
     {
