@@ -16,11 +16,11 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
     currTrackerData = new TrackerData();
     map = new GlobalMap();
 
-    // imgSize.x = 640;
-    // imgSize.y = 480;
+    imgSize.x = 640;
+    imgSize.y = 480;
 
-    imgSize.x = 320;
-    imgSize.y = 240;
+    // imgSize.x = 320;
+    // imgSize.y = 240;
 
     Vector4f intrinsics;
     float fx = (settings.fx/640)*imgSize.x;
@@ -89,6 +89,8 @@ void MonoEngine::Process()
     if (SampleActive(count, BUFFERSIZE))
     {
         SmoothPhotoBuffer(200);
+        // SmoothPhotoRemode(200);
+
         // WritePhotoErrors("/home/duncan/photo.bin");
         // exit(1);
     }
@@ -112,7 +114,6 @@ void MonoEngine::AddKeyFrame(cv::Mat inImage, Sophus::SE3f inPose)
     map->keyframeList.push_back(kf);
 
     ConvertToOR(inImage, orImage);
-
     orImage->UpdateDeviceFromHost();
     monoDepthEstimator->SetRefImage(orImage);
     invRefPose = kf->pose.inverse();
@@ -134,7 +135,17 @@ void MonoEngine::AddKeyFrame_Remode(cv::Mat inImage, Sophus::SE3f inPose)
     Eigen::Quaternionf q = inPose.unit_quaternion();
     Eigen::Vector3f t =  inPose.translation();
     rmd::SE3<float> rmdPose(q.w(), q.x(), q.y(), q.z(), t[0], t[1], t[2]);
-    depthMap->setReferenceImage(inImage, rmdPose, 0.5f, 2.0f);
+
+    ConvertToOR(inImage, orImage);
+    orImage->UpdateDeviceFromHost();
+    monoDepthEstimator->SetRefImage(orImage);
+    invRefPose = kf->pose.inverse();
+
+
+    cv::Mat greyMat;
+    cv::cvtColor(inImage, greyMat, CV_BGR2GRAY);
+
+    depthMap->setReferenceImage(greyMat, rmdPose, 0.5f, 2.0f);
 
 
     hasReferenceFrame = true;
@@ -268,20 +279,25 @@ void MonoEngine::SampleFromBufferMid_Remode()
 {
     // ORUChar4TSImage *rgbImage = imageBuffer[nMid];
     Sophus::SE3f kfPose = poseBuffer[nMid];
-    AddKeyFrame(imageBuffer[nMid], kfPose);
+    AddKeyFrame_Remode(imageBuffer[nMid], kfPose);
 
     for (int i = 0; i < BUFFERSIZE; i++)
     {
         if (i == nMid)
             continue;
-        // std::cout << "Sampling: " << i << std::endl;
+
         Sophus::SE3f trackingPose = poseBuffer[i];
-        Sophus::SE3f inPose = trackingPose*invRefPose;
         cv::Mat inputRGBImage = imageBuffer[i];
 
-        ConvertToOR(inputRGBImage, orImage);
-        orImage->UpdateDeviceFromHost();
-        monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), orImage);
+        Eigen::Quaternionf q = trackingPose.unit_quaternion();
+        Eigen::Vector3f t =  trackingPose.translation();
+        rmd::SE3<float> rmdPose(q.w(), q.x(), q.y(), q.z(), t[0], t[1], t[2]);
+
+        std::cout << "Updating depth map: " << i << std::endl;
+
+        cv::Mat greyMat;
+        cv::cvtColor(inputRGBImage, greyMat, CV_BGR2GRAY);
+        depthMap->update(greyMat, rmdPose);
     }
 
 
@@ -338,7 +354,8 @@ cv::Mat MonoEngine::PreProcessImage(cv::Mat image)
     kernelSize.height = 3;
 
     cv::Mat imOut;
-    cv::GaussianBlur(imResized, imOut, kernelSize, 3);
+    // cv::GaussianBlur(imResized, imOut, kernelSize, 3);
+    imOut = imResized;
 
 
     return imOut;
@@ -346,33 +363,37 @@ cv::Mat MonoEngine::PreProcessImage(cv::Mat image)
 
 void MonoEngine::SmoothPhotoRemode(int iterations)
 {
-    SampleFromBufferMid();
-    SmoothPhoto(iterations);
+    SampleFromBufferMid_Remode();
+    // SmoothPhoto(iterations);
 
 
-    long long timestamp = timeStampBuffer[nMid];
+    depthMap->downloadDenoisedDepthmap(0.6, 3000);
+    // depthMap->downloadDepthmap();
+    cv::Mat im = depthMap->getDepthmap();
 
-    if (depthSource != NULL)
-        depthSource->GetDepthForTimeStamp(timestamp);
-    else
-        std::cout << "No depth source" << std::endl;
+
+
+
 
 
     cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
-    monoDepthEstimator->optimPyramid->d->UpdateHostFromDevice();
+
     for (int y = 0; y < imgSize.y; y++)
         for (int x = 0; x < imgSize.x; x++)
         {
             unsigned int index = x + imgSize.x * y;
-            float val = monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
+            float val = im.at<float>(y,x);
             unsigned char pix = val * 256;
             imOut.at<unsigned char>(y,x) = pix;
+            monoDepthEstimator->currDepthFrame->dataImage->depth->GetData(MEMORYDEVICE_CPU)[index] = val;
         }
+
+    monoDepthEstimator->currDepthFrame->dataImage->depth->UpdateDeviceFromHost();
 
     cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
     cv::imshow( "Display window", imOut );                   // Show our image inside it.
     cv::waitKey(0);                                          // Wait for a keystroke in the window
 
-    paused = true;
+    // paused = true;
 
 }

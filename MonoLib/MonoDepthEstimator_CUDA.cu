@@ -192,7 +192,7 @@ __global__ void UpdateD(float *d_data, float *divQ_data,
 
     d_out /= (1 + sigma_d*invTheta);
 
-    float norm = max_agnostic(1, abs_agnostic(d_out));
+    float norm = max_agnostic(1.0f, abs_agnostic(d_out));
 
     d_data[image_offset] = d_out / norm;
 
@@ -243,7 +243,7 @@ __global__ void UpdateQ(float *qx_data,float *qy_data,
     qy_out /= (1 + sigma_q * epsilon);
 
     float norm_q = sqrt(qx_out*qx_out + qy_out*qy_out);
-    float norm = max_agnostic(1, norm_q);
+    float norm = max_agnostic(1.0f, norm_q);
     qx_out /= norm;
     qy_out /= norm;
 
@@ -272,7 +272,7 @@ __global__ void UpdateQL1(float *qx_data,float *qy_data,
     float qy_out = qy + sigma_q * dy;
 
     float norm_q = sqrt(qx_out*qx_out + qy_out*qy_out);
-    float norm = max_agnostic(1, norm_q);
+    float norm = max_agnostic(1.0f, norm_q);
     qx_out /= norm;
     qy_out /= norm;
 
@@ -299,7 +299,7 @@ __global__ void UpdatePL1(float *p_data,
     float p_out = p + sigma*lambda*(d - a);
 
     float norm_p = abs(p_out);
-    float norm = max_agnostic(1, norm_p);
+    float norm = max_agnostic(1.0f, norm_p);
     p_out /= norm;
 
     p_data[image_offset] = p_out;
@@ -1085,6 +1085,23 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
                       << " Sigma q: " << sigma_q
                       << std::endl;
         }
+
+
+
+        // cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
+        // optimPyramid->d->UpdateHostFromDevice();
+        // for (int y = 0; y < imgSize.y; y++)
+        //     for (int x = 0; x < imgSize.x; x++)
+        //     {
+        //         unsigned int index = x + imgSize.x * y;
+        //         float val = optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
+        //         unsigned char pix = val * 256;
+        //         imOut.at<unsigned char>(y,x) = pix;
+        //     }
+
+        // cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+        // cv::imshow( "Display window", imOut );                   // Show our image inside it.
+        // cv::waitKey(0.1f);                                          // Wait for a keystroke in the window
                                               
 
 
@@ -1395,6 +1412,22 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
             float error = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
             std::cout << "Error: " << error << "   Theta: " << theta << " / " << thetaEnd << "\n";
         }
+
+
+        // cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
+        // optimPyramid->d->UpdateHostFromDevice();
+        // for (int y = 0; y < imgSize.y; y++)
+        //     for (int x = 0; x < imgSize.x; x++)
+        //     {
+        //         unsigned int index = x + imgSize.x * y;
+        //         float val = optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
+        //         unsigned char pix = val * 256;
+        //         imOut.at<unsigned char>(y,x) = pix;
+        //     }
+
+        // cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+        // cv::imshow( "Display window", imOut );                   // Show our image inside it.
+        // cv::waitKey(0.1f);                                          // Wait for a keystroke in the window
                                               
 
 
