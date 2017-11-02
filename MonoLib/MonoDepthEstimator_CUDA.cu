@@ -458,6 +458,76 @@ __global__ void InitSmoothingParameters(float *a_data,float *d_data,float *qx_da
     }
 }
 
+__global__ void updatePhotoErrorPatch(Matrix3f R, Vector3f T,
+                                   Intrinsics K,
+                                   Vector2i imgSize,
+                                   float *photo_error,
+                                   int *nUpdates,
+                                   Vector4u *currImageData,
+                                   Vector4u *refImageData, unsigned int depthSamples,
+                                   float minIDepth, float depthIncrement)
+{
+
+    short int x = blockIdx.x*blockDim.x+threadIdx.x;
+    short int y = blockIdx.y*blockDim.y+threadIdx.y;
+    if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
+
+
+    float u = x;
+    float v = y;
+
+    Vector3f pointRefUnscaled;
+    pointRefUnscaled.x = u * K.fxInv + K.cxInv;
+    pointRefUnscaled.y = v * K.fyInv + K.cyInv;
+    pointRefUnscaled.z = 1;
+
+
+
+    for (unsigned int z = 0; z < depthSamples; z++)
+    {
+        int offset = x + y * imgSize.x+ z* imgSize.x*imgSize.y;
+
+
+        float idepth = minIDepth + z*depthIncrement;
+        float depth = 1.0f/idepth;
+
+        Vector3f pointTrack = R * (pointRefUnscaled * depth) + T;
+        Vector2f pointTrackImage;
+        pointTrackImage.x = K.fx * pointTrack.x / pointTrack.z + K.cx;
+        pointTrackImage.y = K.fy * pointTrack.y / pointTrack.z + K.cy;
+
+
+        //if the voxel is projected in the current image then update photometric error and counter
+        if (PointInImage(pointTrackImage, imgSize) && pointTrack[2] > 0)
+        {
+            //L1 norm of the photometric error
+
+            int x_ref_plus = clamp(x+1, imgSize.x);
+            int y_ref_plus = clamp(y+1, imgSize.y);
+
+            float x_curr_plus = clamp(pointTrackImage.x + 1, (float)imgSize.x);
+            float y_curr_plus = clamp(pointTrackImage.y + 1, (float)imgSize.y);
+
+            Vector4f photo_current_OR =
+                interpolateBilinearVec4(currImageData,pointTrackImage.x,
+                                        pointTrackImage.y, imgSize.x);
+            Vector4u photo_ref = refImageData[x + imgSize.x*y];
+
+            float normL1 = PhotoErrorL1(photo_current_OR,photo_ref);
+
+            float oldError = photo_error[offset];
+            float obsError = normL1;
+            int nUpdate = nUpdates[offset];
+
+            float newError = (nUpdate * oldError + obsError) / (nUpdate + 1);
+
+            photo_error[offset] = newError;
+            nUpdates[offset] = nUpdate + 1;
+        }
+    }
+}
+
+
 __global__ void updatePhotoError2d(Matrix3f R, Vector3f T,
                                    Intrinsics K,
                                    Vector2i imgSize,
@@ -925,7 +995,7 @@ void MonoDepthEstimator_CUDA::UpdatePhotoError(ORUtils::SE3Pose refToTracker,
     dim3 blocks2=getBlocksFor2DProcess(imgSize.x ,imgSize.y);
     dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x ,imgSize.y);
 
-    updatePhotoError2d<<<blocks2,threadsPerBlock2>>>(refToTracker.GetR(),
+    updatePhotoErrorPatch<<<blocks2,threadsPerBlock2>>>(refToTracker.GetR(),
                                                      refToTracker.GetT(),
                                                      monoLevel->intrinsics,
                                                      imgSize,
@@ -1275,7 +1345,7 @@ void MonoDepthEstimator_CUDA::SmoothHuber()
     dim3 blocks2=getBlocksFor2DProcess(imgSize.x,imgSize.y);
     dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
 
-    float lambda = 9.0f;
+    float lambda = 5.0f;
 
     float sigma_d = 0.001;
     float sigma_q = 10;
