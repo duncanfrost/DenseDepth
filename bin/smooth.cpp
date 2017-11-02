@@ -56,11 +56,13 @@ int main(void)
             // std::cout << (int)pix << "->" << val << std::endl;
             monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index] = val;
             monoDepthEstimator->optimPyramid->a->GetData(MEMORYDEVICE_CPU)[index] = val;
+            monoDepthEstimator->optimPyramid->g->GetData(MEMORYDEVICE_CPU)[index] = 1;
         }
 
     monoDepthEstimator->optimPyramid->a->UpdateDeviceFromHost();
     monoDepthEstimator->optimPyramid->d->UpdateDeviceFromHost();
-    monoDepthEstimator->SmoothL1();
+    monoDepthEstimator->optimPyramid->g->UpdateDeviceFromHost();
+    monoDepthEstimator->SmoothHuber();
 
     monoDepthEstimator->optimPyramid->d->UpdateHostFromDevice();
 

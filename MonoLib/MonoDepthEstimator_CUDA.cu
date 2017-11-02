@@ -2,7 +2,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <opencv2/opencv.hpp>
-#include "Shared/L0minimization.h"
+// #include "Shared/L0minimization.h"
 
 using namespace MonoLib;
 
@@ -1261,6 +1261,103 @@ void MonoDepthEstimator_CUDA::SmoothL1()
 
 }
 
+
+void MonoDepthEstimator_CUDA::SmoothHuber()
+{
+    
+    // InitOptim();
+
+    //D is the same as u
+    //A is the same as f_in
+    std::cout << "Here" << std::endl;
+
+    Vector2i imgSize = optimPyramid->d->noDims;
+    dim3 blocks2=getBlocksFor2DProcess(imgSize.x,imgSize.y);
+    dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
+
+    float lambda = 9.0f;
+
+    float sigma_d = 0.001;
+    float sigma_q = 10;
+    float eps = 1e-4f;
+
+    for (unsigned int j = 0; j < 1200; j++)
+    {
+
+        ComputeGradient<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                      imgSize, 
+                                                      optimPyramid->dx->GetData(MEMORYDEVICE_CUDA),
+                                                      optimPyramid->dy->GetData(MEMORYDEVICE_CUDA));
+
+
+
+        UpdateQ<<<blocks2,threadsPerBlock2>>>(optimPyramid->qx->GetData(MEMORYDEVICE_CUDA),
+                                              optimPyramid->qy->GetData(MEMORYDEVICE_CUDA),
+                                              optimPyramid->dx->GetData(MEMORYDEVICE_CUDA),
+                                              optimPyramid->dy->GetData(MEMORYDEVICE_CUDA),
+                                              optimPyramid->g->GetData(MEMORYDEVICE_CUDA),
+                                              imgSize, sigma_q, eps);
+
+        // cv::Mat imOut2 = cv::Mat(imgSize.y, imgSize.x, CV_32FC1);
+        // optimPyramid->dy->UpdateHostFromDevice();
+        // for (int y = 0; y < imgSize.y; y++)
+        //     for (int x = 0; x < imgSize.x; x++)
+        //     {
+        //         unsigned int index = x + imgSize.x * y;
+        //         float val = optimPyramid->dy->GetData(MEMORYDEVICE_CPU)[index];
+        //         imOut2.at<float>(y,x) = val;
+        //     }
+        // std::cout << imOut2 << std::endl;
+        // exit(1);
+
+
+        ComputeDivQ<<<blocks2,threadsPerBlock2>>>(optimPyramid->qx->GetData(MEMORYDEVICE_CUDA),
+                                                  optimPyramid->qy->GetData(MEMORYDEVICE_CUDA),
+                                                  optimPyramid->divQ->GetData(MEMORYDEVICE_CUDA),
+                                                  imgSize);
+
+
+
+        UpdateD<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                              optimPyramid->divQ->GetData(MEMORYDEVICE_CUDA),
+                                              optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
+                                              optimPyramid->g->GetData(MEMORYDEVICE_CUDA),
+                                              sigma_d, lambda, imgSize);
+
+
+        ComputeL1Error<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                     optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
+                                                     optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
+                                                     imgSize, lambda);
+
+
+        // cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
+        // optimPyramid->qx->UpdateHostFromDevice();
+        // for (int y = 0; y < imgSize.y; y++)
+        //     for (int x = 0; x < imgSize.x; x++)
+        //     {
+        //         unsigned int index = x + imgSize.x * y;
+        //         float val = optimPyramid->qx->GetData(MEMORYDEVICE_CPU)[index];
+        //         unsigned char pix = val * 256;
+        //         imOut.at<unsigned char>(y,x) = pix;
+        //     }
+
+        // std::cout << imOut << std::endl;
+
+        // cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+        // cv::imshow( "Display window", imOut );                   // Show our image inside it.
+        // cv::waitKey(0.1f);                                          // Wait for a keystroke in the window
+
+        optimPyramid->error->UpdateHostFromDevice();
+        float error = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
+        std::cout << "Error: " << error << std::endl;
+
+    }
+    
+    std::cout << "Here2" << std::endl;
+
+}
+
 void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
 {
     // Same as smmoth L1 except 
@@ -1394,101 +1491,101 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
 
 void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
 {
-    // Same as smmoth L1 except 
-    InitOptim();
-    MonoLib::MonoPyramidLevel *monoLevel = currDepthFrame->dataImage;
+    // // Same as smmoth L1 except 
+    // InitOptim();
+    // MonoLib::MonoPyramidLevel *monoLevel = currDepthFrame->dataImage;
 
-    Vector2i imgSize = monoLevel->depth->noDims;
-    dim3 blocks2=getBlocksFor2DProcess(imgSize.x,imgSize.y);
-    dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
+    // Vector2i imgSize = monoLevel->depth->noDims;
+    // dim3 blocks2=getBlocksFor2DProcess(imgSize.x,imgSize.y);
+    // dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
 
-    float thetaEnd = 1e-4;
-    float outerError = 0;
-    iterations = 300;
-    float beta = 0.1;
+    // float thetaEnd = 1e-4;
+    // float outerError = 0;
+    // iterations = 300;
+    // float beta = 0.1;
 
-    optimPyramid->photoErrors->UpdateHostFromDevice();
-    cv::Mat dCV = cv::Mat(imgSize.y, imgSize.x, CV_32FC1);
-    cv::Mat aCV = cv::Mat(imgSize.y, imgSize.x, CV_32FC1);
+    // optimPyramid->photoErrors->UpdateHostFromDevice();
+    // cv::Mat dCV = cv::Mat(imgSize.y, imgSize.x, CV_32FC1);
+    // cv::Mat aCV = cv::Mat(imgSize.y, imgSize.x, CV_32FC1);
 
-    float theta = 0.2;
+    // float theta = 0.2;
 
-    float L2=1.0;
-    float tau=0.000051;
-    float sigma=1.0/(L2*tau);
+    // float L2=1.0;
+    // float tau=0.000051;
+    // float sigma=1.0/(L2*tau);
 
 
     
-    MinErrorTrueFit_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
-                                                         optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
-                                                         optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
-                                                         optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
-                                                         optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
-                                                         imgSize,
-                                                         optimPyramid->depthSamples, theta, tvSettings.epsilon,
-                                                         tvSettings.lambda);
-    while (theta > thetaEnd)
-    {
-        theta = theta*(1-beta);
+    // MinErrorTrueFit_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+    //                                                      optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+    //                                                      optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
+    //                                                      optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+    //                                                      optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
+    //                                                      imgSize,
+    //                                                      optimPyramid->depthSamples, theta, tvSettings.epsilon,
+    //                                                      tvSettings.lambda);
+    // while (theta > thetaEnd)
+    // {
+    //     theta = theta*(1-beta);
 
-        float innerErrorStart = 0;
+    //     float innerErrorStart = 0;
 
 
-        //Copy d to opencv
+    //     //Copy d to opencv
 
-        optimPyramid->d->UpdateHostFromDevice();
-        optimPyramid->a->UpdateHostFromDevice();
-        cv::Mat dInU = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
-        for (int y = 0; y < imgSize.y; y++)
-            for (int x = 0; x < imgSize.x; x++)
-            {
+    //     optimPyramid->d->UpdateHostFromDevice();
+    //     optimPyramid->a->UpdateHostFromDevice();
+    //     cv::Mat dInU = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
+    //     for (int y = 0; y < imgSize.y; y++)
+    //         for (int x = 0; x < imgSize.x; x++)
+    //         {
 
-                unsigned int index = x + imgSize.x * y;
-                float dPix = optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
-                float aPix = optimPyramid->a->GetData(MEMORYDEVICE_CPU)[index];
-                dCV.at<float>(y,x) = dPix;
-                aCV.at<float>(y,x) = aPix;
-                dInU.at<unsigned char>(y,x) = dPix*255;
-            }
+    //             unsigned int index = x + imgSize.x * y;
+    //             float dPix = optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
+    //             float aPix = optimPyramid->a->GetData(MEMORYDEVICE_CPU)[index];
+    //             dCV.at<float>(y,x) = dPix;
+    //             aCV.at<float>(y,x) = aPix;
+    //             dInU.at<unsigned char>(y,x) = dPix*255;
+    //         }
             
 
-        // cv::namedWindow( "Before", cv::WINDOW_AUTOSIZE );// Create a window for display.
-        // cv::imshow( "Before", dInU );                   // Show our image inside it.
-        // cv::waitKey(0);                                          // Wait for a keystroke in the window
+    //     // cv::namedWindow( "Before", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    //     // cv::imshow( "Before", dInU );                   // Show our image inside it.
+    //     // cv::waitKey(0);                                          // Wait for a keystroke in the window
 
 
 
-        std::vector<cv::Mat> S_mats = minimizeL0Gradient(aCV,dCV);
-        cv::Mat dOut = S_mats.back();
+    //     std::vector<cv::Mat> S_mats = minimizeL0Gradient(aCV,dCV);
+    //     cv::Mat dOut = S_mats.back();
 
-        cv::Mat dOutU = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
-        for (int y = 0; y < imgSize.y; y++)
-            for (int x = 0; x < imgSize.x; x++)
-            {
-                unsigned int index = x + imgSize.x * y;
-                float dPix = dOut.at<float>(y,x); 
-                optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index] = dPix;
-                dOutU.at<unsigned char>(y,x) = dPix*255;
-            }
+    //     cv::Mat dOutU = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
+    //     for (int y = 0; y < imgSize.y; y++)
+    //         for (int x = 0; x < imgSize.x; x++)
+    //         {
+    //             unsigned int index = x + imgSize.x * y;
+    //             float dPix = dOut.at<float>(y,x); 
+    //             optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index] = dPix;
+    //             dOutU.at<unsigned char>(y,x) = dPix*255;
+    //         }
 
-        optimPyramid->d->UpdateDeviceFromHost();
-        // std::cout << dOut << std::endl;
-        // exit(1);
-
-
-        MinErrorTrueFit_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
-                                                             optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
-                                                             optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
-                                                             optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
-                                                             optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
-                                                             imgSize,
-                                                             optimPyramid->depthSamples, theta, tvSettings.epsilon,
-                                                             tvSettings.lambda);
+    //     optimPyramid->d->UpdateDeviceFromHost();
+    //     // std::cout << dOut << std::endl;
+    //     // exit(1);
 
 
-        std::cout << "Theta: " << theta << std::endl;
+    //     MinErrorTrueFit_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+    //                                                          optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+    //                                                          optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
+    //                                                          optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+    //                                                          optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
+    //                                                          imgSize,
+    //                                                          optimPyramid->depthSamples, theta, tvSettings.epsilon,
+    //                                                          tvSettings.lambda);
 
-    }
 
-    OptimToDepth(false);
+    //     std::cout << "Theta: " << theta << std::endl;
+
+    // }
+
+    // OptimToDepth(false);
 }

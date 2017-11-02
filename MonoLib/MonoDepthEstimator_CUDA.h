@@ -23,6 +23,7 @@ namespace MonoLib {
                               ORUtils::TimeStampedImage<Vector4u> *frame);
 
         void SmoothL1();
+        void SmoothHuber();
 
         void OptimToDepth(bool useRawDepth);
 
