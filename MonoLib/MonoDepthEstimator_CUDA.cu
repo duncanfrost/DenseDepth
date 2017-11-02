@@ -994,6 +994,23 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
     
 
 
+    // cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
+    // optimPyramid->g->UpdateHostFromDevice();
+    // for (int y = 0; y < imgSize.y; y++)
+    //     for (int x = 0; x < imgSize.x; x++)
+    //     {
+    //         unsigned int index = x + imgSize.x * y;
+    //         float val = optimPyramid->g->GetData(MEMORYDEVICE_CPU)[index];
+    //         unsigned char pix = val * 256;
+    //         imOut.at<unsigned char>(y,x) = pix;
+    //     }
+
+    // cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    // cv::imshow( "Display window", imOut );                   // Show our image inside it.
+    // cv::waitKey(0.1f);                                          // Wait for a keystroke in the window
+    // cv::destroyWindow("Display window");
+
+
 
 
     // for (unsigned int i = 0; i < iterations; i++)
@@ -1412,23 +1429,6 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
             float error = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
             std::cout << "Error: " << error << "   Theta: " << theta << " / " << thetaEnd << "\n";
         }
-
-
-        // cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
-        // optimPyramid->d->UpdateHostFromDevice();
-        // for (int y = 0; y < imgSize.y; y++)
-        //     for (int x = 0; x < imgSize.x; x++)
-        //     {
-        //         unsigned int index = x + imgSize.x * y;
-        //         float val = optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
-        //         unsigned char pix = val * 256;
-        //         imOut.at<unsigned char>(y,x) = pix;
-        //     }
-
-        // cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
-        // cv::imshow( "Display window", imOut );                   // Show our image inside it.
-        // cv::waitKey(0.1f);                                          // Wait for a keystroke in the window
-                                              
 
 
         MinErrorTrueFit_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
