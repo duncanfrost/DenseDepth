@@ -961,9 +961,7 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
     //                                                optimPyramid->depthSamples);
 
 
-    float thetaStart = 1;
     float thetaEnd = 1e-4;
-    float thetaDiff = thetaStart - thetaEnd;
     float outerError = 0;
     iterations = 300;
     float beta = 0.002;
@@ -1018,7 +1016,6 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
     
     while (theta > thetaEnd)
     {
-        // float theta = thetaStart - ((float)i / (float)(iterations-1))*thetaDiff;
 
         theta = theta*(1-beta);
 
@@ -1080,16 +1077,16 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
             optimPyramid->error->UpdateHostFromDevice();
             float error = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
 
-            if (error < lastError)
-            {
-                sigma_d *= 1.001;
-                sigma_q *= 1.001;
-            }
-            else
-            {
-                sigma_d *= 0.998;
-                sigma_q *= 0.998;
-            }
+            // if (error < lastError)
+            // {
+            //     sigma_d *= 1.1;
+            //     sigma_q *= 1.1;
+            // }
+            // else
+            // {
+            //     sigma_d *= 0.9;
+            //     sigma_q *= 0.9;
+            // }
                 
 
             if (j == 0) innerErrorStart = error;
@@ -1342,9 +1339,7 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
     dim3 blocks2=getBlocksFor2DProcess(imgSize.x,imgSize.y);
     dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
 
-    float thetaStart = 1;
-    float thetaEnd = 1e-4;
-    float thetaDiff = thetaStart - thetaEnd;
+    float thetaEnd = 1;
     float outerError = 0;
     iterations = 300;
     float beta = 0.002;
@@ -1377,6 +1372,8 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
     while (theta > thetaEnd)
     {
         theta = theta*(1-beta);
+
+        float invTheta = 1.0f / theta;
 
         float innerErrorStart = 0;
 
@@ -1431,6 +1428,22 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
         }
 
 
+        cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
+        optimPyramid->d->UpdateHostFromDevice();
+        for (int y = 0; y < imgSize.y; y++)
+            for (int x = 0; x < imgSize.x; x++)
+            {
+                unsigned int index = x + imgSize.x * y;
+                float val = optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
+                unsigned char pix = val * 256;
+                imOut.at<unsigned char>(y,x) = pix;
+            }
+
+        cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+        cv::imshow( "Display window", imOut );                   // Show our image inside it.
+        cv::waitKey(0.1f);                                          // Wait for a keystroke in the window
+
+
         MinErrorTrueFit_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
                                                              optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
                                                              optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
@@ -1457,9 +1470,7 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
     dim3 blocks2=getBlocksFor2DProcess(imgSize.x,imgSize.y);
     dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x, imgSize.y);
 
-    float thetaStart = 1;
     float thetaEnd = 1e-4;
-    float thetaDiff = thetaStart - thetaEnd;
     float outerError = 0;
     iterations = 300;
     float beta = 0.1;
@@ -1531,13 +1542,6 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
         optimPyramid->d->UpdateDeviceFromHost();
         // std::cout << dOut << std::endl;
         // exit(1);
-
-
-        // cv::namedWindow( "After", cv::WINDOW_AUTOSIZE );// Create a window for display.
-        // cv::imshow( "After", dOutU );                   // Show our image inside it.
-        // cv::waitKey(0);                                          // Wait for a keystroke in the window
-
-                                              
 
 
         MinErrorTrueFit_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
