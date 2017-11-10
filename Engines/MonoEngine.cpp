@@ -192,12 +192,14 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
 
     cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
     monoDepthEstimator->optimPyramid->d->UpdateHostFromDevice();
+    monoDepthEstimator->optimPyramid->nUpdates->UpdateHostFromDevice();
     for (int y = 0; y < imgSize.y; y++)
         for (int x = 0; x < imgSize.x; x++)
         {
             unsigned int index = x + imgSize.x * y;
             float val = monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
             unsigned char pix = val * 256;
+            // pix = monoDepthEstimator->optimPyramid->nUpdates->GetData(MEMORYDEVICE_CPU)[index];
             imOut.at<unsigned char>(y,x) = pix;
         }
 
