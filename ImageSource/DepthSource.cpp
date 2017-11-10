@@ -23,15 +23,19 @@ void DepthSource::GetDepthForTimeStamp(long long timestamp)
 
     std::cout << "Timestamp: " << timestamp << std::endl;
     std::cout << "Depth timestamp: " << time2 << std::endl;
+    std::cout << "Current " << current << std::endl;
 
-    // std::string filename = depthImagePaths[current];
-    // std::string fullPath = directory + "/" + filename;
-    // cv::Mat depth = cv::imread(fullPath,CV_LOAD_IMAGE_ANYDEPTH);
-    // cv::Mat fDepth;
-    // depth.convertTo(fDepth,CV_32FC1);
-    // fDepth /= 5000;
+    std::string filename = depthImagePaths[current];
+    cv::Mat depth = cv::imread(filename,CV_LOAD_IMAGE_ANYDEPTH);
 
-    // return fDepth;
+    std::cout << "depth here" << depth.rows << std::endl;
+
+    cv::Mat fDepth;
+    depth.convertTo(fDepth,CV_32FC1);
+    fDepth /= 5000;
+
+    im = fDepth;
+
 
 }
 
