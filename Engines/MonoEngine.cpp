@@ -62,6 +62,9 @@ void MonoEngine::Process()
     cv::Mat rawImage = source->Image();
     image = PreProcessImage(rawImage);
     timeStamp = source->TimeStamp();
+
+    std::cout << "Timestamp: " << timeStamp << std::endl;
+
     long long count = source->FrameNumber();
     long long timeOut;
 
@@ -173,13 +176,13 @@ void MonoEngine::SmoothPhoto(int iterations)
 void MonoEngine::SmoothPhotoBuffer(int iterations)
 {
     SampleFromBufferMid();
-    SmoothPhoto(iterations);
+    // SmoothPhoto(iterations);
 
 
     //Update images from device
-    monoDepthEstimator->optimPyramid->certainty->UpdateHostFromDevice();
-    monoDepthEstimator->currDepthFrame->dataImage->depth->UpdateHostFromDevice();
-    monoDepthEstimator->optimPyramid->nUpdates->UpdateHostFromDevice();
+    // monoDepthEstimator->optimPyramid->certainty->UpdateHostFromDevice();
+    // monoDepthEstimator->currDepthFrame->dataImage->depth->UpdateHostFromDevice();
+    // monoDepthEstimator->optimPyramid->nUpdates->UpdateHostFromDevice();
 
 
     long long timestamp = timeStampBuffer[nMid];
@@ -188,6 +191,10 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
         depthSource->GetDepthForTimeStamp(timestamp);
     else
         std::cout << "No depth source" << std::endl;
+
+    cv::Mat gtDepth = depthSource->Image();
+
+    std::cout << "Depth rows: " << gtDepth.rows << std::endl;
 
 
     cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
@@ -198,6 +205,7 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
         {
             unsigned int index = x + imgSize.x * y;
             float val = monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
+            val = gtDepth.at<float>(y,x);
             unsigned char pix = val * 256;
             // pix = monoDepthEstimator->optimPyramid->nUpdates->GetData(MEMORYDEVICE_CPU)[index];
             imOut.at<unsigned char>(y,x) = pix;

@@ -104,7 +104,7 @@ private:
 
     cv::Mat imageBuffer[BUFFERSIZE];
     Sophus::SE3f poseBuffer[BUFFERSIZE];
-    unsigned int timeStampBuffer[BUFFERSIZE];
+    long long timeStampBuffer[BUFFERSIZE];
 
 
     void Sample();
