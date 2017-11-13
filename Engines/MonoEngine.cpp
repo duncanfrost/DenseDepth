@@ -206,6 +206,7 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
             unsigned int index = x + imgSize.x * y;
             float val = monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
             val = gtDepth.at<float>(y,x);
+            val = val / 5;
             unsigned char pix = val * 256;
             // pix = monoDepthEstimator->optimPyramid->nUpdates->GetData(MEMORYDEVICE_CPU)[index];
             imOut.at<unsigned char>(y,x) = pix;
