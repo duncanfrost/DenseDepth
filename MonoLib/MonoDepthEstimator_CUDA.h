@@ -24,6 +24,7 @@ namespace MonoLib {
 
         void SmoothL1();
         void SmoothHuber();
+        void LoadDepth(ORFloatImage depthImage);
 
         void OptimToDepth(bool useRawDepth);
 
