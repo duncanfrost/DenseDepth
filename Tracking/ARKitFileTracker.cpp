@@ -66,7 +66,7 @@ void ARKitFileTracker::Init(const std::string file)
             translation[r] = atof(token.c_str());
         }
 
-        pose.translation = translation;
+        pose.translation() = translation;
         pose.setRotationMatrix(rot);
 
         long long timestamp = timestampRaw * 1e6;

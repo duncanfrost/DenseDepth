@@ -8,7 +8,7 @@
 class ARKitFileTracker : public FileTracker
 {
 public:
-    ARKitFileTracker(const std::string &directory, const std::string &listName);
+    ARKitFileTracker(const std::string file);
 
 private:
     void Init(const std::string file);
