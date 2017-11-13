@@ -176,13 +176,17 @@ void MonoEngine::SmoothPhoto(int iterations)
 void MonoEngine::SmoothPhotoBuffer(int iterations)
 {
     SampleFromBufferMid();
-    // SmoothPhoto(iterations);
+    SmoothPhoto(iterations);
 
 
-    //Update images from device
-    // monoDepthEstimator->optimPyramid->certainty->UpdateHostFromDevice();
-    // monoDepthEstimator->currDepthFrame->dataImage->depth->UpdateHostFromDevice();
-    // monoDepthEstimator->optimPyramid->nUpdates->UpdateHostFromDevice();
+    // Update images from device
+    monoDepthEstimator->optimPyramid->certainty->UpdateHostFromDevice();
+    monoDepthEstimator->currDepthFrame->dataImage->depth->UpdateHostFromDevice();
+    monoDepthEstimator->optimPyramid->nUpdates->UpdateHostFromDevice();
+
+    float error = monoDepthEstimator->MeasureError();
+    std::cout << "Error: " << error << std::endl;
+    exit(1);
 
 
     long long timestamp = timeStampBuffer[nMid];

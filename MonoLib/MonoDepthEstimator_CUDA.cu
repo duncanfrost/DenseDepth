@@ -1239,36 +1239,6 @@ __global__ void ComputeTVError_device(float *d_data, float *error_data, Vector2i
 }
 
 
-
-void MonoDepthEstimator_CUDA::MeasureError()
-{
-    MonoLib::MonoPyramidLevel *monoLevel = currDepthFrame->dataImage;
-    Vector2i imgSize = monoLevel->depth->noDims;
-
-    dim3 blocks2=getBlocksFor2DProcess(imgSize.x ,imgSize.y);
-    dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x ,imgSize.y);
-    // ComputeTVError_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
-    //                                                     optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
-    //                                                     imgSize, tvSettings.epsilon); 
-
-    ComputeFullError_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
-                                                          optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
-                                                          optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
-                                                          optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
-                                                          imgSize, tvSettings.epsilon, tvSettings.lambda); 
-    optimPyramid->UpdateHostFromDevice();
-
-    float error = 0;
-    for (int y = 0; y < imgSize.y; y++)
-        for (int x = 0; x < imgSize.x; x++)
-        {
-            unsigned int index = x + imgSize.x*y;
-            error += optimPyramid->error->GetData(MEMORYDEVICE_CPU)[index];
-        }
-    std::cout << "Error " << error << std::endl;
-}
-
-
 void MonoDepthEstimator_CUDA::OptimToDepth(bool useRawDepth)
 {
     float *data;
@@ -1681,4 +1651,23 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
 
 void MonoDepthEstimator_CUDA::LoadDepth(ORFloatImage depthImage)
 {
+}
+
+float MonoDepthEstimator_CUDA::MeasureError()
+{
+    MonoLib::MonoPyramidLevel *monoLevel = currDepthFrame->dataImage;
+    Vector2i imgSize = monoLevel->depth->noDims;
+
+    dim3 blocks2=getBlocksFor2DProcess(imgSize.x ,imgSize.y);
+    dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x ,imgSize.y);
+
+    ComputeFullError_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
+                                                          optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
+                                                          optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+                                                          optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+                                                          imgSize, tvSettings.epsilon, tvSettings.lambda); 
+
+    optimPyramid->error->UpdateHostFromDevice();
+    float error = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
+    return error;
 }

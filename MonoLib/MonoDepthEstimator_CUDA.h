@@ -25,6 +25,7 @@ namespace MonoLib {
         void SmoothL1();
         void SmoothHuber();
         void LoadDepth(ORFloatImage depthImage);
+        float MeasureError();
 
         void OptimToDepth(bool useRawDepth);
 
@@ -34,7 +35,5 @@ namespace MonoLib {
         void InitOptim();
         void SmoothDTAM();
         void DisplayPhotoVolume(int x, int y);
-
-        void MeasureError();
     };
 }

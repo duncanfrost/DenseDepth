@@ -39,6 +39,6 @@ namespace MonoLib {
 
         float EvaluateGT() { return 1e10f; }
         void DisplayPhotoVolume(int x, int y);
-        void MeasureError() {};
+        float MeasureError() {};
     };
 }

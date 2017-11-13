@@ -227,7 +227,7 @@ namespace MonoLib {
 
 
         virtual void DisplayPhotoVolume(int x, int y) = 0;
-        virtual void MeasureError() = 0;
+        virtual float MeasureError() = 0;
         virtual void OptimToDepth(bool useRawDepth) = 0;
 
 
