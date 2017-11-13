@@ -49,7 +49,7 @@ void ARKitFileTracker::Init(const std::string file)
         Sophus::SE3f pose;
 
         Eigen::Matrix3f rot;
-        Eitrn::Vector3f translation;
+        Eigen::Vector3f translation;
 
 
         for (unsigned int r = 0; r < 3; r++)
