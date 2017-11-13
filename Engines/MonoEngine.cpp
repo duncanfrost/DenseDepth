@@ -176,6 +176,10 @@ void MonoEngine::SmoothPhoto(int iterations)
 void MonoEngine::SmoothPhotoBuffer(int iterations)
 {
     SampleFromBufferMid();
+
+    long long timestamp = timeStampBuffer[nMid];
+    LoadGTDepth(timestamp);
+
     SmoothPhoto(iterations);
 
 
@@ -187,67 +191,21 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
     float error = monoDepthEstimator->MeasureError();
     std::cout << "Error: " << error << std::endl;
 
-
-    long long timestamp = timeStampBuffer[nMid];
-
-    if (depthSource != NULL)
-        depthSource->GetDepthForTimeStamp(timestamp);
-    else
-        std::cout << "No depth source" << std::endl;
-
-    cv::Mat gtDepth = depthSource->Image();
-
-    std::cout << "Depth rows: " << gtDepth.rows << std::endl;
-
-
-    cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
-    monoDepthEstimator->optimPyramid->d->UpdateHostFromDevice();
-    monoDepthEstimator->optimPyramid->nUpdates->UpdateHostFromDevice();
-
-    float minIDepth = monoDepthEstimator->optimPyramid->minIDepth;
-    float maxIDepth = monoDepthEstimator->optimPyramid->maxIDepth;
-    float iDepthDiff = maxIDepth - minIDepth;
-
-    float minDepth = 1/maxIDepth;
-    float maxDepth = 1/minIDepth;
-
-    for (int y = 0; y < imgSize.y; y++)
-        for (int x = 0; x < imgSize.x; x++)
-        {
-            unsigned int index = x + imgSize.x * y;
-            float val = monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
-            val = gtDepth.at<float>(y,x);
-            if (val >= minDepth && val <= maxDepth)
-            {
-                float inverseDepth = 1/val;
-                float data = (inverseDepth - minDepth) / iDepthDiff;
-                monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index] = data;
-            }
-            val = val / 5;
-            unsigned char pix = val * 256;
-            // pix = monoDepthEstimator->optimPyramid->nUpdates->GetData(MEMORYDEVICE_CPU)[index];
-            imOut.at<unsigned char>(y,x) = pix;
-        }
-
-    monoDepthEstimator->optimPyramid->d->UpdateDeviceFromHost();
-    monoDepthEstimator->OptimToDepth(false);
-
     error = monoDepthEstimator->MeasureError();
     std::cout << "Error after depth load: " << error << std::endl;
-    exit(1);
 
-    cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
-    cv::imshow( "Display window", imOut );                   // Show our image inside it.
-    cv::waitKey(0);                                          // Wait for a keystroke in the window
-
+    VisualizeDepth();
     paused = true;
-
 }
 
 void MonoEngine::WriteEmpty()
 {
     cv::Mat testIm(imgSize.y, imgSize.x, CV_16UC1); 
     std::stringstream outPath;
+
+    monoDepthEstimator->optimPyramid->d->UpdateDeviceFromHost();
+    monoDepthEstimator->OptimToDepth(false);
+
     outPath << "/home/duncan/Data/P9/Office3/depth3/" << timeStamp << "000000.png";
     cv::Mat imUp;
     cv::resize(testIm, imUp, cv::Size(), 4.0f, 4.0f);
@@ -431,4 +389,57 @@ void MonoEngine::SmoothPhotoRemode(int iterations)
 
     // paused = true;
 
+}
+
+void MonoEngine::LoadGTDepth(long long timestamp)
+{
+    if (depthSource != NULL)
+        depthSource->GetDepthForTimeStamp(timestamp);
+    else
+        std::cout << "No depth source" << std::endl;
+    cv::Mat gtDepth = depthSource->Image();
+
+    float minIDepth = monoDepthEstimator->optimPyramid->minIDepth;
+    float maxIDepth = monoDepthEstimator->optimPyramid->maxIDepth;
+    float iDepthDiff = maxIDepth - minIDepth;
+
+    float minDepth = 1/maxIDepth;
+    float maxDepth = 1/minIDepth;
+
+    for (int y = 0; y < imgSize.y; y++)
+        for (int x = 0; x < imgSize.x; x++)
+        {
+            unsigned int index = x + imgSize.x * y;
+            float val = monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
+            val = gtDepth.at<float>(y,x);
+            if (val >= minDepth && val <= maxDepth)
+            {
+                float inverseDepth = 1/val;
+                float data = (inverseDepth - minDepth) / iDepthDiff;
+                monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index] = data;
+            }
+        }
+
+    monoDepthEstimator->optimPyramid->d->UpdateDeviceFromHost();
+    monoDepthEstimator->OptimToDepth(false);
+
+}
+
+void MonoEngine::VisualizeDepth()
+{
+    cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
+    monoDepthEstimator->optimPyramid->d->UpdateHostFromDevice();
+    for (int y = 0; y < imgSize.y; y++)
+        for (int x = 0; x < imgSize.x; x++)
+        {
+            unsigned int index = x + imgSize.x * y;
+            float val = monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
+            unsigned char pix = val * 256;
+            imOut.at<unsigned char>(y,x) = pix;
+        }
+
+    cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    cv::imshow( "Display window", imOut );                   // Show our image inside it.
+    cv::waitKey(0);                                          // Wait for a keystroke in the window
+    cv::destroyWindow("Display window");
 }

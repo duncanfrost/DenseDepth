@@ -72,7 +72,8 @@ private:
                       Sophus::SE3f inputPose);
 
 
-
+    void LoadGTDepth(long long timestamp);
+    void VisualizeDepth();
 
     void WriteEmpty();
 
