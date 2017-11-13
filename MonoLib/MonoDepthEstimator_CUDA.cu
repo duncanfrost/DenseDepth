@@ -885,6 +885,7 @@ __global__ void MinErrorTrueFit_device(float *photo_error,float *d_data,
 
 __global__ void ComputeFullError_device(float *d_data, float *error_data,
                                         float *photo_error, int *minIdx_data,
+                                        float minIDepth, float maxIDepth,
                                         Vector2i imgSize, float eps, float lambda)
 {
     int x = blockIdx.x*blockDim.x+threadIdx.x;
@@ -1072,6 +1073,7 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
                                                               optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
                                                               optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
                                                               optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+                                                              optimPyramid->minIDepth, optimPyramid->maxIDepth,
                                                               imgSize, tvSettings.epsilon, tvSettings.lambda); 
 
 
@@ -1115,6 +1117,7 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
                                                                   optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
                                                                   optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
                                                                   optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+                                                                  optimPyramid->minIDepth, optimPyramid->maxIDepth,
                                                                   imgSize, tvSettings.epsilon, tvSettings.lambda); 
 
 
@@ -1480,6 +1483,7 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
                                                               optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
                                                               optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
                                                               optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+                                                              optimPyramid->minIDepth, optimPyramid->maxIDepth,
                                                               imgSize, tvSettings.epsilon, tvSettings.lambda); 
 
 
@@ -1672,6 +1676,7 @@ float MonoDepthEstimator_CUDA::MeasureError()
                                                           optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
                                                           optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
                                                           optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+                                                          optimPyramid->minIDepth, optimPyramid->maxIDepth,
                                                           imgSize, tvSettings.epsilon, tvSettings.lambda); 
 
     optimPyramid->error->UpdateHostFromDevice();
