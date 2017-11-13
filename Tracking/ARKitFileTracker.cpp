@@ -7,16 +7,15 @@
 #include <iomanip>
 
 
-ARKitFileTracker::ARKitFileTracker(const std::string &directory, const std::string &listName)
+ARKitFileTracker::ARKitFileTracker(const std::string file)
 {
-    Init(directory, listName);
+    Init(file);
     useFrameCount = false;
 }
 
-void ARKitFileTracker::Init(const std::string &directory, const std::string &listName)
+void ARKitFileTracker::Init(const std::string file)
 {
-    std::string fullListPath = directory + listName;
-    std::ifstream poseFile(fullListPath.c_str());
+    std::ifstream poseFile(file.c_str());
     std::string line;
     bool endOfFile = false;
     Sophus::SE3f firstPose;
@@ -42,34 +41,33 @@ void ARKitFileTracker::Init(const std::string &directory, const std::string &lis
         std::stringstream ss(line);
         std::string token;
 
+
+        //Get the timestamp
         std::getline(ss, token, ' ');
         double timestampRaw = atof(token.c_str());
 
         Sophus::SE3f pose;
-        for (unsigned int i = 0; i < 3; i++)
+
+        Eigen::Matrix3f rot;
+        Eitrn::Vector3f translation;
+
+
+        for (unsigned int r = 0; r < 3; r++)
         {
+            //First get rotation matrix
+            for (unsigned int c = 0; c < 3; c++)
+            {
+                std::getline(ss,token, ' ');
+                rot(r,c) = atof(token.c_str());
+            }
+
+            //Then translation
             std::getline(ss,token, ' ');
-            pose.translation()[i] = atof(token.c_str());
+            translation[r] = atof(token.c_str());
         }
 
-        Eigen::Quaternionf q;
-        std::getline(ss,token, ' ');
-        q.x() = atof(token.c_str());
-        std::getline(ss,token, ' ');
-        q.y() = atof(token.c_str());
-        std::getline(ss,token, ' ');
-        q.z() = atof(token.c_str());
-        std::getline(ss,token, ' ');
-        q.w() = atof(token.c_str());
-        pose.setQuaternion(q);
-
-        pose = pose.inverse();
-
-
-        if (timedPoses.size() == 0)
-            firstPose = pose;
-
-        pose = pose * firstPose.inverse();
+        pose.translation = translation;
+        pose.setRotationMatrix(rot);
 
         long long timestamp = timestampRaw * 1e6;
 

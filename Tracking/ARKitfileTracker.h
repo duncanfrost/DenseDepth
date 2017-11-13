@@ -11,5 +11,5 @@ public:
     ARKitFileTracker(const std::string &directory, const std::string &listName);
 
 private:
-    void Init(const std::string &directory, const std::string &listName);
+    void Init(const std::string file);
 };
