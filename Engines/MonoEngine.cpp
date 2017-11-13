@@ -411,17 +411,15 @@ void MonoEngine::LoadGTDepth(long long timestamp)
     std::cout << "dIDepth: " << dIDepth << std::endl;
 
 
-    float iDepth = 2.0f;
-    
-    int z1 = floor((iDepth - minIDepth) / dIDepth);
-    int z2 = ceil((iDepth - minIDepth) / dIDepth);
-
-
+    // float iDepth = 2.0f;
+    float dData = 0.5;
+    int z1 = floor(dData * (depthSamples - 1));
+    int z2 = ceil(dData * (depthSamples - 1));
     float iDepth1 = ((float)z1 * dIDepth) + minIDepth;
     float iDepth2 = ((float)z2 * dIDepth) + minIDepth;
 
 
-    std::cout << "IDepth orig: " << iDepth << std::endl;
+    // std::cout << "IDepth orig: " << iDepth << std::endl;
 
     std::cout << "Z1: " << z1 << std::endl;
     std::cout << "Z2: " << z2 << std::endl;
