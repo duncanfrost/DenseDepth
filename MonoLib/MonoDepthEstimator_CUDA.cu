@@ -54,6 +54,17 @@ __device__ T HuberNorm(T x, T eps)
         return absX - eps/2;
 }
 
+__global__ void CopyBuffer(float *source, float *dest, Vector2i imgSize)
+{
+    int id_x = blockIdx.x*blockDim.x+threadIdx.x;
+    int id_y = blockIdx.y*blockDim.y+threadIdx.y;
+    if (id_x > imgSize.x - 1 || id_y > imgSize.y - 1) return;
+    int offset = id_x + id_y * imgSize.x;
+
+    dest[offset] = source[offset];
+}
+
+
 __global__ void InitVolumeValues_device(float *photo_error,
                                         int *nUpdates,
                                         Vector2i imgSize, int depthSamples)
@@ -1647,10 +1658,6 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
     // }
 
     // OptimToDepth(false);
-}
-
-void MonoDepthEstimator_CUDA::LoadDepth(ORFloatImage depthImage)
-{
 }
 
 float MonoDepthEstimator_CUDA::MeasureError()
