@@ -1679,6 +1679,6 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
     // OptimToDepth(false);
 }
 
-MonoDepthEstimator_CUDA::LoadDepth(ORFloatImage depthImage)
+void MonoDepthEstimator_CUDA::LoadDepth(ORFloatImage depthImage)
 {
 }
