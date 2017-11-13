@@ -402,6 +402,35 @@ void MonoEngine::LoadGTDepth(long long timestamp)
     float minIDepth = monoDepthEstimator->optimPyramid->minIDepth;
     float maxIDepth = monoDepthEstimator->optimPyramid->maxIDepth;
     float iDepthDiff = maxIDepth - minIDepth;
+    int depthSamples = monoDepthEstimator->optimPyramid->depthSamples; 
+    float dIDepth =iDepthDiff / (depthSamples - 1);
+
+    std::cout << "MinIDepth: " << minIDepth << std::endl;
+    std::cout << "MaxIDepth: " << maxIDepth << std::endl;
+    std::cout << "IDepthDiff: " << iDepthDiff << std::endl;
+    std::cout << "dIDepth: " << dIDepth << std::endl;
+
+
+    float iDepth = 2.0f;
+    
+    int z1 = floor((iDepth - minIDepth) / dIDepth);
+    int z2 = ceil((iDepth - minIDepth) / dIDepth);
+
+
+    float iDepth1 = ((float)z1 * dIDepth) + minIDepth;
+    float iDepth2 = ((float)z2 * dIDepth) + minIDepth;
+
+
+    std::cout << "IDepth orig: " << iDepth << std::endl;
+
+    std::cout << "Z1: " << z1 << std::endl;
+    std::cout << "Z2: " << z2 << std::endl;
+    std::cout << "iDepth1: " << iDepth1 << std::endl;
+    std::cout << "iDepth2: " << iDepth2 << std::endl;
+
+
+
+    exit(1);
 
     float minDepth = 1/maxIDepth;
     float maxDepth = 1/minIDepth;
