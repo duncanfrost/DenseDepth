@@ -886,6 +886,7 @@ __global__ void MinErrorTrueFit_device(float *photo_error,float *d_data,
 __global__ void ComputeFullError_device(float *d_data, float *error_data,
                                         float *photo_error, int *minIdx_data,
                                         float minIDepth, float maxIDepth,
+                                        int depthSamples,
                                         Vector2i imgSize, float eps, float lambda)
 {
     int x = blockIdx.x*blockDim.x+threadIdx.x;
@@ -905,8 +906,30 @@ __global__ void ComputeFullError_device(float *d_data, float *error_data,
     float TV_Huber = HuberNorm(absNorm, eps);
 
 
-    int z = minIdx_data[image_offset];
-    int offset = x + y * imgSize.x+ z* imgSize.x*imgSize.y;
+    float dData = d_data[image_offset];
+    float z = dData * (depthSamples - 1);
+    int z1 = floor(z);
+    int z2 = ceil(z);
+
+    float dz = z - z1;
+    float weight1 = (1 - dz);
+    float weight2 = dz;
+
+    int offset1 = x + y * imgSize.x+ z1* imgSize.x*imgSize.y;
+    int offset2 = x + y * imgSize.x+ z2* imgSize.x*imgSize.y;
+        
+    // float photoErrorPix1 = photo_error[offset1];
+    // float photoErrorPix2 = photo_error[offset2];
+
+    // float photoErrorPix = photoErrorPix1 * weight1 +
+    //     photoErrorPix2 * weight2;
+
+
+    // int offset = x + y * imgSize.x+ (int)z* imgSize.x*imgSize.y;
+
+    int zi = minIdx_data[image_offset];
+    int offset = x + y * imgSize.x+ zi* imgSize.x*imgSize.y;
+
     float photoErrorPix = photo_error[offset];
 
     float totalError = TV_Huber + lambda * photoErrorPix;
@@ -1073,6 +1096,7 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
                                                               optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
                                                               optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
                                                               optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
+                                                              optimPyramid->depthSamples,
                                                               optimPyramid->minIDepth, optimPyramid->maxIDepth,
                                                               imgSize, tvSettings.epsilon, tvSettings.lambda); 
 
@@ -1118,6 +1142,7 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
                                                                   optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
                                                                   optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
                                                                   optimPyramid->minIDepth, optimPyramid->maxIDepth,
+                                                                  optimPyramid->depthSamples,
                                                                   imgSize, tvSettings.epsilon, tvSettings.lambda); 
 
 
@@ -1484,6 +1509,7 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
                                                               optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
                                                               optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
                                                               optimPyramid->minIDepth, optimPyramid->maxIDepth,
+                                                              optimPyramid->depthSamples,
                                                               imgSize, tvSettings.epsilon, tvSettings.lambda); 
 
 
@@ -1677,6 +1703,7 @@ float MonoDepthEstimator_CUDA::MeasureError()
                                                           optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
                                                           optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
                                                           optimPyramid->minIDepth, optimPyramid->maxIDepth,
+                                                          optimPyramid->depthSamples,
                                                           imgSize, tvSettings.epsilon, tvSettings.lambda); 
 
     optimPyramid->error->UpdateHostFromDevice();

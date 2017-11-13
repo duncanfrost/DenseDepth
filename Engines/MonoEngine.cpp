@@ -177,8 +177,6 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
 {
     SampleFromBufferMid();
 
-    long long timestamp = timeStampBuffer[nMid];
-    LoadGTDepth(timestamp);
 
     SmoothPhoto(iterations);
 
@@ -190,6 +188,10 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
 
     float error = monoDepthEstimator->MeasureError();
     std::cout << "Error: " << error << std::endl;
+
+
+    long long timestamp = timeStampBuffer[nMid];
+    LoadGTDepth(timestamp);
 
     error = monoDepthEstimator->MeasureError();
     std::cout << "Error after depth load: " << error << std::endl;
@@ -412,23 +414,31 @@ void MonoEngine::LoadGTDepth(long long timestamp)
 
 
     // float iDepth = 2.0f;
-    float dData = 0.5;
-    int z1 = floor(dData * (depthSamples - 1));
-    int z2 = ceil(dData * (depthSamples - 1));
+    float dData = 0.512;
+    float z = dData * (depthSamples - 1);
+    int z1 = floor(z);
+    int z2 = ceil(z);
+    float dz = z - z1;
+    float weight1 = (1 - dz);
+    float weight2 = dz;
+
+    
+
+
     float iDepth1 = ((float)z1 * dIDepth) + minIDepth;
     float iDepth2 = ((float)z2 * dIDepth) + minIDepth;
 
 
     // std::cout << "IDepth orig: " << iDepth << std::endl;
 
+    std::cout << "Z: " << z << std::endl;
     std::cout << "Z1: " << z1 << std::endl;
     std::cout << "Z2: " << z2 << std::endl;
+    std::cout << "Weight1 :" << weight1 << std::endl;
+    std::cout << "Weight2 :" << weight2 << std::endl;
     std::cout << "iDepth1: " << iDepth1 << std::endl;
     std::cout << "iDepth2: " << iDepth2 << std::endl;
 
-
-
-    exit(1);
 
     float minDepth = 1/maxIDepth;
     float maxDepth = 1/minIDepth;
