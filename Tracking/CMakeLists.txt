@@ -5,11 +5,13 @@ INCLUDE(${PROJECT_SOURCE_DIR}/cmake/UseCUDA.cmake)
 SET(sources
   TUMFileTracker.cpp
   ORBFileTracker.cpp
+  ARKitFileTracker.cpp
   FileTracker.cpp
   )
 
 SET(headers
   TUMFileTracker.h
+  ARKitFileTracker.h
   ORBFileTracker.h
   FileTracker.h
   )
