@@ -28,10 +28,10 @@ int main(void)
     tracker = new TUMFileTracker(poseDirectory, "groundtruth.txt");
 
     MonoEngine::Settings settings;
-    settings.fx = 520.908620;
-    settings.fy = 521.007327;
-    settings.cx = 325.141442;
-    settings.cy = 249.701764;
+    settings.fx = 1012.501526;
+    settings.fy = 1012.501526;
+    settings.cx = 635.658752;
+    settings.cy = 341.148590;
 
     engine = new MonoEngine(source, depthSource, tracker, settings);
 
