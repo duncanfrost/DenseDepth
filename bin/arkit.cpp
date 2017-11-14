@@ -3,29 +3,20 @@
 #include <GUI/ARWindow.h>
 #include <GUI/MapWindow.h>
 #include <Engines/MonoEngine.h>
-#include <Tracking/TUMFileTracker.h>
+#include <Tracking/ARKitFileTracker.h>
 #include <ImageSource/ARKitSource.h>
-#include <ImageSource/TUMDepthSource.h>
 
 void Idle(void);
 void KeyboardFunction(unsigned char key, int x, int y);
 VisualisationModule *visModule;
 MonoEngine *engine;
 ARKitSource *source;
-TUMDepthSource *depthSource;
 FileTracker *tracker;
 
 int main(void)
 {
-    std::string filename1 = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/rgb.txt";
-    std::string filename2 = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/depth.txt";
-
-
-    std::string poseDirectory = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/";
-
     source = new ARKitSource("/home/duncan/Data/ARKit/seq1/","Exposure.txt");
-    depthSource = new TUMDepthSource(filename2);
-    tracker = new TUMFileTracker(poseDirectory, "groundtruth.txt");
+    tracker = new ARKitFileTracker("/home/duncan/Data/ARKit/seq1/Poses.txt");
 
     MonoEngine::Settings settings;
     settings.fx = 1012.501526;
@@ -33,7 +24,7 @@ int main(void)
     settings.cx = 635.658752;
     settings.cy = 341.148590;
 
-    engine = new MonoEngine(source, depthSource, tracker, settings);
+    engine = new MonoEngine(source, NULL, tracker, settings);
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",1280,720,engine->GetARData()));
