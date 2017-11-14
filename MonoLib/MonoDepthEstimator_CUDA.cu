@@ -1041,7 +1041,7 @@ void MonoDepthEstimator_CUDA::UpdatePhotoError(ORUtils::SE3Pose refToTracker,
                                                ORUtils::TimeStampedImage<Vector4u> *frame)
 {
     float depthIncrement = (optimPyramid->maxIDepth - optimPyramid->minIDepth) /
-        (float)optimPyramid->depthSamples;
+       ((float)optimPyramid->depthSamples -1);
 
     MonoLib::MonoPyramidLevel *monoLevel = currDepthFrame->dataImage;
     Vector2i imgSize = monoLevel->depth->noDims;
