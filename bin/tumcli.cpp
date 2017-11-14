@@ -34,6 +34,9 @@ int main(void)
     settings.cx = 325.141442;
     settings.cy = 249.701764;
 
+    settings.inputSizeX = 640;
+    settings.inputSizeY = 480;
+
     engine = new MonoEngine(source, depthSource, tracker, settings);
 
     for (unsigned int i = 0; i < 300; i++)

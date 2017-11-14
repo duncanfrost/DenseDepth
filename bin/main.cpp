@@ -28,6 +28,11 @@ int main(void)
     settings.fy = 683.6179;
     settings.cx = 317.6438;
     settings.cy = 239.5907;
+
+    settings.inputSizeX = 640;
+    settings.inputSizeY = 480;
+
+
     engine = new MonoEngine(source, NULL, tracker, settings);
 
     visModule = new VisualisationModule(&Idle);
