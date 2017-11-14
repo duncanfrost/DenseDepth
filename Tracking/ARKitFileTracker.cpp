@@ -71,7 +71,7 @@ void ARKitFileTracker::Init(const std::string file)
         pose.translation() = translation;
         pose.setRotationMatrix(rot);
 
-        //ARKit's viewmatrix is simply the inverse of the transform
+        //ARKit's viewmatrix is the inverse of the transform
         pose = pose.inverse();
 
         long long timestamp = timestampRaw * 1e6;
@@ -79,12 +79,16 @@ void ARKitFileTracker::Init(const std::string file)
 
 
 
+        //This changes handed-ness I think. Not sure why this is necessary as
+        //the world is apparently right-handed, but their description of the
+        //camera origin is left.
         Eigen::Matrix4f t = Eigen::Matrix4f::Identity();
         t(0,0) = -1;
         Eigen::Matrix4f mat = t * pose.matrix() * t;
         translation = mat.block<3,1>(0,3);
         rot = mat.block<3,3>(0,0);
 
+        //
         translation[0] *= -1;
         translation[1] *= -1;
         translation[2] *= -1;
