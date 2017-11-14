@@ -88,7 +88,6 @@ void ARKitFileTracker::Init(const std::string file)
         translation = mat.block<3,1>(0,3);
         rot = mat.block<3,3>(0,0);
 
-        //
         translation[0] *= -1;
         translation[1] *= -1;
         translation[2] *= -1;

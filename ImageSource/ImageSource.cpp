@@ -12,10 +12,12 @@ ImageSource::ImageSource()
 
 void ImageSource::GrabNewFrame()
 {
-    std::string path =  rgbImagePaths[frameNumber];
+    std::string path = rgbImagePaths[frameNumber];
     timeStamp = rgbTimeStamps[frameNumber];
     cv::Mat imTemp = cv::imread(path);
     imLeft = imTemp;
-    frameNumber++;
+
+    if (frameNumber < rgbImagePaths.size()-1)
+        frameNumber++;
 }
 

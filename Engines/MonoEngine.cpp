@@ -74,8 +74,6 @@ void MonoEngine::Process()
 
 
     
-    Eigen::Quaternionf q = currPose.unit_quaternion();
-    std::cout << q.x() << " " << q.y() << " " << q.z() << " " << q.w() << " " << std::endl;
     // ConvertToOR(image, orImage);
 
 
@@ -100,10 +98,6 @@ void MonoEngine::Process()
 
     std::cout << "Framenumber: " << count << std::endl;
         
-    KeyFrame *kf = new KeyFrame();
-    kf->pose = currPose;
-    map->keyframeList.push_back(kf);
-
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;
 
