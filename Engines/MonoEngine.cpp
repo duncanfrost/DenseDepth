@@ -190,8 +190,8 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
     std::cout << "Error: " << error << std::endl;
 
 
-    long long timestamp = timeStampBuffer[nMid];
-    LoadGTDepth(timestamp);
+    // long long timestamp = timeStampBuffer[nMid];
+    // LoadGTDepth(timestamp);
 
     error = monoDepthEstimator->MeasureError();
     std::cout << "Error after depth load: " << error << std::endl;
