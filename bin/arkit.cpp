@@ -26,6 +26,8 @@ int main(int argc, char* argv[])
     settings.fy = 1012.501526;
     settings.cx = 635.658752;
     settings.cy = 341.148590;
+    settings.inputSizeX = 1280;
+    settings.inputSizeY = 720;
 
     engine = new MonoEngine(source, NULL, tracker, settings);
 

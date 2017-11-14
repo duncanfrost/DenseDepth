@@ -16,17 +16,16 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
     currTrackerData = new TrackerData();
     map = new GlobalMap();
 
-    imgSize.x = 640;
-    imgSize.y = 480;
 
-    // imgSize.x = 320;
-    // imgSize.y = 240;
+    //This is the target size
+    imgSize.x = 640;
+    imgSize.y = 360;
 
     Vector4f intrinsics;
-    float fx = (settings.fx/640)*imgSize.x;
-    float fy = (settings.fy/480)*imgSize.y;
-    float cx = (settings.cx/640)*imgSize.x;
-    float cy = (settings.cy/480)*imgSize.y;
+    float fx = (settings.fx/settings.inputSizeX)*imgSize.x;
+    float fy = (settings.fy/settings.inputSizeY)*imgSize.y;
+    float cx = (settings.cx/settings.inputSizeX)*imgSize.x;
+    float cy = (settings.cy/settings.inputSizeY)*imgSize.y;
 
     intrinsics[0] = fx;
     intrinsics[1] = fy;
@@ -45,7 +44,7 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
 
     hasReferenceFrame = false;
     useRawDepth = true;
-    needsKeyFrame = false;
+    needsKeyFrame = true;
     bufferTop = 0;
     framesProcessed = 0;
     nMid = BUFFERSIZE/2; 
@@ -77,15 +76,15 @@ void MonoEngine::Process()
     // ConvertToOR(image, orImage);
 
 
-    // Sample();
-    SaveToBuffer(image, currPose);
+    Sample();
+    // SaveToBuffer(image, currPose);
 
 
-    // if (needsKeyFrame)
-    // {
-        // AddKeyFrame(orImage, currPose);
-        // needsKeyFrame = false;
-    // }
+    if (needsKeyFrame)
+    {
+        AddKeyFrame(image, currPose);
+        needsKeyFrame = false;
+    }
 
     if (SampleActive(count, BUFFERSIZE))
     {
@@ -166,6 +165,8 @@ void MonoEngine::Sample()
 void MonoEngine::SmoothPhoto(int iterations)
 {
     monoDepthEstimator->RunTVOptimisation(iterations);
+    VisualizeDepth();
+    paused = true;
     // monoDepthEstimator->RunTVL1Optimisation(iterations);
     // monoDepthEstimator->RunTVL0Optimisation(iterations);
 }

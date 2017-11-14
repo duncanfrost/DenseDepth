@@ -22,6 +22,9 @@ public:
         float fy;
         float cx;
         float cy;
+
+        int inputSizeX;
+        int inputSizeY;
     };
 
     MonoEngine(ImageSource* source, DepthSource* depthSource,
