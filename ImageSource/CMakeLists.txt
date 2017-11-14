@@ -7,6 +7,7 @@ SET(sources
   ImageSource.cpp
   PhoneSource.cpp
   TUMSource.cpp
+  ARKitSource.cpp
   TUMDepthSource.cpp
   )
 
@@ -15,6 +16,7 @@ SET(headers
   ImageSource.h
   PhoneSource.h
   TUMSource.h
+  ARKitSource.h
   TUMDepthSource.h
   )
 

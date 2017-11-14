@@ -4,14 +4,14 @@
 #include <GUI/MapWindow.h>
 #include <Engines/MonoEngine.h>
 #include <Tracking/TUMFileTracker.h>
-#include <ImageSource/TUMSource.h>
+#include <ImageSource/ARKitSource.h>
 #include <ImageSource/TUMDepthSource.h>
 
 void Idle(void);
 void KeyboardFunction(unsigned char key, int x, int y);
 VisualisationModule *visModule;
 MonoEngine *engine;
-TUMSource *source;
+ARKitSource *source;
 TUMDepthSource *depthSource;
 FileTracker *tracker;
 
@@ -23,7 +23,7 @@ int main(void)
 
     std::string poseDirectory = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/";
 
-    source = new TUMSource(filename1);
+    source = new ARKitSource("/home/duncan/Data/ARKit/seq1/","Exposure.txt");
     depthSource = new TUMDepthSource(filename2);
     tracker = new TUMFileTracker(poseDirectory, "groundtruth.txt");
 
@@ -36,7 +36,7 @@ int main(void)
     engine = new MonoEngine(source, depthSource, tracker, settings);
 
     visModule = new VisualisationModule(&Idle);
-    visModule->AddWindow(new ARWindow("AR",640,480,engine->GetARData()));
+    visModule->AddWindow(new ARWindow("AR",1280,720,engine->GetARData()));
     visModule->AddWindow(new MapWindow("Map",640,480,engine));
 
     visModule->SetKeyboardFunction(&KeyboardFunction);
