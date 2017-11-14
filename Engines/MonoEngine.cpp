@@ -91,7 +91,7 @@ void MonoEngine::Process()
 
     if (SampleActive(count, BUFFERSIZE))
     {
-        SmoothPhotoBuffer(200);
+        // SmoothPhotoBuffer(200);
         // SmoothPhotoRemode(200);
 
         // WritePhotoErrors("/home/duncan/photo.bin");
@@ -100,6 +100,9 @@ void MonoEngine::Process()
 
     std::cout << "Framenumber: " << count << std::endl;
         
+    KeyFrame *kf = new KeyFrame();
+    kf->pose = currPose;
+    map->keyframeList.push_back(kf);
 
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = image;

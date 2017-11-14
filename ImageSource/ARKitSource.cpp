@@ -46,16 +46,16 @@ void ARKitSource::PathsFromListFile(std::vector<std::string> &imagePaths,
         {
 
             // std::cout << "Timestamp: " << std::setprecision(15) << timestampRaw << std::endl;
-            std::cout << "TimeStamp: " << timestampRaw  << std::endl;
+            // std::cout << "TimeStamp: " << timestampRaw  << std::endl;
 
             long long timestamp = std::stof(timestampRaw) * 1e6;
-            std::cout << "TimeStamp: " << std::setprecision(15) << timestamp  << std::endl;
+            // std::cout << "TimeStamp: " << std::setprecision(15) << timestamp  << std::endl;
 
             std::string imagePath;
 
             std::stringstream fullPath;
             fullPath << directory << "/Images/" << timestampRaw << ".png";
-            std::cout << fullPath.str() << std::endl;
+            // std::cout << fullPath.str() << std::endl;
 
 
             imagePaths.push_back(fullPath.str());

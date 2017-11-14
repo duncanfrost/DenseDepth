@@ -13,10 +13,13 @@ MonoEngine *engine;
 ARKitSource *source;
 FileTracker *tracker;
 
-int main(void)
+int main(int argc, char* argv[])
 {
-    source = new ARKitSource("/home/duncan/Data/ARKit/seq1/","Exposure.txt");
-    tracker = new ARKitFileTracker("/home/duncan/Data/ARKit/seq1/Poses.txt");
+    // std::string sequence = "seq4";
+    std::string sequence = argv[1];
+
+    source = new ARKitSource("/home/duncan/Data/ARKit/" + sequence + "/","Exposure.txt");
+    tracker = new ARKitFileTracker("/home/duncan/Data/ARKit/" + sequence + "/Poses.txt");
 
     MonoEngine::Settings settings;
     settings.fx = 1012.501526;

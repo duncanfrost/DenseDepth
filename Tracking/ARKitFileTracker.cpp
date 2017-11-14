@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <fstream>
 #include <sstream>
+#include <Eigen/Dense>
 #include <iostream>
 #include <iomanip>
 
@@ -66,10 +67,43 @@ void ARKitFileTracker::Init(const std::string file)
             translation[r] = atof(token.c_str());
         }
 
+
         pose.translation() = translation;
         pose.setRotationMatrix(rot);
 
+        //ARKit's viewmatrix is simply the inverse of the transform
+        pose = pose.inverse();
+
         long long timestamp = timestampRaw * 1e6;
+
+
+
+
+        Eigen::Matrix4f t = Eigen::Matrix4f::Identity();
+        t(0,0) = -1;
+        Eigen::Matrix4f mat = t * pose.matrix() * t;
+        translation = mat.block<3,1>(0,3);
+        rot = mat.block<3,3>(0,0);
+
+        translation[0] *= -1;
+        translation[1] *= -1;
+        translation[2] *= -1;
+
+        pose.translation() = translation;
+        pose.setRotationMatrix(rot);
+
+
+
+        // std::cout << mat << std::endl;
+        // std::cout << pose.matrix() << std::endl;
+
+
+        if (timedPoses.size() == 0)
+            firstPose = pose;
+
+        pose = pose * firstPose.inverse();
+
+
 
         timedPoses.push_back(std::make_pair(timestamp,pose));
     }
