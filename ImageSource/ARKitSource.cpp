@@ -54,7 +54,7 @@ void ARKitSource::PathsFromListFile(std::vector<std::string> &imagePaths,
             std::string imagePath;
 
             std::stringstream fullPath;
-            fullPath << directory << "/Images/" << timestampRaw << ".png";
+            fullPath << directory << "/ProcessedImages/" << timestampRaw << ".png";
             // std::cout << fullPath.str() << std::endl;
 
 

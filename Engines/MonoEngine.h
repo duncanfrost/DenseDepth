@@ -63,6 +63,7 @@ public:
     void SampleFromBufferMid();
     void SampleFromBufferMid_Remode();
     void WritePhotoErrors(std::string path);
+    MonoLib::MonoDepthEstimator *monoDepthEstimator;
 
 private:
 
@@ -96,7 +97,6 @@ private:
     long long timeStamp;
     Sophus::SE3f currPose;
     GlobalMap *map;
-    MonoLib::MonoDepthEstimator *monoDepthEstimator;
     rmd::Depthmap *depthMap;
 
     bool hasReferenceFrame;

@@ -51,7 +51,7 @@ void KeyboardFunction(unsigned char key, int x, int y)
         break;
 
     case ' ':
-        // engine->SampleFromBufferMid();
+        engine->AddKeyFrameManual();
 
         break;
 
@@ -60,8 +60,16 @@ void KeyboardFunction(unsigned char key, int x, int y)
         break;
         
     case 'o':
-        engine->SmoothPhotoBuffer(200);
-        engine->WritePhotoErrors("/home/duncan/photo.bin");
+        engine->SmoothPhoto(200);
+        break;
+
+    case 'y':
+        engine->monoDepthEstimator->InitOptim();
+        break;
+        
+
+        // engine->SmoothPhotoBuffer(200);
+        // engine->WritePhotoErrors("/home/duncan/photo.bin");
         break;
     }
 }
