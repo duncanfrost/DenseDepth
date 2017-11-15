@@ -44,7 +44,7 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
 
     hasReferenceFrame = false;
     useRawDepth = true;
-    needsKeyFrame = true;
+    needsKeyFrame = false;
     bufferTop = 0;
     framesProcessed = 0;
     nMid = BUFFERSIZE/2; 
@@ -70,15 +70,8 @@ void MonoEngine::Process()
 
     currPose = tracker->PoseAtTime(timeStamp, count, timeOut);
 
-
-
-    
-    // ConvertToOR(image, orImage);
-
-
     Sample();
     SaveToBuffer();
-
 
     if (needsKeyFrame)
     {
@@ -86,11 +79,11 @@ void MonoEngine::Process()
         needsKeyFrame = false;
     }
 
-    // if (SampleActive(count, BUFFERSIZE))
-    // {
-    //     SmoothPhotoBuffer(200);
-    //     // SmoothPhotoRemode(200);
-    // }
+    if (SampleActive(count, BUFFERSIZE))
+    {
+        SmoothPhotoBuffer(200);
+        // SmoothPhotoRemode(200);
+    }
 
     std::cout << "Framenumber: " << count << std::endl;
         
