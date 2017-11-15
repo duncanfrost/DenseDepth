@@ -66,6 +66,7 @@ public:
     void SampleFromBufferMid();
     void SampleFromBufferMid_Remode();
     void WritePhotoErrors(std::string path);
+    void Sample();
     MonoLib::MonoDepthEstimator *monoDepthEstimator;
 
 private:
@@ -112,7 +113,6 @@ private:
     long long timeStampBuffer[BUFFERSIZE];
 
 
-    void Sample();
     bool paused;
 
 

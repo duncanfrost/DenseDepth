@@ -57,6 +57,10 @@ void KeyboardFunction(unsigned char key, int x, int y)
 
         break;
 
+    case 'h':
+        engine->Sample();
+        break;
+
     case 'p':
         engine->TogglePaused();
         break;

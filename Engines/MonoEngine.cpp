@@ -44,7 +44,7 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
 
     hasReferenceFrame = false;
     useRawDepth = true;
-    needsKeyFrame = false;
+    needsKeyFrame = true;
     bufferTop = 0;
     framesProcessed = 0;
     nMid = BUFFERSIZE/2; 
@@ -71,7 +71,7 @@ void MonoEngine::Process()
     currPose = tracker->PoseAtTime(timeStamp, count, timeOut);
 
     Sample();
-    SaveToBuffer();
+    // SaveToBuffer();
 
     if (needsKeyFrame)
     {
@@ -79,11 +79,11 @@ void MonoEngine::Process()
         needsKeyFrame = false;
     }
 
-    if (SampleActive(count, BUFFERSIZE))
-    {
-        SmoothPhotoBuffer(200);
-        // SmoothPhotoRemode(200);
-    }
+    // if (SampleActive(count, BUFFERSIZE))
+    // {
+    //     SmoothPhotoBuffer(200);
+    //     // SmoothPhotoRemode(200);
+    // }
 
     std::cout << "Framenumber: " << count << std::endl;
         
@@ -338,8 +338,8 @@ cv::Mat MonoEngine::PreProcessImage(cv::Mat image)
     kernelSize.height = 3;
 
     cv::Mat imOut;
-    // cv::GaussianBlur(imResized, imOut, kernelSize, 3);
-    imOut = imResized;
+    cv::GaussianBlur(imResized, imOut, kernelSize, 3);
+    // imOut = imResized;
 
 
     return imOut;
