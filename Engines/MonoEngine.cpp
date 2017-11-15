@@ -44,7 +44,7 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
 
     hasReferenceFrame = false;
     useRawDepth = true;
-    needsKeyFrame = true;
+    needsKeyFrame = false;
     bufferTop = 0;
     framesProcessed = 0;
     nMid = BUFFERSIZE/2; 
@@ -76,19 +76,19 @@ void MonoEngine::Process()
     // ConvertToOR(image, orImage);
 
 
-    Sample();
-    // SaveToBuffer(image, currPose);
+    // Sample();
+    SaveToBuffer(image, currPose);
 
 
-    if (needsKeyFrame)
-    {
-        AddKeyFrame(image, currPose);
-        needsKeyFrame = false;
-    }
+    // if (needsKeyFrame)
+    // {
+    //     AddKeyFrame(image, currPose);
+    //     needsKeyFrame = false;
+    // }
 
     if (SampleActive(count, BUFFERSIZE))
     {
-        // SmoothPhotoBuffer(200);
+        SmoothPhotoBuffer(200);
         // SmoothPhotoRemode(200);
 
         // WritePhotoErrors("/home/duncan/photo.bin");

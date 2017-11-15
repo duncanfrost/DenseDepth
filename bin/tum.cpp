@@ -69,8 +69,9 @@ void KeyboardFunction(unsigned char key, int x, int y)
         break;
         
     case 'o':
-        engine->SmoothPhotoBuffer(200);
-        engine->WritePhotoErrors("/home/duncan/photo.bin");
+        // engine->SmoothPhotoBuffer(200);
+        // engine->WritePhotoErrors("/home/duncan/photo.bin");
+        engine->SmoothPhoto(200);
         break;
     }
 }
