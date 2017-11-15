@@ -44,7 +44,7 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
 
     hasReferenceFrame = false;
     useRawDepth = true;
-    needsKeyFrame = false;
+    needsKeyFrame = true;
     bufferTop = 0;
     framesProcessed = 0;
     nMid = BUFFERSIZE/2; 
@@ -76,24 +76,21 @@ void MonoEngine::Process()
     // ConvertToOR(image, orImage);
 
 
-    // Sample();
-    SaveToBuffer(image, currPose);
+    Sample(image, currPose);
+    // SaveToBuffer(image, currPose);
 
 
-    // if (needsKeyFrame)
-    // {
-    //     AddKeyFrame(image, currPose);
-    //     needsKeyFrame = false;
-    // }
-
-    if (SampleActive(count, BUFFERSIZE))
+    if (needsKeyFrame)
     {
-        SmoothPhotoBuffer(200);
-        // SmoothPhotoRemode(200);
-
-        // WritePhotoErrors("/home/duncan/photo.bin");
-        // exit(1);
+        AddKeyFrame(image, currPose);
+        needsKeyFrame = false;
     }
+
+    // if (SampleActive(count, BUFFERSIZE))
+    // {
+    //     SmoothPhotoBuffer(200);
+    //     // SmoothPhotoRemode(200);
+    // }
 
     std::cout << "Framenumber: " << count << std::endl;
         
@@ -151,14 +148,16 @@ void MonoEngine::AddKeyFrame_Remode(cv::Mat inImage, Sophus::SE3f inPose)
 }
 
 
-void MonoEngine::Sample()
+void MonoEngine::Sample(cv::Mat inputRGBImage, Sophus::SE3f trackingPose)
 {
     if (!hasReferenceFrame)
         return;
 
 
     std::cout << "Sampling" << std::endl;
-    Sophus::SE3f inPose = currPose*invRefPose;
+    Sophus::SE3f inPose = trackingPose*invRefPose;
+    ConvertToOR(inputRGBImage, orImage);
+    orImage->UpdateDeviceFromHost();
     monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), orImage);
 }
 

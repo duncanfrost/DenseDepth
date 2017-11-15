@@ -111,7 +111,7 @@ private:
     long long timeStampBuffer[BUFFERSIZE];
 
 
-    void Sample();
+    void Sample(cv::Mat inputRGBImage, Sophus::SE3f trackingPose);
     bool paused;
 
 
