@@ -59,7 +59,7 @@ void MonoEngine::Process()
 
     source->GrabNewFrame();
     cv::Mat rawImage = source->Image();
-    image = PreProcessImage(rawImage);
+    currImage = PreProcessImage(rawImage);
     timeStamp = source->TimeStamp();
 
     std::cout << "Timestamp: " << timeStamp << std::endl;
@@ -76,13 +76,13 @@ void MonoEngine::Process()
     // ConvertToOR(image, orImage);
 
 
-    Sample(image, currPose);
+    Sample();
     // SaveToBuffer(image, currPose);
 
 
     if (needsKeyFrame)
     {
-        AddKeyFrame(image, currPose);
+        AddKeyFrame(currImage, currPose);
         needsKeyFrame = false;
     }
 
@@ -95,7 +95,7 @@ void MonoEngine::Process()
     std::cout << "Framenumber: " << count << std::endl;
         
     currTrackerData->trackerPose = currPose;
-    currTrackerData->frame = image;
+    currTrackerData->frame = currImage;
 
     framesProcessed++;
 }
@@ -148,15 +148,15 @@ void MonoEngine::AddKeyFrame_Remode(cv::Mat inImage, Sophus::SE3f inPose)
 }
 
 
-void MonoEngine::Sample(cv::Mat inputRGBImage, Sophus::SE3f trackingPose)
+void MonoEngine::Sample()
 {
     if (!hasReferenceFrame)
         return;
 
 
     std::cout << "Sampling" << std::endl;
-    Sophus::SE3f inPose = trackingPose*invRefPose;
-    ConvertToOR(inputRGBImage, orImage);
+    Sophus::SE3f inPose = currPose*invRefPose;
+    ConvertToOR(currImage, orImage);
     orImage->UpdateDeviceFromHost();
     monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), orImage);
 }

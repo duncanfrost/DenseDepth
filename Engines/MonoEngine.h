@@ -89,7 +89,9 @@ private:
     FileTracker* tracker;
     ImageSource* source;
     DepthSource* depthSource;
-    cv::Mat image;
+
+
+    cv::Mat currImage;
     Vector2i imgSize;
     ORUChar4TSImage *orImage;
 
@@ -111,7 +113,7 @@ private:
     long long timeStampBuffer[BUFFERSIZE];
 
 
-    void Sample(cv::Mat inputRGBImage, Sophus::SE3f trackingPose);
+    void Sample();
     bool paused;
 
 
