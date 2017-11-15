@@ -19,7 +19,7 @@ namespace MonoLib {
 
 
         void UpdatePhotoError(ORUtils::SE3Pose refToTracker,
-                              ORUtils::TimeStampedImage<Vector4u> *frame);
+                              ORUtils::MemoryBlock<float> *frame);
 
         void RunTVOptimisation(unsigned int iterations) {}
         void RunTVL1Optimisation(unsigned int iterations) {}
@@ -32,7 +32,7 @@ namespace MonoLib {
         MonoDepthEstimator_CPU(Vector2i imgSize, Vector4f intrinsics_raw);
         ~MonoDepthEstimator_CPU();
 
-        void SetRefImage(ORUChar4TSImage *frame);
+        void SetRefImage(ORUtils::MemoryBlock<float> *frame);
         void OptimToDepth(bool useRawDepth) {};
 
         void UpdateForPointCloud() {}

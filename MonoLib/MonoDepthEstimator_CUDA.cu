@@ -1008,10 +1008,10 @@ float MonoDepthEstimator_CUDA::EvaluateGT()
     return diffTotal / (float)totalMeasured;
 }
 
-void MonoDepthEstimator_CUDA::SetRefImage(ORUChar4TSImage *frame)
+void MonoDepthEstimator_CUDA::SetRefImage(ORUtils::MemoryBlock<float> *frame)
 {
     currDepthFrame->Init();
-    currDepthFrame->colorImageData->SetFrom(frame, MEMCPYDIR_CUDA_TO_CPU);
+    // currDepthFrame->colorImageData->SetFrom(frame, MEMCPYDIR_CUDA_TO_CPU);
 
     MonoDepthEstimator::SetRefImage(frame);
 }
@@ -1038,7 +1038,7 @@ void MonoDepthEstimator_CUDA::ReinitOptim()
 }
 
 void MonoDepthEstimator_CUDA::UpdatePhotoError(ORUtils::SE3Pose refToTracker,
-                                               ORUtils::TimeStampedImage<Vector4u> *frame)
+                                               ORUtils::MemoryBlock<float> *frame)
 {
     float depthIncrement = (optimPyramid->maxIDepth - optimPyramid->minIDepth) /
        ((float)optimPyramid->depthSamples -1);
@@ -1049,18 +1049,18 @@ void MonoDepthEstimator_CUDA::UpdatePhotoError(ORUtils::SE3Pose refToTracker,
     dim3 blocks2=getBlocksFor2DProcess(imgSize.x ,imgSize.y);
     dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x ,imgSize.y);
 
-    updatePhotoErrorPatch<<<blocks2,threadsPerBlock2>>>(refToTracker.GetR(),
-                                                        refToTracker.GetT(),
-                                                        monoLevel->intrinsics,
-                                                        imgSize,
-                                                        optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
-                                                        optimPyramid->nUpdates->GetData(MEMORYDEVICE_CUDA),
-                                                        frame->GetData(MEMORYDEVICE_CUDA),
-                                                        currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CUDA),
-                                                        optimPyramid->depthSamples,
-                                                        optimPyramid->minIDepth,
-                                                        depthIncrement);
-    monoLevel->nUpdate++;
+    // updatePhotoErrorPatch<<<blocks2,threadsPerBlock2>>>(refToTracker.GetR(),
+    //                                                     refToTracker.GetT(),
+    //                                                     monoLevel->intrinsics,
+    //                                                     imgSize,
+    //                                                     optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+    //                                                     optimPyramid->nUpdates->GetData(MEMORYDEVICE_CUDA),
+    //                                                     frame->GetData(MEMORYDEVICE_CUDA),
+    //                                                     currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CUDA),
+    //                                                     optimPyramid->depthSamples,
+    //                                                     optimPyramid->minIDepth,
+    //                                                     depthIncrement);
+    // monoLevel->nUpdate++;
 
     cudaThreadSynchronize();
 }

@@ -35,7 +35,7 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
     monoDepthEstimator = new MonoLib::MonoDepthEstimator_CUDA(imgSize, intrinsics);
     depthMap = new rmd::Depthmap(imgSize.x, imgSize.y, fx, cx, fy, cy);
 
-    orImage = new ORUChar4TSImage(imgSize, true, true, true);
+    orImage = new ORUtils::MemoryBlock<float>(imgSize.x*imgSize.y, true, true, true);
 
 
     // for (unsigned int i = 0; i < BUFFERSIZE; i++)

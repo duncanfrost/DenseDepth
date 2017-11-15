@@ -93,7 +93,7 @@ private:
 
     cv::Mat currImage;
     Vector2i imgSize;
-    ORUChar4TSImage *orImage;
+    ORUtils::MemoryBlock<float> *orImage;
 
     int bufferTop;
     int framesProcessed;

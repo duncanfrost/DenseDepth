@@ -13,14 +13,14 @@ namespace MonoLib {
 
         void ComputeMaxPixel();
 
-        void SetRefImage(ORUChar4TSImage *frame);
+        void SetRefImage(ORUtils::MemoryBlock<float> *frame);
         float EvaluateGT();
         void UpdateForPointCloud() {currDepthFrame->UpdateHostFromDevice();}
 
         void ReinitOptim();
 
         void UpdatePhotoError(ORUtils::SE3Pose refToTracker,
-                              ORUtils::TimeStampedImage<Vector4u> *frame);
+                              ORUtils::MemoryBlock<float> *frame);
 
         void SmoothL1();
         void SmoothHuber();

@@ -93,10 +93,10 @@ MonoDepthEstimator_CPU::~MonoDepthEstimator_CPU()
 {
 }
 
-void MonoDepthEstimator_CPU::SetRefImage(ORUChar4TSImage *frame)
+void MonoDepthEstimator_CPU::SetRefImage(ORUtils::MemoryBlock<float> *frame)
 {
     currDepthFrame->Init();
-    currDepthFrame->colorImageData->SetFrom(frame, MEMCPYDIR_CPU_TO_CPU);
+    // currDepthFrame->colorImageData->SetFrom(frame, MEMCPYDIR_CPU_TO_CPU);
 
     MonoDepthEstimator::SetRefImage(frame);
 }
@@ -157,7 +157,7 @@ void MonoDepthEstimator_CPU::SetBuffer(float *data, Vector2i imgSize, float valu
 
 
 void MonoDepthEstimator_CPU::UpdatePhotoError(ORUtils::SE3Pose refToTracker,
-                                              ORUtils::TimeStampedImage<Vector4u> *frame)
+                                              ORUtils::MemoryBlock<float> *frame)
 {
     float depthIncrement = (optimPyramid->maxIDepth - optimPyramid->minIDepth) /
         (float)optimPyramid->depthSamples;
@@ -170,15 +170,15 @@ void MonoDepthEstimator_CPU::UpdatePhotoError(ORUtils::SE3Pose refToTracker,
 
     std::cout << refToTracker << std::endl;
 
-    updatePhotoError2dCPU(refToTracker.GetR(),
-                          refToTracker.GetT(),monoLevel->intrinsics,
-                          imgSize,
-                          optimPyramid->photoErrors->GetData(MEMORYDEVICE_CPU),
-                          frame->GetData(MEMORYDEVICE_CPU),
-                          currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CPU),
-                          optimPyramid->depthSamples,
-                          optimPyramid->minIDepth,
-                          depthIncrement,monoLevel->nUpdate);
+    // updatePhotoError2dCPU(refToTracker.GetR(),
+    //                       refToTracker.GetT(),monoLevel->intrinsics,
+    //                       imgSize,
+    //                       optimPyramid->photoErrors->GetData(MEMORYDEVICE_CPU),
+    //                       frame->GetData(MEMORYDEVICE_CPU),
+    //                       currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CPU),
+    //                       optimPyramid->depthSamples,
+    //                       optimPyramid->minIDepth,
+    //                       depthIncrement,monoLevel->nUpdate);
 
     monoLevel->nUpdate++;
 }

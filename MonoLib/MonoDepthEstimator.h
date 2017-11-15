@@ -80,7 +80,7 @@ namespace MonoLib {
         virtual ~MonoDepthEstimator() {}
 
         virtual void ReinitOptim() {}
-        virtual void SetRefImage(ORUChar4TSImage *frame)
+        virtual void SetRefImage(ORUtils::MemoryBlock<float> *frame)
         {
             currDepthFrame->UpdateDeviceFromHost();
 
@@ -217,7 +217,7 @@ namespace MonoLib {
         virtual float EvaluateGT() = 0;
 
         virtual void UpdatePhotoError(ORUtils::SE3Pose refToTracker,
-                                      ORUtils::TimeStampedImage<Vector4u> *frame) = 0;
+                                      ORUtils::MemoryBlock<float> *frame) = 0;
 
         virtual void RunTVOptimisation(unsigned int iterations) = 0;
         virtual void RunTVL1Optimisation(unsigned int iterations) = 0;
