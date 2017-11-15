@@ -22,10 +22,10 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
     imgSize.y = 360;
 
     Vector4f intrinsics;
-    float fx = (settings.fx/settings.inputSizeX)*imgSize.x;
-    float fy = (settings.fy/settings.inputSizeY)*imgSize.y;
-    float cx = (settings.cx/settings.inputSizeX)*imgSize.x;
-    float cy = (settings.cy/settings.inputSizeY)*imgSize.y;
+    float fx = (settings.fx/(float)settings.inputSizeX)*(float)imgSize.x;
+    float fy = (settings.fy/(float)settings.inputSizeY)*(float)imgSize.y;
+    float cx = (settings.cx/(float)settings.inputSizeX)*(float)imgSize.x;
+    float cy = (settings.cy/(float)settings.inputSizeY)*(float)imgSize.y;
 
     intrinsics[0] = fx;
     intrinsics[1] = fy;
