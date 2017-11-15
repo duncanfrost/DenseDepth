@@ -77,7 +77,7 @@ void MonoEngine::Process()
 
 
     Sample();
-    // SaveToBuffer(image, currPose);
+    SaveToBuffer();
 
 
     if (needsKeyFrame)
@@ -296,8 +296,7 @@ void MonoEngine::SampleFromBufferMid_Remode()
 }
 
 
-void MonoEngine::SaveToBuffer(cv::Mat inputRGBImage,
-                              Sophus::SE3f inputPose)
+void MonoEngine::SaveToBuffer()
 {
     cv::Mat lastImage = imageBuffer[BUFFERSIZE - 1];
 
@@ -312,9 +311,9 @@ void MonoEngine::SaveToBuffer(cv::Mat inputRGBImage,
 
     //No need to do this for the pose buffer
     imageBuffer[0] = lastImage;
-    imageBuffer[0] = inputRGBImage.clone();
+    imageBuffer[0] = currImage.clone();
 
-    poseBuffer[0] = inputPose;
+    poseBuffer[0] = currPose;
     timeStampBuffer[0] = timeStamp;
 
     std::cout << "Timestamp here: " << timeStamp << std::endl;

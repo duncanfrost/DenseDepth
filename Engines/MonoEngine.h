@@ -72,8 +72,7 @@ private:
 
     void MakePointCloud(bool useRawDepth);
 
-    void SaveToBuffer(cv::Mat inputRGBImage,
-                      Sophus::SE3f inputPose);
+    void SaveToBuffer();
 
 
     void LoadGTDepth(long long timestamp);
