@@ -41,7 +41,7 @@ namespace ORUtils
 
 		/** Total number of allocated entries in the data array. */
 		size_t dataSize;
-
+            ;
 		/** Get the data pointer on CPU or GPU. */
 		inline DEVICEPTR(T)* GetData(MemoryDeviceType memoryType)
 		{

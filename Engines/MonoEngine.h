@@ -28,7 +28,13 @@ public:
     };
 
     MonoEngine(ImageSource* source, DepthSource* depthSource,
+               ImageSource* featureSource,
                FileTracker *tracker, Settings settings);
+
+    MonoEngine(ImageSource* source, DepthSource* depthSource,
+               FileTracker *tracker, Settings settings);
+
+
 
     void AddKeyFrameManual()
     {
@@ -71,6 +77,8 @@ public:
 
 private:
 
+    void Init();
+
     void MakePointCloud(bool useRawDepth);
 
     void SaveToBuffer();
@@ -88,7 +96,9 @@ private:
     TrackerData* currTrackerData;
     FileTracker* tracker;
     ImageSource* source;
+    ImageSource* featureSource;
     DepthSource* depthSource;
+    Settings settings;
 
 
     cv::Mat currImage;

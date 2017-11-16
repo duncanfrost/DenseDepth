@@ -5,16 +5,35 @@
 
 Sophus::SE3f MonoEngine::invRefPose;
 
+
+MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
+                       ImageSource* featureSource,
+                       FileTracker *tracker, Settings settings)
+{
+    this->featureSource = featureSource;
+    this->source = source;
+    this->tracker = tracker;
+    this->depthSource = depthSource;
+    this->settings = settings;
+    Init();
+}
+
 MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
                        FileTracker *tracker, Settings settings)
 {
     this->source = source;
     this->tracker = tracker;
     this->depthSource = depthSource;
+    this->settings = settings;
+    this->featureSource = NULL;
+    Init();
+}
 
-    
+void MonoEngine::Init()
+{
     currTrackerData = new TrackerData();
     map = new GlobalMap();
+
 
 
     //This is the target size
@@ -58,6 +77,10 @@ void MonoEngine::Process()
         return;
 
     source->GrabNewFrame();
+
+    if (featureSource != NULL)
+        featureSource->GrabNewFrame();
+
     cv::Mat rawImage = source->Image();
     currImage = PreProcessImage(rawImage);
     timeStamp = source->TimeStamp();

@@ -6,6 +6,7 @@
 #include <Tracking/TUMFileTracker.h>
 #include <ImageSource/TUMSource.h>
 #include <ImageSource/TUMDepthSource.h>
+#include <ImageSource/TUMFeatureSource.h>
 
 void Idle(void);
 void KeyboardFunction(unsigned char key, int x, int y);
@@ -13,6 +14,7 @@ VisualisationModule *visModule;
 MonoEngine *engine;
 TUMSource *source;
 TUMDepthSource *depthSource;
+TUMFeatureSource *featureSource;
 FileTracker *tracker;
 
 int main(void)
@@ -25,6 +27,7 @@ int main(void)
 
     source = new TUMSource(filename1);
     depthSource = new TUMDepthSource(filename2);
+    featureSource = new TUMFeatureSource("/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/feature.txt");
     tracker = new TUMFileTracker(poseDirectory, "groundtruth.txt");
 
     MonoEngine::Settings settings;
@@ -37,7 +40,7 @@ int main(void)
     settings.inputSizeY = 480;
 
 
-    engine = new MonoEngine(source, depthSource, tracker, settings);
+    engine = new MonoEngine(source, depthSource, featureSource, tracker, settings);
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",640,480,engine->GetARData()));

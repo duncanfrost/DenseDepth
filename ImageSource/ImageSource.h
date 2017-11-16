@@ -9,7 +9,7 @@ public:
 
     ImageSource();
 
-    void GrabNewFrame();
+    virtual void GrabNewFrame();
 
     void SetFrameNumber(unsigned int number)
     {

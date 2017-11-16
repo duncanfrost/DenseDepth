@@ -9,6 +9,7 @@ SET(sources
   TUMSource.cpp
   ARKitSource.cpp
   TUMDepthSource.cpp
+  TUMFeatureSource.cpp
   )
 
 SET(headers
@@ -18,6 +19,7 @@ SET(headers
   TUMSource.h
   ARKitSource.h
   TUMDepthSource.h
+  TUMFeatureSource.h
   )
 
 
