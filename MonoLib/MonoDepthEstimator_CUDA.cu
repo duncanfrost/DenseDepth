@@ -1016,6 +1016,17 @@ void MonoDepthEstimator_CUDA::SetRefImage(ORUChar4TSImage *frame)
     MonoDepthEstimator::SetRefImage(frame);
 }
 
+void MonoDepthEstimator_CUDA::SetRefAndFeatureImage(ORUChar4TSImage *frame,
+                                                    ORUtils::MemoryBlock<float> *featureImage)
+{
+    currDepthFrame->Init();
+    currDepthFrame->colorImageData->SetFrom(frame, MEMCPYDIR_CUDA_TO_CPU);
+    currDepthFrame->featureImageData->SetFrom(featureImage, MEMCPYDIR_CUDA_TO_CPU);
+
+    MonoDepthEstimator::SetRefImage(frame);
+}
+
+
 void MonoDepthEstimator_CUDA::ReinitOptim()
 {
     float *photoErrors = optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA);

@@ -101,6 +101,17 @@ void MonoDepthEstimator_CPU::SetRefImage(ORUChar4TSImage *frame)
     MonoDepthEstimator::SetRefImage(frame);
 }
 
+void MonoDepthEstimator_CPU::SetRefAndFeatureImage(ORUChar4TSImage *frame,
+                                                   ORUtils::MemoryBlock<float> *featureImage)
+{
+    currDepthFrame->Init();
+    currDepthFrame->colorImageData->SetFrom(frame, MEMCPYDIR_CPU_TO_CPU);
+    currDepthFrame->featureImageData->SetFrom(featureImage, MEMCPYDIR_CPU_TO_CPU);
+
+    MonoDepthEstimator::SetRefImage(frame);
+}
+
+
 float MonoDepthEstimator_CPU::MeasureErrorGT(float *mu, float *sigma2,
                                              float *GTDepths,
                                              unsigned int width, unsigned int height)

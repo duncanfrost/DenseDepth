@@ -33,6 +33,7 @@ namespace MonoLib {
         ~MonoDepthEstimator_CPU();
 
         void SetRefImage(ORUChar4TSImage *frame);
+        void SetRefAndFeatureImage(ORUChar4TSImage *frame, ORUtils::MemoryBlock<float> *featureImage);
         void OptimToDepth(bool useRawDepth) {};
 
         void UpdateForPointCloud() {}

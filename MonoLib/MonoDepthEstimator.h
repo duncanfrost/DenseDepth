@@ -92,6 +92,20 @@ namespace MonoLib {
             updateNumber = 0;
         }
 
+        virtual void SetRefAndFeatureImage(ORUChar4TSImage *frame,
+                                           ORUtils::MemoryBlock<float> *featureImage)
+        {
+            currDepthFrame->UpdateDeviceFromHost();
+
+            isInitialised = true;
+
+            currDepthFrame->dataImage->nUpdate = 0;
+            ReinitOptim();
+
+            updateNumber = 0;
+        }
+
+
 
         void SetLimitsFromGroundTruth(float *depth_data, Vector2i imgSize)
         {

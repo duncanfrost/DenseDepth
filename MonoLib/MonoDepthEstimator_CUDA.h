@@ -14,6 +14,8 @@ namespace MonoLib {
         void ComputeMaxPixel();
 
         void SetRefImage(ORUChar4TSImage *frame);
+        void SetRefAndFeatureImage(ORUChar4TSImage *frame,
+                                   ORUtils::MemoryBlock<float> *featureImage);
         float EvaluateGT();
         void UpdateForPointCloud() {currDepthFrame->UpdateHostFromDevice();}
 
