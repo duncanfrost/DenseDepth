@@ -14,6 +14,7 @@ namespace MonoLib
     public:
         MonoPyramidLevel *dataImage;
         ORUtils::TimeStampedImage<Vector4u> *colorImageData;
+        ORUtils::MemoryBlock<float> *featureImageData;
 
         float meanGrey;
 
@@ -32,6 +33,15 @@ namespace MonoLib
             this->colorImageData =
                 new ORUtils::TimeStampedImage<Vector4u>(imgSize,
                                                         allocateCPU,allocateCUDA);
+
+
+            //TODO: these need to be passed in as aruments
+            int featureChannels = 64;
+            int featureHeight = 472;
+            int featureWidth = 632;
+            this->featureImageData = new
+                ORUtils::MemoryBlock<float>(featureChannels*featureHeight*featureWidth,
+                                            true, true, true);
         }
 
 
@@ -49,12 +59,14 @@ namespace MonoLib
         {
             dataImage->UpdateHostFromDevice();
             colorImageData->UpdateHostFromDevice();
+            featureImageData->UpdateHostFromDevice();
         }
 
         void UpdateDeviceFromHost()
         {
             dataImage->UpdateDeviceFromHost();
             colorImageData->UpdateDeviceFromHost();
+            featureImageData->UpdateDeviceFromHost();
         }
 
         ~MonoView(void)
