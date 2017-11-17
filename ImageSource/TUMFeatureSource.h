@@ -8,6 +8,7 @@ class TUMFeatureSource : public ImageSource
 {
 public:
     void GrabNewFrame();
+    void GrabNewFrameDebug();
 
     TUMFeatureSource(const std::string& listFile);
 
@@ -15,4 +16,7 @@ private:
     void PathsFromListFile(std::vector<std::string> &imagePaths,
                            std::vector<long long> &timeStamps,
                            std::string listPath);
+
+    int height, width, nChannels;
+    float *data;
 };

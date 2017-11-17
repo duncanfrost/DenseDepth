@@ -6,16 +6,71 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iomanip>
 
-void TUMFeatureSource::GrabNewFrame()
-{
-    std::cout << "Getting here" << std::endl;
-    exit(1);
-}
-
 TUMFeatureSource::TUMFeatureSource(const std::string& listFile)
 {
+    nChannels = 64;
+    height = 472;
+    width = 632;
+    data = new float[nChannels * height * width];
     PathsFromListFile(rgbImagePaths, rgbTimeStamps, listFile);
 }
+
+void TUMFeatureSource::GrabNewFrame()
+{
+    std::string path = rgbImagePaths[frameNumber];
+    timeStamp = rgbTimeStamps[frameNumber];
+
+
+    int nChannels = 64;
+    int height = 472;
+    int width = 632;
+
+    FILE * pFile;
+    pFile = fopen (path.c_str(), "rb");
+    fread (data, sizeof(float), nChannels * height * width, pFile);
+    fclose(pFile);
+
+    if (frameNumber < rgbImagePaths.size()-1)
+        frameNumber++;
+}
+
+void TUMFeatureSource::GrabNewFrameDebug()
+{
+    std::string path = rgbImagePaths[frameNumber];
+    timeStamp = rgbTimeStamps[frameNumber];
+
+
+
+    FILE * pFile;
+    pFile = fopen (path.c_str(), "rb");
+    fread (data, sizeof(float), nChannels * height * width, pFile);
+
+
+    for (int c = 0; c < 10; c++)
+    {
+        cv::Mat imOut = cv::Mat(height, width, CV_8UC1);
+        for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
+            {
+                // float data = channel.at<float>(y,x);
+                int index = c + nChannels*x + nChannels*width*y; 
+                float data_pix = data[index];
+                data_pix = data_pix + 160;
+                imOut.at<unsigned char>(y,x) = data_pix;
+            }
+
+        cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+        cv::imshow( "Display window", imOut );                   // Show our image inside it.
+        cv::waitKey(0);                                          // Wait for a keystroke in the window
+        cv::destroyWindow("Display window");
+    }
+
+    fclose(pFile);
+
+    if (frameNumber < rgbImagePaths.size()-1)
+        frameNumber++;
+}
+
 
 void TUMFeatureSource::PathsFromListFile(std::vector<std::string> &imagePaths,
                                   std::vector<long long> &timeStamps,
@@ -58,8 +113,6 @@ void TUMFeatureSource::PathsFromListFile(std::vector<std::string> &imagePaths,
             
             std::stringstream fullPath;
             fullPath << listDir << imagePath;
-
-            // std::cout << fullPath.str() << std::endl;
 
             imagePaths.push_back(fullPath.str());
             timeStamps.push_back(timestamp);

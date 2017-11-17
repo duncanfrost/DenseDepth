@@ -79,7 +79,10 @@ void MonoEngine::Process()
     source->GrabNewFrame();
 
     if (featureSource != NULL)
+    {
+
         featureSource->GrabNewFrame();
+    }
 
     cv::Mat rawImage = source->Image();
     currImage = PreProcessImage(rawImage);
