@@ -21,6 +21,11 @@ namespace MonoLib {
         void UpdatePhotoError(ORUtils::SE3Pose refToTracker,
                               ORUtils::TimeStampedImage<Vector4u> *frame);
 
+        void UpdatePhotoErrorWithFeatures(ORUtils::SE3Pose refToTracker,
+                                          ORUtils::TimeStampedImage<Vector4u> *frame,
+                                          ORUtils::MemoryBlock<float> *featureImage) {};
+
+
         void RunTVOptimisation(unsigned int iterations) {}
         void RunTVL1Optimisation(unsigned int iterations) {}
         void RunTVL0Optimisation(unsigned int iterations) {}

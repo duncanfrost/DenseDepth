@@ -186,7 +186,12 @@ void MonoEngine::Sample()
     Sophus::SE3f inPose = currPose*invRefPose;
     ConvertToOR(currImage, orImage);
     orImage->UpdateDeviceFromHost();
-    monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), orImage);
+    if (featureSource != NULL)
+        monoDepthEstimator->UpdatePhotoErrorWithFeatures(SophusToOR(inPose),
+                                                         orImage, featureData);
+    else
+        monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), orImage);
+
 }
 
 void MonoEngine::SmoothPhoto(int iterations)

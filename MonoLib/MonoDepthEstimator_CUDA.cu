@@ -1721,3 +1721,37 @@ float MonoDepthEstimator_CUDA::MeasureError()
     float error = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
     return error;
 }
+
+void MonoDepthEstimator_CUDA::UpdatePhotoErrorWithFeatures(ORUtils::SE3Pose refToTracker,
+                                                           ORUtils::TimeStampedImage<Vector4u> *frame,
+                                                           ORUtils::MemoryBlock<float> *featureImage)
+{
+
+
+    
+    float depthIncrement = (optimPyramid->maxIDepth - optimPyramid->minIDepth) /
+        ((float)optimPyramid->depthSamples -1);
+
+    MonoLib::MonoPyramidLevel *monoLevel = currDepthFrame->dataImage;
+    Vector2i imgSize = monoLevel->depth->noDims;
+
+    dim3 blocks2=getBlocksFor2DProcess(imgSize.x ,imgSize.y);
+    dim3 threadsPerBlock2=getThreadsFor2DProcess(imgSize.x ,imgSize.y);
+
+    std::cout << "Updating here" << std::endl;
+
+    updatePhotoError2d<<<blocks2,threadsPerBlock2>>>(refToTracker.GetR(),
+                                                        refToTracker.GetT(),
+                                                        monoLevel->intrinsics,
+                                                        imgSize,
+                                                        optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+                                                        optimPyramid->nUpdates->GetData(MEMORYDEVICE_CUDA),
+                                                        frame->GetData(MEMORYDEVICE_CUDA),
+                                                        currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CUDA),
+                                                        optimPyramid->depthSamples,
+                                                        optimPyramid->minIDepth,
+                                                        depthIncrement);
+    monoLevel->nUpdate++;
+
+    cudaThreadSynchronize();
+}
