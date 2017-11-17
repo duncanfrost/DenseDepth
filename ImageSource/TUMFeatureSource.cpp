@@ -20,11 +20,6 @@ void TUMFeatureSource::GrabNewFrame()
     std::string path = rgbImagePaths[frameNumber];
     timeStamp = rgbTimeStamps[frameNumber];
 
-
-    int nChannels = 64;
-    int height = 472;
-    int width = 632;
-
     FILE * pFile;
     pFile = fopen (path.c_str(), "rb");
     fread (data, sizeof(float), nChannels * height * width, pFile);
@@ -39,11 +34,10 @@ void TUMFeatureSource::GrabNewFrameDebug()
     std::string path = rgbImagePaths[frameNumber];
     timeStamp = rgbTimeStamps[frameNumber];
 
-
-
     FILE * pFile;
     pFile = fopen (path.c_str(), "rb");
     fread (data, sizeof(float), nChannels * height * width, pFile);
+    fclose(pFile);
 
 
     for (int c = 0; c < 10; c++)
@@ -65,7 +59,6 @@ void TUMFeatureSource::GrabNewFrameDebug()
         cv::destroyWindow("Display window");
     }
 
-    fclose(pFile);
 
     if (frameNumber < rgbImagePaths.size()-1)
         frameNumber++;
