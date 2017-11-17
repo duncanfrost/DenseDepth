@@ -44,7 +44,7 @@ void MonoEngine::Init()
 
     //This is the target size
     imgSize.x = 640;
-    imgSize.y = 360;
+    imgSize.y = 480;
 
     Vector4f intrinsics;
     float fx = (settings.fx/(float)settings.inputSizeX)*(float)imgSize.x;
