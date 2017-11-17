@@ -11,12 +11,16 @@ TUMFeatureSource::TUMFeatureSource(const std::string& listFile)
     nChannels = 64;
     height = 472;
     width = 632;
-    data = new float[nChannels * height * width];
+    data = NULL;
     PathsFromListFile(rgbImagePaths, rgbTimeStamps, listFile);
 }
 
 void TUMFeatureSource::GrabNewFrame()
 {
+
+    if (data == NULL)
+        data = new float[nChannels * height * width];
+
     std::string path = rgbImagePaths[frameNumber];
     timeStamp = rgbTimeStamps[frameNumber];
 
@@ -31,6 +35,10 @@ void TUMFeatureSource::GrabNewFrame()
 
 void TUMFeatureSource::GrabNewFrameDebug()
 {
+
+    if (data == NULL)
+        data = new float[nChannels * height * width];
+
     std::string path = rgbImagePaths[frameNumber];
     timeStamp = rgbTimeStamps[frameNumber];
 

@@ -7,7 +7,7 @@ Sophus::SE3f MonoEngine::invRefPose;
 
 
 MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
-                       ImageSource* featureSource,
+                       TUMFeatureSource* featureSource,
                        FileTracker *tracker, Settings settings)
 {
     this->featureSource = featureSource;
@@ -16,6 +16,12 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
     this->depthSource = depthSource;
     this->settings = settings;
     Init();
+
+    featureChannels = 64;
+    featureHeight = 472;
+    featureWidth = 632;
+    featureData = new ORUtils::MemoryBlock<float>(featureChannels*featureHeight*featureWidth, true, true, true);
+    featureSource->SetData(featureData->GetData(MEMORYDEVICE_CPU));
 }
 
 MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
@@ -53,12 +59,11 @@ void MonoEngine::Init()
     
     monoDepthEstimator = new MonoLib::MonoDepthEstimator_CUDA(imgSize, intrinsics);
     depthMap = new rmd::Depthmap(imgSize.x, imgSize.y, fx, cx, fy, cy);
-
     orImage = new ORUChar4TSImage(imgSize, true, true, true);
 
 
-    // for (unsigned int i = 0; i < BUFFERSIZE; i++)
-    //     imageBuffer[i] = (imgSize, true, true, true);
+
+
 
 
     hasReferenceFrame = false;
@@ -80,8 +85,8 @@ void MonoEngine::Process()
 
     if (featureSource != NULL)
     {
-
         featureSource->GrabNewFrame();
+        float *data = featureData->GetData(MEMORYDEVICE_CPU);
     }
 
     cv::Mat rawImage = source->Image();

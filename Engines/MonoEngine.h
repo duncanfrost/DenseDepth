@@ -3,6 +3,7 @@
 #include <MonoLib/Shared/Map.h>
 #include <opencv2/opencv.hpp>
 #include <ImageSource/ImageSource.h>
+#include <ImageSource/TUMFeatureSource.h>
 #include <ImageSource/DepthSource.h>
 #include <Tracking/FileTracker.h>
 #include <sophus/se3.hpp>
@@ -28,7 +29,7 @@ public:
     };
 
     MonoEngine(ImageSource* source, DepthSource* depthSource,
-               ImageSource* featureSource,
+               TUMFeatureSource* featureSource,
                FileTracker *tracker, Settings settings);
 
     MonoEngine(ImageSource* source, DepthSource* depthSource,
@@ -96,7 +97,7 @@ private:
     TrackerData* currTrackerData;
     FileTracker* tracker;
     ImageSource* source;
-    ImageSource* featureSource;
+    TUMFeatureSource* featureSource;
     DepthSource* depthSource;
     Settings settings;
 
@@ -104,6 +105,11 @@ private:
     cv::Mat currImage;
     Vector2i imgSize;
     ORUChar4TSImage *orImage;
+
+    ORUtils::MemoryBlock<float> *featureData;
+    int featureChannels;
+    int featureHeight;
+    int featureWidth;
 
     int bufferTop;
     int framesProcessed;
@@ -124,6 +130,7 @@ private:
 
 
     bool paused;
+
 
 
 
