@@ -74,6 +74,7 @@ public:
     void SampleFromBufferMid_Remode();
     void WritePhotoErrors(std::string path);
     void Sample();
+    void Sample2();
     MonoLib::MonoDepthEstimator *monoDepthEstimator;
 
 private:
@@ -106,7 +107,7 @@ private:
     Vector2i imgSize;
     ORUChar4TSImage *orImage;
 
-    ORUtils::MemoryBlock<float> *featureData;
+    ORUtils::MemoryBlock<float> *featureImage;
     int featureChannels;
     int featureHeight;
     int featureWidth;

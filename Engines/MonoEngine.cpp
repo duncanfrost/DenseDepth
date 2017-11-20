@@ -20,8 +20,8 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
     featureChannels = 64;
     featureHeight = 472;
     featureWidth = 632;
-    featureData = new ORUtils::MemoryBlock<float>(featureChannels*featureHeight*featureWidth, true, true, true);
-    featureSource->SetData(featureData->GetData(MEMORYDEVICE_CPU));
+    featureImage = new ORUtils::MemoryBlock<float>(featureChannels*featureHeight*featureWidth, true, true, true);
+    featureSource->SetData(featureImage->GetData(MEMORYDEVICE_CPU));
 }
 
 MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
@@ -86,7 +86,7 @@ void MonoEngine::Process()
     if (featureSource != NULL)
     {
         featureSource->GrabNewFrame();
-        float *data = featureData->GetData(MEMORYDEVICE_CPU);
+        float *data = featureImage->GetData(MEMORYDEVICE_CPU);
     }
 
     cv::Mat rawImage = source->Image();
@@ -101,7 +101,7 @@ void MonoEngine::Process()
 
     currPose = tracker->PoseAtTime(timeStamp, count, timeOut);
 
-    Sample();
+    Sample2();
     // SaveToBuffer();
 
     if (needsKeyFrame)
@@ -136,7 +136,7 @@ void MonoEngine::AddKeyFrame(cv::Mat inImage, Sophus::SE3f inPose)
     ConvertToOR(inImage, orImage);
     orImage->UpdateDeviceFromHost();
     if (featureSource != NULL)
-        monoDepthEstimator->SetRefAndFeatureImage(orImage, featureData);
+        monoDepthEstimator->SetRefAndFeatureImage(orImage, featureImage);
     else
         monoDepthEstimator->SetRefImage(orImage);
     
@@ -188,9 +188,55 @@ void MonoEngine::Sample()
     orImage->UpdateDeviceFromHost();
     if (featureSource != NULL)
         monoDepthEstimator->UpdatePhotoErrorWithFeatures(SophusToOR(inPose),
-                                                         orImage, featureData);
+                                                         orImage, featureImage);
     else
         monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), orImage);
+}
+
+void MonoEngine::Sample2()
+{
+    //This is just to test interpolation
+    std::cout << "Sample2" << std::endl;
+    float *featureData = featureImage->GetData(MEMORYDEVICE_CPU);
+    float outData[64];
+
+
+    std::cout << "Data before" << std::endl;
+
+    for (unsigned int i = 0; i < 64; i++)
+        std::cout << outData[i] << " ";
+    std::cout << std::endl;
+
+    Vector2f pos(100.3, 100.8);
+    InterpolateFeature(featureData, outData, pos, featureWidth, featureChannels);
+
+    int c = 31;
+
+    int ix = (int)pos.x;
+    int iy = (int)pos.y;
+
+    float dataTL = featureData[(featureChannels*(ix + featureWidth*iy)) + c];
+    float dataTR = featureData[(featureChannels*(ix + 1 + featureWidth*iy)) + c];
+    float dataBL = featureData[(featureChannels*(ix + featureWidth*(iy + 1))) + c];
+    float dataBR = featureData[(featureChannels*(ix + 1 + featureWidth*(iy + 1))) + c];
+
+    float interp = outData[c];
+
+    float dx = pos.x - (int)pos.x;
+    float dy = pos.y - (int)pos.y;
+    float weight_tl = (1.0f - dx) * (1.0f - dy);
+    float weight_tr = (dx)        * (1.0f - dy);
+    float weight_bl = (1.0f - dx) * (dy);
+    float weight_br = (dx)        * (dy);
+
+
+    float sum = dataTL*weight_tl + dataTR*weight_tr + dataBL*weight_bl +
+        dataBR*weight_br;
+    std::cout << "interp1: " << sum << std::endl;
+    std::cout << "interp: " << interp << std::endl;
+    exit(1);
+
+
 
 }
 
