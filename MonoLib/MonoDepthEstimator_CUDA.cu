@@ -655,7 +655,8 @@ __global__ void updatePhotoErrorFeatures(Matrix3f R, Vector3f T,
                                          float *photo_error,
                                          int *nUpdates,
                                          Vector4u *currImageData,
-                                         Vector4u *refImageData, unsigned int depthSamples,
+                                         Vector4u *refImageData,
+                                         unsigned int depthSamples,
                                          float minIDepth, float depthIncrement)
 {
 
@@ -703,30 +704,7 @@ __global__ void updatePhotoErrorFeatures(Matrix3f R, Vector3f T,
                                         pointTrackImage.y, imgSize.x);
             Vector4u photo_ref = refImageData[x + imgSize.x*y];
 
-
-            //Compute gradient for ref
-            float pixMid = colourToIntensity(photo_ref);
-            float pixXPlus = colourToIntensity(refImageData[ x_ref_plus + imgSize.x* y]);
-            float pixYPlus = colourToIntensity(refImageData[ x + imgSize.x* y_ref_plus]);
-            float dIx_ref = pixXPlus - pixMid;
-            float dIy_ref = pixYPlus - pixMid;
-
-
-            //Compute gradient for current
-            pixMid = colourToIntensity(photo_current_OR);
-            pixXPlus = colourToIntensity(
-                interpolateBilinearVec4(currImageData,x_curr_plus,
-                                        pointTrackImage.y, imgSize.x));
-            pixYPlus = colourToIntensity(
-                interpolateBilinearVec4(currImageData,pointTrackImage.x,
-                                        y_curr_plus, imgSize.x));
-            float dIx_curr = pixXPlus - pixMid;
-            float dIy_curr = pixYPlus - pixMid;
-
             float normL1 = PhotoErrorL1(photo_current_OR,photo_ref);
-            // float normL1 = PhotoErrorL1Grad(photo_current_OR,photo_ref,
-            //                             dIx_ref, dIy_ref,
-            // dIx_curr, dIy_curr);
 
             float oldError = photo_error[offset];
             float obsError = normL1;
