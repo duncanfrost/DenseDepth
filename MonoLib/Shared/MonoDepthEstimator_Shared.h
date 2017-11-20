@@ -163,3 +163,36 @@ inline float depthFromIndex(int i,float zmin, float depthIncrement)
     float idepth = zmin + depthIncrement*i;
     return 1/idepth;
 }
+
+
+
+_CPU_AND_GPU_CODE_
+inline void InterpolateFeature(float *data, float *data_out, Vector2f pos, unsigned int width,
+                               unsigned int nChannels)
+{
+    int ix = (int)pos.x;
+    int iy = (int)pos.y;
+
+    float *dataTL = data + (nChannels*(ix + width*iy));
+    float *dataTR = data + (nChannels*(ix + 1 + width*iy));
+    float *dataBL = data + (nChannels*(ix + width*(iy + 1)));
+    float *dataBR = data + (nChannels*(ix + 1 + width*(iy + 1)));
+
+    float dx = pos.x - (int)pos.x;
+    float dy = pos.y - (int)pos.y;
+
+    float weight_tl = (1.0f - dx) * (1.0f - dy);
+    float weight_tr = (dx)        * (1.0f - dy);
+    float weight_bl = (1.0f - dx) * (dy);
+    float weight_br = (dx)        * (dy);
+
+    for (unsigned int i = 0; i < nChannels; i++)
+    {
+        data_out[i] = weight_tl * dataTL[i] +
+            weight_tr * dataTR[i] +
+            weight_bl * dataBL[i] +
+            weight_br * dataBR[i];
+    }
+
+
+}
