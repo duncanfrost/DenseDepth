@@ -9,8 +9,8 @@
 TUMFeatureSource::TUMFeatureSource(const std::string& listFile)
 {
     nChannels = 64;
-    height = 472;
-    width = 632;
+    height = 480;
+    width = 640;
     data = NULL;
     PathsFromListFile(rgbImagePaths, rgbTimeStamps, listFile);
 }

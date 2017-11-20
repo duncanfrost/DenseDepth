@@ -18,8 +18,8 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
     Init();
 
     featureChannels = 64;
-    featureHeight = 472;
-    featureWidth = 632;
+    featureHeight = 480;
+    featureWidth = 640;
     featureImage = new ORUtils::MemoryBlock<float>(featureChannels*featureHeight*featureWidth, true, true, true);
     featureSource->SetData(featureImage->GetData(MEMORYDEVICE_CPU));
 }
@@ -85,8 +85,7 @@ void MonoEngine::Process()
 
     if (featureSource != NULL)
     {
-        featureSource->GrabNewFrame();
-        float *data = featureImage->GetData(MEMORYDEVICE_CPU);
+        featureSource->GrabNewFrameDebug();
     }
 
     cv::Mat rawImage = source->Image();

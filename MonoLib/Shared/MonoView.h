@@ -37,8 +37,8 @@ namespace MonoLib
 
             //TODO: these need to be passed in as aruments
             int featureChannels = 64;
-            int featureHeight = 472;
-            int featureWidth = 632;
+            int featureHeight = 480;
+            int featureWidth = 640;
             this->featureImageData = new
                 ORUtils::MemoryBlock<float>(featureChannels*featureHeight*featureWidth,
                                             true, true, true);
