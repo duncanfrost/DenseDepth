@@ -649,6 +649,98 @@ __global__ void updatePhotoError2d(Matrix3f R, Vector3f T,
     }
 }
 
+__global__ void updatePhotoErrorFeatures(Matrix3f R, Vector3f T,
+                                         Intrinsics K,
+                                         Vector2i imgSize,
+                                         float *photo_error,
+                                         int *nUpdates,
+                                         Vector4u *currImageData,
+                                         Vector4u *refImageData, unsigned int depthSamples,
+                                         float minIDepth, float depthIncrement)
+{
+
+    short int x = blockIdx.x*blockDim.x+threadIdx.x;
+    short int y = blockIdx.y*blockDim.y+threadIdx.y;
+    if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
+
+
+    float u = x;
+    float v = y;
+
+    Vector3f pointRefUnscaled;
+    pointRefUnscaled.x = u * K.fxInv + K.cxInv;
+    pointRefUnscaled.y = v * K.fyInv + K.cyInv;
+    pointRefUnscaled.z = 1;
+
+
+
+    for (unsigned int z = 0; z < depthSamples; z++)
+    {
+        int offset = x + y * imgSize.x+ z* imgSize.x*imgSize.y;
+
+        float idepth = minIDepth + z*depthIncrement;
+        float depth = 1.0f/idepth;
+
+        Vector3f pointTrack = R * (pointRefUnscaled * depth) + T;
+        Vector2f pointTrackImage;
+        pointTrackImage.x = K.fx * pointTrack.x / pointTrack.z + K.cx;
+        pointTrackImage.y = K.fy * pointTrack.y / pointTrack.z + K.cy;
+
+
+        //if the voxel is projected in the current image then update photometric error and counter
+        if (PointInImage(pointTrackImage, imgSize) && pointTrack[2] > 0)
+        {
+            //L1 norm of the photometric error
+
+            int x_ref_plus = clamp(x+1, imgSize.x);
+            int y_ref_plus = clamp(y+1, imgSize.y);
+
+            float x_curr_plus = clamp(pointTrackImage.x + 1, (float)imgSize.x);
+            float y_curr_plus = clamp(pointTrackImage.y + 1, (float)imgSize.y);
+
+            Vector4f photo_current_OR =
+                interpolateBilinearVec4(currImageData,pointTrackImage.x,
+                                        pointTrackImage.y, imgSize.x);
+            Vector4u photo_ref = refImageData[x + imgSize.x*y];
+
+
+            //Compute gradient for ref
+            float pixMid = colourToIntensity(photo_ref);
+            float pixXPlus = colourToIntensity(refImageData[ x_ref_plus + imgSize.x* y]);
+            float pixYPlus = colourToIntensity(refImageData[ x + imgSize.x* y_ref_plus]);
+            float dIx_ref = pixXPlus - pixMid;
+            float dIy_ref = pixYPlus - pixMid;
+
+
+            //Compute gradient for current
+            pixMid = colourToIntensity(photo_current_OR);
+            pixXPlus = colourToIntensity(
+                interpolateBilinearVec4(currImageData,x_curr_plus,
+                                        pointTrackImage.y, imgSize.x));
+            pixYPlus = colourToIntensity(
+                interpolateBilinearVec4(currImageData,pointTrackImage.x,
+                                        y_curr_plus, imgSize.x));
+            float dIx_curr = pixXPlus - pixMid;
+            float dIy_curr = pixYPlus - pixMid;
+
+            float normL1 = PhotoErrorL1(photo_current_OR,photo_ref);
+            // float normL1 = PhotoErrorL1Grad(photo_current_OR,photo_ref,
+            //                             dIx_ref, dIy_ref,
+            // dIx_curr, dIy_curr);
+
+            float oldError = photo_error[offset];
+            float obsError = normL1;
+            int nUpdate = nUpdates[offset];
+
+            float newError = (nUpdate * oldError + obsError) / (nUpdate + 1);
+
+            photo_error[offset] = newError;
+            nUpdates[offset] = nUpdate + 1;
+        }
+    }
+}
+
+
 
 __global__ void MinPhotoErrorInit(float *photo_error,float *d_data,
                                   float *a_data, int *minIdx_data,
@@ -1052,7 +1144,7 @@ void MonoDepthEstimator_CUDA::UpdatePhotoError(ORUtils::SE3Pose refToTracker,
                                                ORUtils::TimeStampedImage<Vector4u> *frame)
 {
     float depthIncrement = (optimPyramid->maxIDepth - optimPyramid->minIDepth) /
-       ((float)optimPyramid->depthSamples -1);
+        ((float)optimPyramid->depthSamples -1);
 
     MonoLib::MonoPyramidLevel *monoLevel = currDepthFrame->dataImage;
     Vector2i imgSize = monoLevel->depth->noDims;
@@ -1740,17 +1832,17 @@ void MonoDepthEstimator_CUDA::UpdatePhotoErrorWithFeatures(ORUtils::SE3Pose refT
 
     std::cout << "Updating here" << std::endl;
 
-    updatePhotoError2d<<<blocks2,threadsPerBlock2>>>(refToTracker.GetR(),
-                                                        refToTracker.GetT(),
-                                                        monoLevel->intrinsics,
-                                                        imgSize,
-                                                        optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
-                                                        optimPyramid->nUpdates->GetData(MEMORYDEVICE_CUDA),
-                                                        frame->GetData(MEMORYDEVICE_CUDA),
-                                                        currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CUDA),
-                                                        optimPyramid->depthSamples,
-                                                        optimPyramid->minIDepth,
-                                                        depthIncrement);
+    updatePhotoErrorFeatures<<<blocks2,threadsPerBlock2>>>(refToTracker.GetR(),
+                                                           refToTracker.GetT(),
+                                                           monoLevel->intrinsics,
+                                                           imgSize,
+                                                           optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+                                                           optimPyramid->nUpdates->GetData(MEMORYDEVICE_CUDA),
+                                                           frame->GetData(MEMORYDEVICE_CUDA),
+                                                           currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CUDA),
+                                                           optimPyramid->depthSamples,
+                                                           optimPyramid->minIDepth,
+                                                           depthIncrement);
     monoLevel->nUpdate++;
 
     cudaThreadSynchronize();

@@ -101,7 +101,7 @@ void MonoEngine::Process()
 
     currPose = tracker->PoseAtTime(timeStamp, count, timeOut);
 
-    Sample2();
+    Sample();
     // SaveToBuffer();
 
     if (needsKeyFrame)
@@ -234,7 +234,7 @@ void MonoEngine::Sample2()
         dataBR*weight_br;
     std::cout << "interp1: " << sum << std::endl;
     std::cout << "interp: " << interp << std::endl;
-    exit(1);
+    // exit(1);
 
 
 
