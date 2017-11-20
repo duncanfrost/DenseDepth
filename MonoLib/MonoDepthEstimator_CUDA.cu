@@ -691,14 +691,6 @@ __global__ void updatePhotoErrorFeatures(Matrix3f R, Vector3f T,
         //if the voxel is projected in the current image then update photometric error and counter
         if (PointInImage(pointTrackImage, imgSize) && pointTrack[2] > 0)
         {
-            //L1 norm of the photometric error
-
-            int x_ref_plus = clamp(x+1, imgSize.x);
-            int y_ref_plus = clamp(y+1, imgSize.y);
-
-            float x_curr_plus = clamp(pointTrackImage.x + 1, (float)imgSize.x);
-            float y_curr_plus = clamp(pointTrackImage.y + 1, (float)imgSize.y);
-
             Vector4f photo_current_OR =
                 interpolateBilinearVec4(currImageData,pointTrackImage.x,
                                         pointTrackImage.y, imgSize.x);
