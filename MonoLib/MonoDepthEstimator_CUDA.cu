@@ -1814,17 +1814,17 @@ void MonoDepthEstimator_CUDA::UpdatePhotoErrorWithFeatures(ORUtils::SE3Pose refT
 
     std::cout << "Updating here" << std::endl;
 
-    // updatePhotoErrorFeatures<<<blocks2,threadsPerBlock2>>>(refToTracker.GetR(),
-    //                                                        refToTracker.GetT(),
-    //                                                        monoLevel->intrinsics,
-    //                                                        imgSize,
-    //                                                        optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
-    //                                                        optimPyramid->nUpdates->GetData(MEMORYDEVICE_CUDA),
-    //                                                        featureImage->GetData(MEMORYDEVICE_CUDA),
-    //                                                        currDepthFrame->featureImageData->GetData(MEMORYDEVICE_CUDA),
-    //                                                        optimPyramid->depthSamples,
-    //                                                        optimPyramid->minIDepth,
-    //                                                        depthIncrement);
+    updatePhotoErrorFeatures<<<blocks2,threadsPerBlock2>>>(refToTracker.GetR(),
+                                                           refToTracker.GetT(),
+                                                           monoLevel->intrinsics,
+                                                           imgSize,
+                                                           optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+                                                           optimPyramid->nUpdates->GetData(MEMORYDEVICE_CUDA),
+                                                           featureImage->GetData(MEMORYDEVICE_CUDA),
+                                                           currDepthFrame->featureImageData->GetData(MEMORYDEVICE_CUDA),
+                                                           optimPyramid->depthSamples,
+                                                           optimPyramid->minIDepth,
+                                                           depthIncrement);
     monoLevel->nUpdate++;
 
     cudaThreadSynchronize();
