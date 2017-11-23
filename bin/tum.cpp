@@ -70,7 +70,7 @@ void KeyboardFunction(unsigned char key, int x, int y)
         break;
 
     case ' ':
-        engine->SampleFromBufferMid();
+        engine->AddKeyFrameManual();
         break;
 
     case 'p':

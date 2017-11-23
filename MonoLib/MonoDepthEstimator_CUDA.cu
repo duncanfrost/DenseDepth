@@ -1047,7 +1047,7 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
 
         float invTheta = 1 / theta;
 
-        for (unsigned int j = 0; j < 10; j++)
+        for (unsigned int j = 0; j < 1; j++)
         {
 
             ComputeGradient<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
