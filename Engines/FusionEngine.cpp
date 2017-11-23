@@ -9,14 +9,18 @@ FusionEngine::FusionEngine(PhoneSource* source, FileTracker* tracker)
     currTrackerData = new TrackerData();
     map = new GlobalMap();
 
+    Vector2i inputSize;
+    inputSize.x = 640;
+    inputSize.y = 480;
+    
     imgSize.width = 640;
     imgSize.height = 480;
 
     Vector4f intrinsics;
-    float fx = (683.8249/640)*imgSize.width;
-    float fy = (683.6179/480)*imgSize.height;
-    float cx = (317.6438/640)*imgSize.width;
-    float cy = (239.5907/480)*imgSize.height;
+    float fx = (683.8249f/(float)inputSize.x)*imgSize.width;
+    float fy = (683.6179f/(float)inputSize.y)*imgSize.height;
+    float cx = (317.6438f/(float)inputSize.x)*imgSize.width;
+    float cy = (239.5907f/(float)inputSize.y)*imgSize.height;
 
     intrinsics[0] = fx;
     intrinsics[1] = fy;

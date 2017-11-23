@@ -43,8 +43,8 @@ int main(void)
     engine = new MonoEngine(source, depthSource, featureSource, tracker, settings);
 
     visModule = new VisualisationModule(&Idle);
-    visModule->AddWindow(new ARWindow("AR",640,480,engine->GetARData()));
-    visModule->AddWindow(new MapWindow("Map",640,480,engine));
+    visModule->AddWindow(new ARWindow("AR",settings.inputSizeX,settings.inputSizeY,engine->GetARData()));
+    visModule->AddWindow(new MapWindow("Map",settings.inputSizeX,settings.inputSizeY,engine));
 
     visModule->SetKeyboardFunction(&KeyboardFunction);
     visModule->StartLoop();

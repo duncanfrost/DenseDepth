@@ -135,9 +135,11 @@ void MonoEngine::AddKeyFrame(cv::Mat inImage, Sophus::SE3f inPose)
 
     ConvertToOR(inImage, orImage);
     orImage->UpdateDeviceFromHost();
-    featureImage->UpdateDeviceFromHost();
     if (featureSource != NULL)
+    {
+        featureImage->UpdateDeviceFromHost();
         monoDepthEstimator->SetRefAndFeatureImage(orImage, featureImage);
+    }
     else
         monoDepthEstimator->SetRefImage(orImage);
     
