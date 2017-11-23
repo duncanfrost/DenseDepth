@@ -110,62 +110,6 @@ __global__ void Init2DValues_device(float *g_data, Vector4u *imageData,
     // g_data[offset]=1;
 }
 
-__global__ void UpdateDQ(float *g_data, float *qx_data,float *qy_data,
-                         float *d_data, float *a_data, Vector2i imgSize,
-                         float minIDepth, float maxIDepth, float epsilon, float sigma_q,
-                         float sigma_d, float theta)
-{
-    int id_x = blockIdx.x*blockDim.x+threadIdx.x;
-    int id_y = blockIdx.y*blockDim.y+threadIdx.y;
-    if (id_x > imgSize.x - 1 || id_y > imgSize.y - 1) return;
-
-    int offset = id_x + id_y * imgSize.x;
-
-
-    int x_plus = clamp(id_x + 1, imgSize.x);
-    int y_plus = clamp(id_y + 1, imgSize.y);
-
-    //Gradient from matrix A
-    float grad_d_x=d_data[x_plus + imgSize.x * id_y] - d_data[id_x + imgSize.x * id_y];
-    float grad_d_y=d_data[id_x + imgSize.x * y_plus] - d_data[id_x + imgSize.x * id_y];
-
-    //This is the weigting based on gradient
-    float gx=g_data[id_x + imgSize.x*id_y];
-    //	gx = 1;
-
-    float new_qx=(qx_data[offset]+sigma_q*gx*grad_d_x)/(1.+sigma_q*epsilon);
-    float new_qy=(qy_data[offset]+sigma_q*gx*grad_d_y)/(1.+sigma_q*epsilon);
-
-    float magn=sqrtf(new_qx*new_qx+new_qy*new_qy);
-    if(magn>1)
-    {
-        new_qx=new_qx/magn;
-        new_qy=new_qy/magn;
-    }
-
-    qx_data[offset]=new_qx;
-    qy_data[offset]=new_qy;
-
-    //Update D
-    __syncthreads();
-
-    int x_minus = clamp(id_x-1,imgSize.x);
-    int y_minus = clamp(id_y-1,imgSize.y);
-
-    float grad_qx_x=qx_data[id_x + imgSize.x * id_y] - qx_data[x_minus + imgSize.x*id_y];
-    float grad_qy_y=qy_data[id_x + imgSize.x * id_y] - qy_data[id_x + imgSize.x*y_minus];
-
-
-    // TODO: I'm sure this is a mistake. This should be negative, but doesn't work
-    float Atransq = 1*(grad_qx_x+grad_qy_y);
-    float new_d=(d_data[offset]+sigma_d*(gx*Atransq+1.0f* a_data[offset]/theta))/(1.+sigma_d/theta);;
-    if(new_d<minIDepth) new_d=minIDepth;
-    if(new_d>maxIDepth) new_d=maxIDepth;
-
-    d_data[offset]=new_d;
-}
-
-
 __global__ void ComputeGradient(float *image_data, Vector2i imgSize,
                                 float *gradx_data, float *grady_data)
 {
