@@ -83,7 +83,7 @@ void MonoEngine::Process()
 
     source->GrabNewFrame();
 
-    if (featureSource != NULL)
+    if (featureSource)
     {
         featureSource->GrabNewFrame();
         // featureSource->GrabNewFrameDebug();
@@ -135,7 +135,7 @@ void MonoEngine::AddKeyFrame(cv::Mat inImage, Sophus::SE3f inPose)
 
     ConvertToOR(inImage, orImage);
     orImage->UpdateDeviceFromHost();
-    if (featureSource != NULL)
+    if (featureSource)
     {
         featureImage->UpdateDeviceFromHost();
         monoDepthEstimator->SetRefAndFeatureImage(orImage, featureImage);
@@ -189,10 +189,12 @@ void MonoEngine::Sample()
     Sophus::SE3f inPose = currPose*invRefPose;
     ConvertToOR(currImage, orImage);
     orImage->UpdateDeviceFromHost();
-    featureImage->UpdateDeviceFromHost();
-    if (featureSource != NULL)
+    if (featureSource)
+    {
+        featureImage->UpdateDeviceFromHost();
         monoDepthEstimator->UpdatePhotoErrorWithFeatures(SophusToOR(inPose),
                                                          orImage, featureImage);
+    }
     else
         monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), orImage);
 }
