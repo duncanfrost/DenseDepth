@@ -54,7 +54,7 @@ void TUMFeatureSource::GrabNewFrameDebug()
     float max = -999999;
     float min = 999999;
 
-    for (int c = 0; c < 1; c++)
+    for (int c = 0; c < 64; c++)
     {
         cv::Mat imOut = cv::Mat(height, width, CV_8UC1);
         for (int y = 0; y < height; y++)

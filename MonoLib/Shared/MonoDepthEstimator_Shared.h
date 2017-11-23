@@ -43,7 +43,7 @@ inline float PhotoErrorL1(Vector4f photoCurrent,
     diffg = diffg < 0 ? -diffg : diffg;
     float diffb = photoCurrent.z-(float)photoRef.z;
     diffb = diffb < 0 ? -diffb : diffb;
-    float normL1=(diffr+diffg+diffb)/(3.*255.);//normL1 in [0 1]
+    float normL1=(diffr+diffg+diffb)/(3.0f*255.0f);//normL1 in [0 1]
     return normL1;
 }
 

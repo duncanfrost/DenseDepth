@@ -21,8 +21,6 @@ int main(void)
 {
     std::string filename1 = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/rgb.txt";
     std::string filename2 = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/depth.txt";
-
-
     std::string poseDirectory = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/";
 
     MonoEngine::Settings settings;
@@ -34,6 +32,8 @@ int main(void)
     settings.inputSizeX = 640;
     settings.inputSizeY = 480;
 
+    // settings.targetSizeX = 640;
+    // settings.targetSizeY = 480;
     settings.targetSizeX = 213;
     settings.targetSizeY = 160;
 
