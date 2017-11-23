@@ -60,6 +60,10 @@ void MonoEngine::Init()
     orImage = new ORUChar4TSImage(imgSize, true, true, true);
 
 
+    source->SetFrameNumber(1);
+    if (featureSource)
+        featureSource->SetFrameNumber(1);
+
 
 
 
@@ -142,8 +146,9 @@ void MonoEngine::AddKeyFrame(cv::Mat inImage, Sophus::SE3f inPose)
         monoDepthEstimator->SetRefImage(orImage);
     
     invRefPose = kf->pose.inverse();
+    timeStampRef = timeStamp;
 
-    monoDepthEstimator->SetLimitsManual(0.5,2);
+    monoDepthEstimator->SetLimitsManual(0.3,3);
     hasReferenceFrame = true;
 }
 
@@ -165,7 +170,7 @@ void MonoEngine::AddKeyFrame_Remode(cv::Mat inImage, Sophus::SE3f inPose)
     orImage->UpdateDeviceFromHost();
     monoDepthEstimator->SetRefImage(orImage);
     invRefPose = kf->pose.inverse();
-
+    timeStampRef = timeStamp;
 
     cv::Mat greyMat;
     cv::cvtColor(inImage, greyMat, CV_BGR2GRAY);
@@ -247,8 +252,8 @@ void MonoEngine::Sample2()
 void MonoEngine::SmoothPhoto(int iterations)
 {
     monoDepthEstimator->RunTVOptimisation(iterations);
-    VisualizeDepth();
-    paused = true;
+    // VisualizeDepth();
+    // paused = true;
     // monoDepthEstimator->RunTVL1Optimisation(iterations);
     // monoDepthEstimator->RunTVL0Optimisation(iterations);
 }
@@ -558,4 +563,44 @@ void MonoEngine::VisualizeDepth()
     cv::imshow( "Display window", imOut );                   // Show our image inside it.
     cv::waitKey(0);                                          // Wait for a keystroke in the window
     cv::destroyWindow("Display window");
+}
+
+void MonoEngine::MeasureDepthError()
+{
+    if (depthSource != NULL)
+        depthSource->GetDepthForTimeStamp(timeStampRef);
+    else
+        std::cout << "No depth source" << std::endl;
+    cv::Mat gtDepth = depthSource->Image();
+
+    cv::Mat gtDepthResized;
+
+    cv::Size outSize;
+    outSize.width = imgSize.x;
+    outSize.height = imgSize.y;
+    cv::resize(gtDepth, gtDepthResized, outSize);
+
+    MonoLib::MonoPyramidLevel *dataPyramidLevel =
+        monoDepthEstimator->currDepthFrame->dataImage;
+
+    dataPyramidLevel->depth->UpdateHostFromDevice();
+
+
+    float error = 0;
+    for (int y = 0; y < imgSize.y; y++)
+        for (int x = 0; x < imgSize.x; x++)
+        {
+            float gtTrue = gtDepthResized.at<float>(y,x);
+
+            if (gtTrue <= 0)
+                continue;
+
+            unsigned int index = x + imgSize.x * y;
+            float gtEst = dataPyramidLevel->depth->GetData(MEMORYDEVICE_CPU)[index];
+
+            float diff = gtTrue - gtEst;
+            error += diff*diff;
+        }
+
+    std::cout << "Depth error : " << error << std::endl;
 }

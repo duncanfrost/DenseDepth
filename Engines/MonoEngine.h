@@ -77,6 +77,9 @@ public:
     void WritePhotoErrors(std::string path);
     void Sample();
     void Sample2();
+
+    void MeasureDepthError();
+
     MonoLib::MonoDepthEstimator *monoDepthEstimator;
 
 private:
@@ -119,6 +122,7 @@ private:
     int nMid;
 
     long long timeStamp;
+    long long timeStampRef;
     Sophus::SE3f currPose;
     GlobalMap *map;
     rmd::Depthmap *depthMap;
@@ -133,6 +137,7 @@ private:
 
 
     bool paused;
+
 
 
 

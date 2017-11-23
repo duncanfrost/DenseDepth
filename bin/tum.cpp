@@ -83,6 +83,10 @@ void KeyboardFunction(unsigned char key, int x, int y)
         engine->SmoothPhoto(200);
         break;
 
+    case 'r':
+        engine->MeasureDepthError();
+        break;
+
     case 'y':
         std::cout << "Init optim" << std::endl;
         engine->monoDepthEstimator->InitOptim();
