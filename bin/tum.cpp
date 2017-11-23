@@ -76,5 +76,11 @@ void KeyboardFunction(unsigned char key, int x, int y)
         // engine->WritePhotoErrors("/home/duncan/photo.bin");
         engine->SmoothPhoto(200);
         break;
+
+    case 'y':
+        std::cout << "Init optim" << std::endl;
+        engine->monoDepthEstimator->InitOptim();
+        break;
+
     }
 }

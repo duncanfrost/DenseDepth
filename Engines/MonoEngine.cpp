@@ -86,6 +86,7 @@ void MonoEngine::Process()
     if (featureSource != NULL)
     {
         featureSource->GrabNewFrame();
+        // featureSource->GrabNewFrameDebug();
     }
 
     cv::Mat rawImage = source->Image();

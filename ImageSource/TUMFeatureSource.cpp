@@ -43,12 +43,18 @@ void TUMFeatureSource::GrabNewFrameDebug()
     timeStamp = rgbTimeStamps[frameNumber];
 
     FILE * pFile;
+    // pFile = fopen ("/home/duncan/test2.bin", "rb");
+
+    std::cout << "Path: " << path << std::endl;
+
     pFile = fopen (path.c_str(), "rb");
     fread (data, sizeof(float), nChannels * height * width, pFile);
     fclose(pFile);
 
+    float max = -999999;
+    float min = 999999;
 
-    for (int c = 0; c < 10; c++)
+    for (int c = 0; c < 1; c++)
     {
         cv::Mat imOut = cv::Mat(height, width, CV_8UC1);
         for (int y = 0; y < height; y++)
@@ -57,9 +63,21 @@ void TUMFeatureSource::GrabNewFrameDebug()
                 // float data = channel.at<float>(y,x);
                 int index = c + nChannels*x + nChannels*width*y; 
                 float data_pix = data[index];
-                data_pix = data_pix + 160;
+
+
+                data_pix = (data_pix + 0.55)*255;
+
+                if (data_pix < min)
+                    min = data_pix;
+                if (data_pix > max)
+                    max = data_pix;
+
                 imOut.at<unsigned char>(y,x) = data_pix;
             }
+
+
+        std::cout << "Min: " << min << std::endl;
+        std::cout << "Max: " << max << std::endl;
 
         cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
         cv::imshow( "Display window", imOut );                   // Show our image inside it.

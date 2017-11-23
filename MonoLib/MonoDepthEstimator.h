@@ -24,7 +24,8 @@ namespace MonoLib {
             TVParameters()
             {
                 //Weighting between regulariser and photometric cost
-                lambda=0.2f;
+                lambda=0.01;
+                //this is normally 0.2 for rgb channels
 
                 // Step sizes for gradient ascent/descent 
                 sigma_d = 0.01;

@@ -698,7 +698,7 @@ __global__ void updatePhotoErrorFeatures(Matrix3f R, Vector3f T,
             InterpolateFeature(currImageData, interpData, pointTrackImage,
                                imgSize.x, featureChannels);
 
-            float error = 0;
+            float total = 0;
             for (unsigned int c = 0; c < featureChannels; c++)
             {
                 int index = featureChannels*(x + imgSize.x*y) + c;
@@ -706,9 +706,9 @@ __global__ void updatePhotoErrorFeatures(Matrix3f R, Vector3f T,
                 float featureCurr = interpData[c];
 
                 float diff = abs(featureRef - featureCurr);
-                error += diff;
+                total += diff*diff;
             }
-            float normL1 = error / 64;
+            float normL1 = total;
 
             float oldError = photo_error[offset];
             float obsError = normL1;
