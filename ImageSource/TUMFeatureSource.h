@@ -10,7 +10,7 @@ public:
     void GrabNewFrame();
     void GrabNewFrameDebug();
 
-    TUMFeatureSource(const std::string& listFile);
+    TUMFeatureSource(const std::string& listFile, int height, int width);
 
     float *GetData() {return data;}
     void SetData(float* data)

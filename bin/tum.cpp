@@ -34,18 +34,19 @@ int main(void)
     settings.inputSizeX = 640;
     settings.inputSizeY = 480;
 
-    settings.targetSizeX = 640;
-    settings.targetSizeY = 480;
+    settings.targetSizeX = 213;
+    settings.targetSizeY = 160;
 
     source = new TUMSource(filename1);
     depthSource = new TUMDepthSource(filename2);
-    featureSource = new TUMFeatureSource("/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/feature.txt");
+    featureSource = new TUMFeatureSource("/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/feature.txt",
+                                         settings.targetSizeY, settings.targetSizeX);
     tracker = new TUMFileTracker(poseDirectory, "groundtruth.txt");
 
 
 
-    // engine = new MonoEngine(source, depthSource, featureSource, tracker, settings);
-    engine = new MonoEngine(source, depthSource, tracker, settings);
+    engine = new MonoEngine(source, depthSource, featureSource, tracker, settings);
+    // engine = new MonoEngine(source, depthSource, tracker, settings);
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",settings.inputSizeX,settings.inputSizeY,engine->GetARData()));

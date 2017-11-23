@@ -6,11 +6,11 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iomanip>
 
-TUMFeatureSource::TUMFeatureSource(const std::string& listFile)
+TUMFeatureSource::TUMFeatureSource(const std::string& listFile, int height, int width)
 {
     nChannels = 64;
-    height = 480;
-    width = 640;
+    this->height = height;
+    this->width = width;
     data = NULL;
     PathsFromListFile(rgbImagePaths, rgbTimeStamps, listFile);
 }
