@@ -107,6 +107,7 @@ __global__ void Init2DValues_device(float *g_data, Vector4u *imageData,
     float normb = powf(norm,beta);
 
     g_data[offset]=expf(-alpha*normb);
+    // g_data[offset]=1;
 }
 
 __global__ void UpdateDQ(float *g_data, float *qx_data,float *qy_data,
@@ -1171,7 +1172,6 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
 
         theta = theta*(1-beta);
 
-        float innerErrorStart = 0;
 
 
         float sigma_q = tvSettings.sigma_q;
@@ -1234,11 +1234,9 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
             optimPyramid->error->UpdateHostFromDevice();
             float error = SumError(optimPyramid->error->GetData(MEMORYDEVICE_CPU), imgSize);
 
-            if (j == 0) innerErrorStart = error;
 
             std::cout << "Theta " << theta
                       << " OuterError " << outerError
-                      << " Start error: " << innerErrorStart
                       << " Error: " << error
                       << " Sigma d: " << sigma_d 
                       << " Sigma q: " << sigma_q
@@ -1587,7 +1585,6 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
 
         float invTheta = 1.0f / theta;
 
-        float innerErrorStart = 0;
 
         ComputeFullError_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
                                                               optimPyramid->error->GetData(MEMORYDEVICE_CUDA),
@@ -1713,7 +1710,6 @@ void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
     // {
     //     theta = theta*(1-beta);
 
-    //     float innerErrorStart = 0;
 
 
     //     //Copy d to opencv

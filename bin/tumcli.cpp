@@ -36,6 +36,8 @@ int main(void)
 
     settings.inputSizeX = 640;
     settings.inputSizeY = 480;
+    settings.targetSizeX = 640;
+    settings.targetSizeY = 480;
 
     engine = new MonoEngine(source, depthSource, tracker, settings);
 

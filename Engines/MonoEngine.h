@@ -26,6 +26,8 @@ public:
 
         int inputSizeX;
         int inputSizeY;
+        int targetSizeX;
+        int targetSizeY;
     };
 
     MonoEngine(ImageSource* source, DepthSource* depthSource,

@@ -18,8 +18,8 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
     Init();
 
     featureChannels = 64;
-    featureHeight = 480;
-    featureWidth = 640;
+    featureHeight = settings.targetSizeY;
+    featureWidth = settings.targetSizeX;
     featureImage = new ORUtils::MemoryBlock<float>(featureChannels*featureHeight*featureWidth, true, true, true);
     featureSource->SetData(featureImage->GetData(MEMORYDEVICE_CPU));
 }
@@ -40,11 +40,9 @@ void MonoEngine::Init()
     currTrackerData = new TrackerData();
     map = new GlobalMap();
 
-
-
     //This is the target size
-    imgSize.x = 640;
-    imgSize.y = 480;
+    imgSize.x = settings.targetSizeX;
+    imgSize.y = settings.targetSizeY;
 
     Vector4f intrinsics;
     float fx = (settings.fx/(float)settings.inputSizeX)*(float)imgSize.x;

@@ -25,11 +25,6 @@ int main(void)
 
     std::string poseDirectory = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/";
 
-    source = new TUMSource(filename1);
-    depthSource = new TUMDepthSource(filename2);
-    featureSource = new TUMFeatureSource("/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/feature.txt");
-    tracker = new TUMFileTracker(poseDirectory, "groundtruth.txt");
-
     MonoEngine::Settings settings;
     settings.fx = 520.908620;
     settings.fy = 521.007327;
@@ -39,12 +34,22 @@ int main(void)
     settings.inputSizeX = 640;
     settings.inputSizeY = 480;
 
+    settings.targetSizeX = 640;
+    settings.targetSizeY = 480;
 
-    engine = new MonoEngine(source, depthSource, featureSource, tracker, settings);
+    source = new TUMSource(filename1);
+    depthSource = new TUMDepthSource(filename2);
+    featureSource = new TUMFeatureSource("/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/feature.txt");
+    tracker = new TUMFileTracker(poseDirectory, "groundtruth.txt");
+
+
+
+    // engine = new MonoEngine(source, depthSource, featureSource, tracker, settings);
+    engine = new MonoEngine(source, depthSource, tracker, settings);
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",settings.inputSizeX,settings.inputSizeY,engine->GetARData()));
-    visModule->AddWindow(new MapWindow("Map",settings.inputSizeX,settings.inputSizeY,engine));
+    visModule->AddWindow(new MapWindow("Map",1000,500,engine));
 
     visModule->SetKeyboardFunction(&KeyboardFunction);
     visModule->StartLoop();

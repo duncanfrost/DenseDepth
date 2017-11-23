@@ -28,12 +28,14 @@ int main(int argc, char* argv[])
     settings.cy = 341.148590;
     settings.inputSizeX = 1280;
     settings.inputSizeY = 720;
+    settings.targetSizeX = 1280;
+    settings.targetSizeY = 720;
 
     engine = new MonoEngine(source, NULL, tracker, settings);
 
     visModule = new VisualisationModule(&Idle);
-    visModule->AddWindow(new ARWindow("AR",1280,720,engine->GetARData()));
-    visModule->AddWindow(new MapWindow("Map",640,480,engine));
+    visModule->AddWindow(new ARWindow("AR",settings.inputSizeX,settings.inputSizeY, engine->GetARData()));
+    visModule->AddWindow(new MapWindow("Map",settings.inputSizeX, settings.inputSizeY,engine));
 
     visModule->SetKeyboardFunction(&KeyboardFunction);
     visModule->StartLoop();
