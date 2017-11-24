@@ -3,6 +3,7 @@ SET(targetname GUI)
 INCLUDE(${PROJECT_SOURCE_DIR}/cmake/UseCUDA.cmake)
 
 SET(sources
+  DepthWindow.cpp
   ARWindow.cpp
   Button.cpp
   glTexture.cpp
@@ -14,6 +15,7 @@ SET(sources
   )
 
 SET(headers
+  DepthWindow.h
   ARWindow.h
   Button.h
   glTexture.h

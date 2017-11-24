@@ -23,6 +23,7 @@ SET(headers
   Shared/MonoView.h
   Shared/OptimPyramidLevel.h
   Shared/TrackerData.h
+  Shared/DepthData.h
   )
 
 CUDA_ADD_LIBRARY(${targetname} STATIC ${sources} ${headers} ${templates} OPTIONS --generate-code arch=compute_${CUDA_COMPUTE_CAPABILITY},code=sm_${CUDA_COMPUTE_CAPABILITY})
