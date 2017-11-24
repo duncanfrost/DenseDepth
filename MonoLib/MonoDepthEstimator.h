@@ -240,7 +240,7 @@ namespace MonoLib {
                                                   ORUtils::MemoryBlock<float> *featureImage) = 0;
 
 
-        virtual void RunTVOptimisationActive() = 0;
+        virtual void RunTVOptimisationActive(float theta) = 0;
         virtual void RunTVOptimisation(unsigned int iterations) = 0;
         virtual void RunTVL1Optimisation(unsigned int iterations) = 0;
         virtual void RunTVL0Optimisation(unsigned int iterations) = 0;

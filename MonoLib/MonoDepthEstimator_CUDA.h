@@ -35,7 +35,7 @@ namespace MonoLib {
 
         void OptimToDepth(bool useRawDepth);
 
-        void RunTVOptimisationActive();
+        void RunTVOptimisationActive(float theta);
         void RunTVOptimisation(unsigned int iterations);
         void RunTVL1Optimisation(unsigned int iterations);
         void RunTVL0Optimisation(unsigned int iterations);

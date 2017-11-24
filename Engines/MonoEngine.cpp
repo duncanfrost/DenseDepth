@@ -642,7 +642,17 @@ void MonoEngine::ProcessDepthData()
 
 void MonoEngine::SmoothPhotoActive()
 {
-    monoDepthEstimator->RunTVOptimisationActive();
+    monoDepthEstimator->InitOptim();
+
+    float thetaEnd = 1e-4;
+    float beta = 0.002;
+    float theta = 0.2;
+    
+    while (theta > thetaEnd)
+    {
+        theta = theta*(1-beta);
+        monoDepthEstimator->RunTVOptimisationActive(theta);
+        ProcessDepthData();
+    }
     paused = true;
-    ProcessDepthData();
 }
