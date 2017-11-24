@@ -570,7 +570,10 @@ void MonoEngine::MeasureDepthError()
     if (depthSource != NULL)
         depthSource->GetDepthForTimeStamp(timeStampRef);
     else
+    {
         std::cout << "No depth source" << std::endl;
+        return;
+    }
     cv::Mat gtDepth = depthSource->Image();
 
     cv::Mat gtDepthResized;
