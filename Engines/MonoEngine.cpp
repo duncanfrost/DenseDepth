@@ -640,3 +640,9 @@ void MonoEngine::ProcessDepthData()
 
 }
 
+void MonoEngine::SmoothPhotoActive()
+{
+    monoDepthEstimator->RunTVOptimisationActive();
+    paused = true;
+    ProcessDepthData();
+}

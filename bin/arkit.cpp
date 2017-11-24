@@ -69,7 +69,7 @@ void KeyboardFunction(unsigned char key, int x, int y)
         break;
         
     case 'o':
-        engine->SmoothPhoto(200);
+        engine->SmoothPhotoActive();
         break;
 
     case 'y':

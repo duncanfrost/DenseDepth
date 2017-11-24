@@ -71,6 +71,7 @@ public:
 
     static Sophus::SE3f invRefPose;
     void SmoothPhoto(int iterations);
+    void SmoothPhotoActive();
     void SmoothPhotoBuffer(int iterations);
     void SmoothPhotoRemode(int iterations);
 

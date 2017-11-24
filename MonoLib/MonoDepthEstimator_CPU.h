@@ -26,6 +26,7 @@ namespace MonoLib {
                                           ORUtils::MemoryBlock<float> *featureImage) {};
 
 
+        void RunTVOptimisationActive() {}
         void RunTVOptimisation(unsigned int iterations) {}
         void RunTVL1Optimisation(unsigned int iterations) {}
         void RunTVL0Optimisation(unsigned int iterations) {}
