@@ -118,6 +118,10 @@ void MonoEngine::Process()
     //     // SmoothPhotoRemode(200);
     // }
 
+    // if (framesProcessed == 100)
+    //     SmoothPhoto(200);
+        
+
     std::cout << "Framenumber: " << count << std::endl;
         
     currTrackerData->trackerPose = currPose;
@@ -253,7 +257,8 @@ void MonoEngine::SmoothPhoto(int iterations)
 {
     monoDepthEstimator->RunTVOptimisation(iterations);
     // VisualizeDepth();
-    // paused = true;
+    MeasureDepthError();
+    paused = true;
     // monoDepthEstimator->RunTVL1Optimisation(iterations);
     // monoDepthEstimator->RunTVL0Optimisation(iterations);
 }

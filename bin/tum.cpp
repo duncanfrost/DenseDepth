@@ -45,8 +45,8 @@ int main(void)
 
 
 
-    engine = new MonoEngine(source, depthSource, featureSource, tracker, settings);
-    // engine = new MonoEngine(source, depthSource, tracker, settings);
+    // engine = new MonoEngine(source, depthSource, featureSource, tracker, settings);
+    engine = new MonoEngine(source, depthSource, tracker, settings);
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",settings.inputSizeX,settings.inputSizeY,engine->GetARData()));
