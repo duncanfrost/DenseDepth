@@ -45,6 +45,9 @@ int main(int argc, char* argv[])
 void Idle(void)
 {
     engine->Process();
+    engine->DoSmoothProcess();
+
+
     visModule->DrawWindows();
 }
 

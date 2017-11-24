@@ -80,6 +80,14 @@ void MonoEngine::Init()
     framesProcessed = 0;
     nMid = BUFFERSIZE/2; 
     paused = false;
+
+
+    //Active processing stuff
+    thetaEnd = 1e-4;
+    beta = 0.002;
+    theta = 0.2;
+    processActive = false;
+
 }
 
 
@@ -129,8 +137,10 @@ void MonoEngine::Process()
 
     std::cout << "Framenumber: " << count << std::endl;
         
+
     currTrackerData->trackerPose = currPose;
     currTrackerData->frame = currImage;
+
 
     framesProcessed++;
 }
@@ -643,16 +653,20 @@ void MonoEngine::ProcessDepthData()
 void MonoEngine::SmoothPhotoActive()
 {
     monoDepthEstimator->InitOptim();
+    processActive = true;
+}
 
-    float thetaEnd = 1e-4;
-    float beta = 0.002;
-    float theta = 0.2;
-    
-    while (theta > thetaEnd)
+void MonoEngine::DoSmoothProcess()
+{
+    if (!processActive)
+        return;
+
+    if (theta > thetaEnd)
     {
         theta = theta*(1-beta);
         monoDepthEstimator->RunTVOptimisationActive(theta);
         ProcessDepthData();
     }
-    paused = true;
+
 }
+

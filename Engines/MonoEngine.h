@@ -70,6 +70,8 @@ public:
     }
 
     static Sophus::SE3f invRefPose;
+
+    void DoSmoothProcess();
     void SmoothPhoto(int iterations);
     void SmoothPhotoActive();
     void SmoothPhotoBuffer(int iterations);
@@ -146,6 +148,12 @@ private:
 
 
     bool paused;
+
+    //Active processing stuff
+    bool processActive;
+    float thetaEnd;
+    float beta;
+    float theta;
 
 
 
