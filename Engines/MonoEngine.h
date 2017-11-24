@@ -54,6 +54,11 @@ public:
         return currTrackerData;
     }
 
+    TrackerData* GetDepthData()
+    {
+        return currDepthData;
+    }
+
     GlobalMap *GetMap()
     {
         return map;
@@ -80,6 +85,8 @@ public:
 
     void MeasureDepthError();
 
+    void ProcessDepthData();
+
     MonoLib::MonoDepthEstimator *monoDepthEstimator;
 
 private:
@@ -101,6 +108,7 @@ private:
 
 
     TrackerData* currTrackerData;
+    TrackerData* currDepthData;
     FileTracker* tracker;
     ImageSource* source;
     TUMFeatureSource* featureSource;

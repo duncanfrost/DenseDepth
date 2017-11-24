@@ -38,11 +38,16 @@ MonoEngine::MonoEngine(ImageSource* source, DepthSource* depthSource,
 void MonoEngine::Init()
 {
     currTrackerData = new TrackerData();
+    currDepthData = new TrackerData();
+
+
     map = new GlobalMap();
 
     //This is the target size
     imgSize.x = settings.targetSizeX;
     imgSize.y = settings.targetSizeY;
+
+    currDepthData->frame = cv::Mat(imgSize.y, imgSize.x, CV_8UC3);
 
     Vector4f intrinsics;
     float fx = (settings.fx/(float)settings.inputSizeX)*(float)imgSize.x;
@@ -259,8 +264,7 @@ void MonoEngine::SmoothPhoto(int iterations)
     // VisualizeDepth();
     MeasureDepthError();
     paused = true;
-    // monoDepthEstimator->RunTVL1Optimisation(iterations);
-    // monoDepthEstimator->RunTVL0Optimisation(iterations);
+    ProcessDepthData();
 }
 
 void MonoEngine::SmoothPhotoBuffer(int iterations)
@@ -612,3 +616,27 @@ void MonoEngine::MeasureDepthError()
 
     std::cout << "Depth error : " << error << std::endl;
 }
+
+void MonoEngine::ProcessDepthData()
+{
+    MonoLib::MonoPyramidLevel *dataPyramidLevel =
+        monoDepthEstimator->currDepthFrame->dataImage;
+
+    monoDepthEstimator->optimPyramid->d->UpdateHostFromDevice();
+
+
+    for (int y = 0; y < imgSize.y; y++)
+        for (int x = 0; x < imgSize.x; x++)
+        {
+            unsigned int index = x + imgSize.x * y;
+            float d = monoDepthEstimator->optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
+            cv::Vec3b out;
+            out[0] = d*255;
+            out[1] = d*255;
+            out[2] = d*255;
+
+            currDepthData->frame.at<cv::Vec3b>(y,x) = out;
+        }
+
+}
+
