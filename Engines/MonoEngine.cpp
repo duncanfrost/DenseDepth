@@ -582,6 +582,7 @@ void MonoEngine::MeasureDepthError()
         monoDepthEstimator->currDepthFrame->dataImage;
 
     dataPyramidLevel->depth->UpdateHostFromDevice();
+    monoDepthEstimator->optimPyramid->nUpdates->UpdateHostFromDevice();
 
 
     float error = 0;
@@ -595,6 +596,11 @@ void MonoEngine::MeasureDepthError()
                 continue;
 
             unsigned int index = x + imgSize.x * y;
+
+            int nUpdates = monoDepthEstimator->optimPyramid->nUpdates->GetData(MEMORYDEVICE_CPU)[index];
+            std::cout << nUpdates << std::endl;
+            if (nUpdates < 140)
+                continue;
             float gtEst = dataPyramidLevel->depth->GetData(MEMORYDEVICE_CPU)[index];
 
             float diff = gtTrue - gtEst;
