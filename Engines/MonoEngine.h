@@ -99,8 +99,8 @@ public:
 
     MonoLib::MonoDepthEstimator *monoDepthEstimator;
 
-    void ProcessKeyFrame(int count);
-    void ProcessBuffer(int count);
+    void ProcessKeyFrame();
+    void ProcessBuffer();
 
 private:
 
@@ -165,6 +165,7 @@ private:
     float beta;
     float theta;
 
+    int processCount;
 
 
 

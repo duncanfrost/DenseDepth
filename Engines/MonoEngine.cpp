@@ -78,6 +78,7 @@ void MonoEngine::Init()
     framesProcessed = 0;
     nMid = BUFFERSIZE/2; 
     paused = false;
+    processCount = 0;
 
 
     //Active processing stuff
@@ -115,11 +116,7 @@ void MonoEngine::Process()
 
 
     // ProcessKeyFrame(count);
-
-    Timer t1("Process buffer");
-    t1.start();
-    ProcessBuffer(count);
-    t1.stop();
+    ProcessBuffer();
 
 
     currTrackerData->trackerPose = currPose;
@@ -128,7 +125,7 @@ void MonoEngine::Process()
     framesProcessed++;
 }
 
-void MonoEngine::ProcessKeyFrame(int count)
+void MonoEngine::ProcessKeyFrame()
 {
     Sample();
 
@@ -137,15 +134,18 @@ void MonoEngine::ProcessKeyFrame(int count)
         AddKeyFrame(currImage, currPose);
         needsKeyFrame = false;
     }
+
+    processCount++;
 }
 
-void MonoEngine::ProcessBuffer(int count)
+void MonoEngine::ProcessBuffer()
 {
     SaveToBuffer();
-    if (SampleActive(count, BUFFERSIZE))
+    if (SampleActive(processCount, BUFFERSIZE))
     {
         SmoothPhotoBuffer();
     }
+    processCount++;
 }
 
 
