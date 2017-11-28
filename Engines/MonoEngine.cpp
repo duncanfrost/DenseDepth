@@ -75,7 +75,7 @@ void MonoEngine::Init()
 
     hasReferenceFrame = false;
     useRawDepth = true;
-    needsKeyFrame = true;
+    needsKeyFrame = false;
     bufferTop = 0;
     framesProcessed = 0;
     nMid = BUFFERSIZE/2; 
@@ -223,7 +223,7 @@ void MonoEngine::Sample()
 
 void MonoEngine::SmoothPhoto(int iterations)
 {
-    monoDepthEstimator->RunTVOptimisation(iterations);
+    monoDepthEstimator->RunTVOptimisation();
     // VisualizeDepth();
     MeasureDepthError();
     paused = true;

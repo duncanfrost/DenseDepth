@@ -1007,7 +1007,7 @@ void MonoDepthEstimator_CUDA::UpdatePhotoError(ORUtils::SE3Pose refToTracker,
     cudaThreadSynchronize();
 }
 
-void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
+void MonoDepthEstimator_CUDA::RunTVOptimisation()
 {
     InitOptim();
     MonoLib::MonoPyramidLevel *monoLevel = currDepthFrame->dataImage;
@@ -1019,7 +1019,6 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation(unsigned int iterations)
 
     float thetaEnd = 1e-4;
     float outerError = 0;
-    iterations = 300;
     float beta = 0.002;
     float theta = 0.2;
     
@@ -1395,7 +1394,7 @@ void MonoDepthEstimator_CUDA::SmoothHuber()
 
 }
 
-void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
+void MonoDepthEstimator_CUDA::RunTVL1Optimisation()
 {
     // Same as smmoth L1 except 
     InitOptim();
@@ -1407,7 +1406,6 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
 
     float thetaEnd = 1;
     float outerError = 0;
-    iterations = 300;
     float beta = 0.002;
 
     optimPyramid->photoErrors->UpdateHostFromDevice();
@@ -1527,7 +1525,7 @@ void MonoDepthEstimator_CUDA::RunTVL1Optimisation(unsigned int iterations)
     OptimToDepth(false);
 }
 
-void MonoDepthEstimator_CUDA::RunTVL0Optimisation(unsigned int iterations)
+void MonoDepthEstimator_CUDA::RunTVL0Optimisation()
 {
     // // Same as smmoth L1 except 
     // InitOptim();

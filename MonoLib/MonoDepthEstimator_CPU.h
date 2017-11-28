@@ -27,9 +27,9 @@ namespace MonoLib {
 
 
         void RunTVOptimisationActive(float theta) {}
-        void RunTVOptimisation(unsigned int iterations) {}
-        void RunTVL1Optimisation(unsigned int iterations) {}
-        void RunTVL0Optimisation(unsigned int iterations) {}
+        void RunTVOptimisation() {}
+        void RunTVL1Optimisation() {}
+        void RunTVL0Optimisation() {}
 
         void InitOptim(){}
         void SmoothDTAM(){}
