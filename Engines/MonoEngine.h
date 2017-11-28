@@ -19,6 +19,12 @@ public:
 
     struct Settings
     {
+
+        Settings()
+        {
+            checkTimeDiff = false;
+        }
+
         float fx;
         float fy;
         float cx;
@@ -28,6 +34,8 @@ public:
         int inputSizeY;
         int targetSizeX;
         int targetSizeY;
+
+        bool checkTimeDiff;
     };
 
     MonoEngine(ImageSource* source, DepthSource* depthSource,
@@ -43,7 +51,7 @@ public:
     {
         needsKeyFrame = true;
     }
-    
+
     void AddKeyFrame(cv::Mat inImage, Sophus::SE3f inPose);
     void AddKeyFrame_Remode(cv::Mat inImage, Sophus::SE3f inPose);
 
