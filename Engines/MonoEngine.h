@@ -80,10 +80,10 @@ public:
     static Sophus::SE3f invRefPose;
 
     void DoSmoothProcess();
-    void SmoothPhoto(int iterations);
+    void SmoothPhoto();
     void SmoothPhotoActive();
-    void SmoothPhotoBuffer(int iterations);
-    void SmoothPhotoRemode(int iterations);
+    void SmoothPhotoBuffer();
+    void SmoothPhotoRemode();
 
     void GetPointCloud(unsigned int &width,
                        unsigned int &height, Vector3f **points,
@@ -98,6 +98,9 @@ public:
     void ProcessDepthData();
 
     MonoLib::MonoDepthEstimator *monoDepthEstimator;
+
+    void ProcessKeyFrame(int count);
+    void ProcessBuffer(int count);
 
 private:
 

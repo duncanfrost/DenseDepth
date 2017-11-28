@@ -70,12 +70,9 @@ void MonoEngine::Init()
         featureSource->SetFrameNumber(1);
 
 
-
-
-
     hasReferenceFrame = false;
     useRawDepth = true;
-    needsKeyFrame = false;
+    needsKeyFrame = true;
     bufferTop = 0;
     framesProcessed = 0;
     nMid = BUFFERSIZE/2; 
@@ -116,33 +113,36 @@ void MonoEngine::Process()
 
     currPose = tracker->PoseAtTime(timeStamp, count, timeOut);
 
+
+
+    // ProcessKeyFrame(count);
+    ProcessBuffer(count);
+
+
+    currTrackerData->trackerPose = currPose;
+    currTrackerData->frame = currImage;
+
+    framesProcessed++;
+}
+
+void MonoEngine::ProcessKeyFrame(int count)
+{
     Sample();
-    // SaveToBuffer();
 
     if (needsKeyFrame)
     {
         AddKeyFrame(currImage, currPose);
         needsKeyFrame = false;
     }
+}
 
-    // if (SampleActive(count, BUFFERSIZE))
-    // {
-    //     SmoothPhotoBuffer(200);
-    //     // SmoothPhotoRemode(200);
-    // }
-
-    // if (framesProcessed == 100)
-    //     SmoothPhoto(200);
-        
-
-    std::cout << "Framenumber: " << count << std::endl;
-        
-
-    currTrackerData->trackerPose = currPose;
-    currTrackerData->frame = currImage;
-
-
-    framesProcessed++;
+void MonoEngine::ProcessBuffer(int count)
+{
+    SaveToBuffer();
+    if (SampleActive(count, BUFFERSIZE))
+    {
+        SmoothPhotoBuffer();
+    }
 }
 
 
@@ -221,21 +221,21 @@ void MonoEngine::Sample()
         monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), orImage);
 }
 
-void MonoEngine::SmoothPhoto(int iterations)
+void MonoEngine::SmoothPhoto()
 {
     monoDepthEstimator->RunTVOptimisation();
     // VisualizeDepth();
     MeasureDepthError();
-    paused = true;
+    // paused = true;
     ProcessDepthData();
 }
 
-void MonoEngine::SmoothPhotoBuffer(int iterations)
+void MonoEngine::SmoothPhotoBuffer()
 {
     SampleFromBufferMid();
 
 
-    SmoothPhoto(iterations);
+    SmoothPhoto();
 
 
     // Update images from device
@@ -253,8 +253,8 @@ void MonoEngine::SmoothPhotoBuffer(int iterations)
     error = monoDepthEstimator->MeasureError();
     std::cout << "Error after depth load: " << error << std::endl;
 
-    VisualizeDepth();
-    paused = true;
+    // VisualizeDepth();
+    // paused = true;
 }
 
 void MonoEngine::WriteEmpty()
@@ -412,7 +412,7 @@ cv::Mat MonoEngine::PreProcessImage(cv::Mat image)
     return imOut;
 }
 
-void MonoEngine::SmoothPhotoRemode(int iterations)
+void MonoEngine::SmoothPhotoRemode()
 {
     SampleFromBufferMid_Remode();
     // SmoothPhoto(iterations);
@@ -441,9 +441,9 @@ void MonoEngine::SmoothPhotoRemode(int iterations)
 
     monoDepthEstimator->currDepthFrame->dataImage->depth->UpdateDeviceFromHost();
 
-    cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
-    cv::imshow( "Display window", imOut );                   // Show our image inside it.
-    cv::waitKey(0);                                          // Wait for a keystroke in the window
+    // cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+    // cv::imshow( "Display window", imOut );                   // Show our image inside it.
+    // cv::waitKey(0);                                          // Wait for a keystroke in the window
 
     // paused = true;
 

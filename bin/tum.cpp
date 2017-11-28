@@ -45,8 +45,8 @@ int main(void)
 
 
 
-    // engine = new MonoEngine(source, depthSource, featureSource, tracker, settings);
-    engine = new MonoEngine(source, depthSource, tracker, settings);
+    engine = new MonoEngine(source, depthSource, featureSource, tracker, settings);
+    // engine = new MonoEngine(source, depthSource, tracker, settings);
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",settings.inputSizeX,settings.inputSizeY,engine->GetARData()));
@@ -80,7 +80,7 @@ void KeyboardFunction(unsigned char key, int x, int y)
     case 'o':
         // engine->SmoothPhotoBuffer(200);
         // engine->WritePhotoErrors("/home/duncan/photo.bin");
-        engine->SmoothPhoto(200);
+        engine->SmoothPhoto();
         break;
 
     case 'r':
