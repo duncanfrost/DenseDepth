@@ -113,10 +113,19 @@ void MonoEngine::Process()
     long long timeOut;
     currPose = tracker->PoseAtTime(timeStamp, count, timeOut);
 
+    std::cout << "Time out: " << timeOut << std::endl;
+
+    if (timeOut < 8000)
+        // ProcessBuffer();
+        ProcessKeyFrame();
+    else
+    {
+        std::cout << "====================PROBLEM===============" << std::endl;
+        needsKeyFrame = true;
+    }
 
 
-    // ProcessKeyFrame(count);
-    ProcessBuffer();
+
 
 
     currTrackerData->trackerPose = currPose;
@@ -133,7 +142,15 @@ void MonoEngine::ProcessKeyFrame()
     {
         AddKeyFrame(currImage, currPose);
         needsKeyFrame = false;
+        processCount = 0;
     }
+
+    if (processCount > 75)
+    {
+        SmoothPhoto();
+        needsKeyFrame = true;
+    }
+
 
     processCount++;
 }
