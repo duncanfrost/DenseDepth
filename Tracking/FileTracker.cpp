@@ -54,6 +54,16 @@ Sophus::SE3f FileTracker::PoseAtTime(long long timeIn,
 
     Sophus::SE3f pose = Sophus::SE3f::exp(muRelative) * poseMin;
 
+    long long diffMax = timeMax - timeIn;
+    long long diffMin = timeIn - timeMin;
+
+    if (diffMax > diffMin)
+        timeOut = diffMax;
+    else
+        timeOut = diffMin;
+
+    // timeOut = timeDist;
+
     
 
     return pose;
