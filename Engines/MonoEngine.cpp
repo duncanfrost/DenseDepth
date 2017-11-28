@@ -87,6 +87,8 @@ void MonoEngine::Init()
     theta = 0.2;
     processActive = false;
 
+    depthErrorFile.open("/home/duncan/deptherror.txt");
+
 }
 
 
@@ -583,6 +585,7 @@ void MonoEngine::MeasureDepthError()
 
 
     float error = 0;
+    int pixelCount = 0;
     for (int y = 0; y < imgSize.y; y++)
         for (int x = 0; x < imgSize.x; x++)
         {
@@ -596,9 +599,15 @@ void MonoEngine::MeasureDepthError()
 
             float diff = gtTrue - gtEst;
             error += diff*diff;
+            pixelCount++;
         }
 
+    error /= (float)pixelCount;
+    error = sqrt(error);
     std::cout << "Depth error : " << error << std::endl;
+    if (depthErrorFile.is_open())
+        depthErrorFile << error << std::endl;
+
 }
 
 void MonoEngine::ProcessDepthData()

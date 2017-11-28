@@ -10,6 +10,7 @@
 #include <ORUtils/ImageTypes.h>
 #include <MonoLib/MonoDepthEstimator_CUDA.h>
 #include <rmd/depthmap.h>
+#include <fstream>
 
 #define BUFFERSIZE 150
 
@@ -103,6 +104,8 @@ public:
     void ProcessBuffer();
 
 private:
+
+    std::ofstream depthErrorFile;
 
     void Init();
 
