@@ -35,7 +35,8 @@ int main(int argc, char* argv[])
 
     visModule = new VisualisationModule(&Idle);
     visModule->AddWindow(new ARWindow("AR",settings.targetSizeX,settings.targetSizeY, engine->GetARData()));
-    visModule->AddWindow(new ARWindow("Depth",settings.targetSizeX,settings.targetSizeY, engine->GetDepthData()));
+    visModule->AddWindow(new ARWindow("Inverse Depth",settings.targetSizeX,settings.targetSizeY,
+                                      engine->GetDepthData()));
     visModule->AddWindow(new MapWindow("Map",1000, 500,engine));
 
     visModule->SetKeyboardFunction(&KeyboardFunction);

@@ -653,6 +653,7 @@ void MonoEngine::ProcessDepthData()
 void MonoEngine::SmoothPhotoActive()
 {
     monoDepthEstimator->InitOptim();
+    theta = 0.2;
     processActive = true;
 }
 
@@ -661,12 +662,21 @@ void MonoEngine::DoSmoothProcess()
     if (!processActive)
         return;
 
-    if (theta > thetaEnd)
+    for (unsigned int i = 0; i < 30; i++)
     {
-        theta = theta*(1-beta);
-        monoDepthEstimator->RunTVOptimisationActive(theta);
-        ProcessDepthData();
+        if (theta > thetaEnd)
+        {
+            theta = theta*(1-beta);
+            monoDepthEstimator->RunTVOptimisationActive(theta);
+        }
+        else
+        {
+            processActive = false;
+        }
     }
+
+    ProcessDepthData();
+
 
 }
 
