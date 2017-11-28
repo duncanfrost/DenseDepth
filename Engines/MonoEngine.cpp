@@ -116,12 +116,13 @@ void MonoEngine::Process()
     std::cout << "Time out: " << timeOut << std::endl;
 
     if (timeOut < 8000)
-        // ProcessBuffer();
-        ProcessKeyFrame();
+        ProcessBuffer();
+        // ProcessKeyFrame();
     else
     {
         std::cout << "====================PROBLEM===============" << std::endl;
         needsKeyFrame = true;
+        processCount = 0;
     }
 
 
@@ -145,7 +146,7 @@ void MonoEngine::ProcessKeyFrame()
         processCount = 0;
     }
 
-    if (processCount > 75)
+    if (processCount > BUFFERSIZE)
     {
         SmoothPhoto();
         needsKeyFrame = true;
