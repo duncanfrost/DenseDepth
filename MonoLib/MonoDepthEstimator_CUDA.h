@@ -38,7 +38,6 @@ namespace MonoLib {
         void RunTVOptimisationActive(float theta);
         void RunTVOptimisation();
         void RunTVL1Optimisation();
-        void RunTVL0Optimisation();
         void InitOptim();
         void SmoothDTAM();
         void DisplayPhotoVolume(int x, int y);
