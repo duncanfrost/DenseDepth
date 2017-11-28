@@ -92,7 +92,6 @@ public:
     void SampleFromBufferMid_Remode();
     void WritePhotoErrors(std::string path);
     void Sample();
-    void Sample2();
 
     void MeasureDepthError();
 

@@ -221,53 +221,6 @@ void MonoEngine::Sample()
         monoDepthEstimator->UpdatePhotoError(SophusToOR(inPose), orImage);
 }
 
-void MonoEngine::Sample2()
-{
-    //This is just to test interpolation
-    std::cout << "Sample2" << std::endl;
-    float *featureData = featureImage->GetData(MEMORYDEVICE_CPU);
-    float outData[64];
-
-
-    std::cout << "Data before" << std::endl;
-
-    for (unsigned int i = 0; i < 64; i++)
-        std::cout << outData[i] << " ";
-    std::cout << std::endl;
-
-    Vector2f pos(100.3, 100.8);
-    InterpolateFeature(featureData, outData, pos, featureWidth, featureChannels);
-
-    int c = 31;
-
-    int ix = (int)pos.x;
-    int iy = (int)pos.y;
-
-    float dataTL = featureData[(featureChannels*(ix + featureWidth*iy)) + c];
-    float dataTR = featureData[(featureChannels*(ix + 1 + featureWidth*iy)) + c];
-    float dataBL = featureData[(featureChannels*(ix + featureWidth*(iy + 1))) + c];
-    float dataBR = featureData[(featureChannels*(ix + 1 + featureWidth*(iy + 1))) + c];
-
-    float interp = outData[c];
-
-    float dx = pos.x - (int)pos.x;
-    float dy = pos.y - (int)pos.y;
-    float weight_tl = (1.0f - dx) * (1.0f - dy);
-    float weight_tr = (dx)        * (1.0f - dy);
-    float weight_bl = (1.0f - dx) * (dy);
-    float weight_br = (dx)        * (dy);
-
-
-    float sum = dataTL*weight_tl + dataTR*weight_tr + dataBL*weight_bl +
-        dataBR*weight_br;
-    std::cout << "interp1: " << sum << std::endl;
-    std::cout << "interp: " << interp << std::endl;
-    // exit(1);
-
-
-
-}
-
 void MonoEngine::SmoothPhoto(int iterations)
 {
     monoDepthEstimator->RunTVOptimisation(iterations);
