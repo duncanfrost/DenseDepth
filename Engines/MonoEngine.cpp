@@ -2,6 +2,7 @@
 #include <ORUtils/MathTypes.h>
 #include "ActiveFunctions.h"
 #include "ORConvert.h"
+#include "Timer.h"
 
 Sophus::SE3f MonoEngine::invRefPose;
 
@@ -109,14 +110,16 @@ void MonoEngine::Process()
 
     long long count = source->FrameNumber();
     long long timeOut;
-
-
     currPose = tracker->PoseAtTime(timeStamp, count, timeOut);
 
 
 
     // ProcessKeyFrame(count);
+
+    Timer t1("Process buffer");
+    t1.start();
     ProcessBuffer(count);
+    t1.stop();
 
 
     currTrackerData->trackerPose = currPose;
