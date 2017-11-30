@@ -43,7 +43,7 @@ int main(void)
 
     source = new TUMSource(filename1);
     depthSource = new TUMDepthSource(filename2);
-    featureSource = new TUMFeatureSource("/home/duncan/Data/TUM/rgbd_dataset_freiburg2_desk/feature.txt",
+    featureSource = new TUMFeatureSource("/home/duncan/Data/TUM/rgbd_dataset_freiburg2_xyz/feature.txt",
                                          settings.targetSizeY, settings.targetSizeX);
     tracker = new TUMFileTracker(poseDirectory, "groundtruth.txt");
 
