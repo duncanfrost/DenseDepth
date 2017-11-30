@@ -615,6 +615,7 @@ void MonoEngine::MeasureDepthError()
                 continue;
 
             unsigned int index = x + imgSize.x * y;
+            goodPoint[index] = false;
 
             int nUpdates = monoDepthEstimator->optimPyramid->nUpdates->GetData(MEMORYDEVICE_CPU)[index];
             float gtEst = dataPyramidLevel->depth->GetData(MEMORYDEVICE_CPU)[index];
@@ -626,6 +627,7 @@ void MonoEngine::MeasureDepthError()
             error += diff*diff;
             pixelCount++;
 
+            goodPoint[index] = true;
 
         }
 
