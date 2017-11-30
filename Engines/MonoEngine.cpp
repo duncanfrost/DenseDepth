@@ -89,6 +89,7 @@ void MonoEngine::Init()
 
     depthErrorFile.open("/home/duncan/deptherror.txt");
 
+    goodPoint = new bool[imgSize.x*imgSize.y];
 }
 
 
@@ -295,7 +296,7 @@ void MonoEngine::WriteEmpty()
 }
 
 
-void MonoEngine::MakePointCloud(bool useRawDepth)
+void MonoEngine::MakePointCloud()
 {
     // If you want to use raw depth, don't use OptimToDepth
     // inside monodepthestimator and use it here
@@ -309,9 +310,7 @@ void MonoEngine::GetPointCloud(unsigned int &width,
                                unsigned int &height, Vector3f **points,
                                Vector4u **colorData)
 {
-
-    this->MakePointCloud(useRawDepth);
-
+    this->MakePointCloud();
     MonoLib::MonoPyramidLevel *dataPyramidLevel =
         monoDepthEstimator->currDepthFrame->dataImage;
 

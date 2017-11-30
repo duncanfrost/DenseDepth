@@ -109,7 +109,7 @@ private:
 
     void Init();
 
-    void MakePointCloud(bool useRawDepth);
+    void MakePointCloud();
 
     void SaveToBuffer();
 
@@ -169,6 +169,11 @@ private:
     float theta;
 
     int processCount;
+
+    //Buffer for storing whether we consider points good or not 
+    bool *goodPoint;
+
+
 
 
 
