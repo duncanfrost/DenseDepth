@@ -317,14 +317,19 @@ void MonoEngine::GetPointCloud(unsigned int &width,
 
     *points = dataPyramidLevel->pointRef->GetData(MEMORYDEVICE_CPU);
     *colorData = monoDepthEstimator->currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CPU);
+    monoDepthEstimator->optimPyramid->nUpdates->UpdateHostFromDevice();
+    dataPyramidLevel->depth->UpdateHostFromDevice();
     for (int y = 0; y < imgSize.y;  y++)
         for (int x = 0; x < imgSize.x;  x++)
         {
             unsigned int index = x + imgSize.x * y;
-            if (x > imgSize.x/2)
-                goodPoint[index] = true;
-            else
+            int nUpdates = monoDepthEstimator->optimPyramid->nUpdates->GetData(MEMORYDEVICE_CPU)[index];
+            float gtEst = dataPyramidLevel->depth->GetData(MEMORYDEVICE_CPU)[index];
+
+            if (nUpdates < 140 || gtEst > 2.8)
                 goodPoint[index] = false;
+            else
+                goodPoint[index] = true;
         }
 
     *goodData = goodPoint;
@@ -612,14 +617,16 @@ void MonoEngine::MeasureDepthError()
             unsigned int index = x + imgSize.x * y;
 
             int nUpdates = monoDepthEstimator->optimPyramid->nUpdates->GetData(MEMORYDEVICE_CPU)[index];
-            std::cout << nUpdates << std::endl;
-            if (nUpdates < 140)
-                continue;
             float gtEst = dataPyramidLevel->depth->GetData(MEMORYDEVICE_CPU)[index];
+
+            if (nUpdates < 140 || gtEst > 2.8f || gtTrue > 2.8f)
+                continue;
 
             float diff = gtTrue - gtEst;
             error += diff*diff;
             pixelCount++;
+
+
         }
 
     error /= (float)pixelCount;
