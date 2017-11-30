@@ -31,6 +31,7 @@ int main(void)
     settings.cx = 325.141442;
     settings.cy = 249.701764;
     settings.checkTimeDiff = true;
+    settings.useTVSmoothing = true;
 
     settings.inputSizeX = 640;
     settings.inputSizeY = 480;

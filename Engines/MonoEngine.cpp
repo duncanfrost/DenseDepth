@@ -248,10 +248,11 @@ void MonoEngine::Sample()
 
 void MonoEngine::SmoothPhoto()
 {
-    monoDepthEstimator->RunTVOptimisation();
-    // VisualizeDepth();
+    if (settings.useTVSmoothing)
+        monoDepthEstimator->RunTVOptimisation();
+    else
+        monoDepthEstimator->InitOptim();
     MeasureDepthError();
-    // paused = true;
     ProcessDepthData();
 }
 

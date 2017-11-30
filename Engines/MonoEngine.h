@@ -24,6 +24,7 @@ public:
         Settings()
         {
             checkTimeDiff = false;
+            useTVSmoothing = true;
         }
 
         float fx;
@@ -37,6 +38,7 @@ public:
         int targetSizeY;
 
         bool checkTimeDiff;
+        bool useTVSmoothing;
     };
 
     MonoEngine(ImageSource* source, DepthSource* depthSource,
