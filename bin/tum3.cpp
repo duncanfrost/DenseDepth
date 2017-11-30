@@ -19,18 +19,22 @@ FileTracker *tracker;
 
 int main(void)
 {
-    std::string filename1 = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_xyz/rgb.txt";
-    std::string filename2 = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_xyz/depth.txt";
-    std::string poseDirectory = "/home/duncan/Data/TUM/rgbd_dataset_freiburg2_xyz/";
+    std::string filename1 = "/home/duncan/Data/TUM/rgbd_dataset_freiburg3_structure_texture_far/rgb.txt";
+    std::string filename2 = "/home/duncan/Data/TUM/rgbd_dataset_freiburg3_structure_texture_far/depth.txt";
+    std::string poseDirectory = "/home/duncan/Data/TUM/rgbd_dataset_freiburg3_structure_texture_far/";
 
     MonoEngine::Settings settings;
 
-    //These settings are for freiburg2
-    settings.fx = 520.908620;
-    settings.fy = 521.007327;
-    settings.cx = 325.141442;
-    settings.cy = 249.701764;
-    settings.checkTimeDiff = true;
+    //These settings are for freiburg3
+    settings.fx = 535.4f;
+    settings.fy = 537.6f;
+    settings.cx = 320.1f;
+    settings.cy = 247.6f;
+    settings.checkTimeDiff = false;
+
+
+
+
 
     settings.inputSizeX = 640;
     settings.inputSizeY = 480;

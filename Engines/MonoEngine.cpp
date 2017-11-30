@@ -118,15 +118,16 @@ void MonoEngine::Process()
 
     std::cout << "Time out: " << timeOut << std::endl;
 
-    if (timeOut < 8000)
+    if (timeOut < 8000 || !settings.checkTimeDiff)
         ProcessBuffer();
-        // ProcessKeyFrame();
+    // ProcessKeyFrame();
     else
     {
         std::cout << "====================PROBLEM===============" << std::endl;
         needsKeyFrame = true;
         processCount = 0;
     }
+        
 
 
 
