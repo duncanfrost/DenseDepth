@@ -88,6 +88,7 @@ public:
 
     void GetPointCloud(unsigned int &width,
                        unsigned int &height, Vector3f **points,
+                       bool **goodData,
                        Vector4u **colorData);
     void SampleFromBufferMid();
     void SampleFromBufferMid_Remode();

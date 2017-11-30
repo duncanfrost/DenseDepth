@@ -308,6 +308,7 @@ void MonoEngine::MakePointCloud()
 
 void MonoEngine::GetPointCloud(unsigned int &width,
                                unsigned int &height, Vector3f **points,
+                               bool **goodData,
                                Vector4u **colorData)
 {
     this->MakePointCloud();
@@ -316,6 +317,20 @@ void MonoEngine::GetPointCloud(unsigned int &width,
 
     *points = dataPyramidLevel->pointRef->GetData(MEMORYDEVICE_CPU);
     *colorData = monoDepthEstimator->currDepthFrame->colorImageData->GetData(MEMORYDEVICE_CPU);
+    for (int y = 0; y < imgSize.y;  y++)
+        for (int x = 0; x < imgSize.x;  x++)
+        {
+            unsigned int index = x + imgSize.x * y;
+            if (x > imgSize.x/2)
+                goodPoint[index] = true;
+            else
+                goodPoint[index] = false;
+        }
+
+    *goodData = goodPoint;
+
+
+    
 
     // monoDepthEstimator->currDepthFrame->colorImageData->UpdateHostFromDevice();
 
