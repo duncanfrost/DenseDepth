@@ -814,6 +814,43 @@ __global__ void MinErrorTrueFit_device(float *photo_error,float *d_data,
 }
 
 
+__global__ void MinErrorQuant_device(float *photo_error,float *d_data,
+                                     float *a_data, int *minIdx_data,
+                                     float *error_data,
+                                     Vector2i imgSize,
+                                     int depthSamples, float theta,
+                                     float eps, float lambda)
+{
+    int x = blockIdx.x*blockDim.x+threadIdx.x;
+    int y = blockIdx.y*blockDim.y+threadIdx.y;
+    if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
+    int image_offset=x + y * imgSize.x;
+
+    float minError = 9999.0f;
+    int minIdx = 0;
+
+    float increment = 1.0f / (float)(depthSamples - 1);
+    float d_value = d_data[image_offset];
+
+    for (unsigned int z = 0; z < depthSamples; z++)
+    {
+        float error = GetCombinedError(photo_error, d_value,
+                                       x,y,z,theta,lambda,increment,imgSize);
+
+        if (error < minError)
+        {
+            minIdx = z;
+            minError = error;
+        }
+    }
+
+    a_data[image_offset] = increment*(float)minIdx;
+    minIdx_data[image_offset] = minIdx;
+}
+
+
+
+
 __global__ void ComputeFullError_device(float *d_data, float *error_data,
                                         float *photo_error, int *minIdx_data,
                                         float minIDepth, float maxIDepth,
@@ -1100,24 +1137,8 @@ void MonoDepthEstimator_CUDA::RunTVOptimisation()
 
 
 
-        // cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
-        // optimPyramid->d->UpdateHostFromDevice();
-        // for (int y = 0; y < imgSize.y; y++)
-        //     for (int x = 0; x < imgSize.x; x++)
-        //     {
-        //         unsigned int index = x + imgSize.x * y;
-        //         float val = optimPyramid->d->GetData(MEMORYDEVICE_CPU)[index];
-        //         unsigned char pix = val * 256;
-        //         imOut.at<unsigned char>(y,x) = pix;
-        //     }
-
-        // cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
-        // cv::imshow( "Display window", imOut );                   // Show our image inside it.
-        // cv::waitKey(0.1f);                                          // Wait for a keystroke in the window
-                                              
-
-
-        MinErrorTrueFit_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+        // MinErrorTrueFit_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
+        MinErrorQuant_device<<<blocks2,threadsPerBlock2>>>(optimPyramid->photoErrors->GetData(MEMORYDEVICE_CUDA),
                                                              optimPyramid->d->GetData(MEMORYDEVICE_CUDA),
                                                              optimPyramid->a->GetData(MEMORYDEVICE_CUDA),
                                                              optimPyramid->minIndices->GetData(MEMORYDEVICE_CUDA),
