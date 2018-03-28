@@ -9,7 +9,6 @@
 #include <sophus/se3.hpp>
 #include <ORUtils/ImageTypes.h>
 #include <MonoLib/MonoDepthEstimator_CUDA.h>
-#include <rmd/depthmap.h>
 #include <fstream>
 
 #define BUFFERSIZE 150
@@ -56,7 +55,6 @@ public:
     }
 
     void AddKeyFrame(cv::Mat inImage, Sophus::SE3f inPose);
-    void AddKeyFrame_Remode(cv::Mat inImage, Sophus::SE3f inPose);
 
     void Process();
 
@@ -86,14 +84,12 @@ public:
     void SmoothPhoto();
     void SmoothPhotoActive();
     void SmoothPhotoBuffer();
-    void SmoothPhotoRemode();
 
     void GetPointCloud(unsigned int &width,
                        unsigned int &height, Vector3f **points,
                        bool **goodData,
                        Vector4u **colorData);
     void SampleFromBufferMid();
-    void SampleFromBufferMid_Remode();
     void WritePhotoErrors(std::string path);
     void Sample();
 
@@ -152,7 +148,6 @@ private:
     long long timeStampRef;
     Sophus::SE3f currPose;
     GlobalMap *map;
-    rmd::Depthmap *depthMap;
 
     bool hasReferenceFrame;
     bool useRawDepth;

@@ -62,7 +62,6 @@ void MonoEngine::Init()
     intrinsics[3] = cy;
     
     monoDepthEstimator = new MonoLib::MonoDepthEstimator_CUDA(imgSize, intrinsics);
-    depthMap = new rmd::Depthmap(imgSize.x, imgSize.y, fx, cx, fy, cy);
     orImage = new ORUChar4TSImage(imgSize, true, true, true);
 
 
@@ -194,35 +193,6 @@ void MonoEngine::AddKeyFrame(cv::Mat inImage, Sophus::SE3f inPose)
     timeStampRef = timeStamp;
 
     monoDepthEstimator->SetLimitsManual(0.3,3);
-    hasReferenceFrame = true;
-}
-
-void MonoEngine::AddKeyFrame_Remode(cv::Mat inImage, Sophus::SE3f inPose)
-{
-    std::cout << "About to make new keyframe" << std::endl;
-
-    KeyFrame *kf = new KeyFrame();
-    kf->pose = inPose;
-    map->keyframeList.push_back(kf);
-
-
-
-    Eigen::Quaternionf q = inPose.unit_quaternion();
-    Eigen::Vector3f t =  inPose.translation();
-    rmd::SE3<float> rmdPose(q.w(), q.x(), q.y(), q.z(), t[0], t[1], t[2]);
-
-    ConvertToOR(inImage, orImage);
-    orImage->UpdateDeviceFromHost();
-    monoDepthEstimator->SetRefImage(orImage);
-    invRefPose = kf->pose.inverse();
-    timeStampRef = timeStamp;
-
-    cv::Mat greyMat;
-    cv::cvtColor(inImage, greyMat, CV_BGR2GRAY);
-
-    depthMap->setReferenceImage(greyMat, rmdPose, 0.5f, 2.0f);
-
-
     hasReferenceFrame = true;
 }
 
@@ -372,35 +342,6 @@ void MonoEngine::SampleFromBufferMid()
 
 }
 
-void MonoEngine::SampleFromBufferMid_Remode()
-{
-    // ORUChar4TSImage *rgbImage = imageBuffer[nMid];
-    Sophus::SE3f kfPose = poseBuffer[nMid];
-    AddKeyFrame_Remode(imageBuffer[nMid], kfPose);
-
-    for (int i = 0; i < BUFFERSIZE; i++)
-    {
-        if (i == nMid)
-            continue;
-
-        Sophus::SE3f trackingPose = poseBuffer[i];
-        cv::Mat inputRGBImage = imageBuffer[i];
-
-        Eigen::Quaternionf q = trackingPose.unit_quaternion();
-        Eigen::Vector3f t =  trackingPose.translation();
-        rmd::SE3<float> rmdPose(q.w(), q.x(), q.y(), q.z(), t[0], t[1], t[2]);
-
-        std::cout << "Updating depth map: " << i << std::endl;
-
-        cv::Mat greyMat;
-        cv::cvtColor(inputRGBImage, greyMat, CV_BGR2GRAY);
-        depthMap->update(greyMat, rmdPose);
-    }
-
-
-}
-
-
 void MonoEngine::SaveToBuffer()
 {
     cv::Mat lastImage = imageBuffer[BUFFERSIZE - 1];
@@ -457,42 +398,6 @@ cv::Mat MonoEngine::PreProcessImage(cv::Mat image)
     return imOut;
 }
 
-void MonoEngine::SmoothPhotoRemode()
-{
-    SampleFromBufferMid_Remode();
-    // SmoothPhoto(iterations);
-
-
-    depthMap->downloadDenoisedDepthmap(0.6, 3000);
-    // depthMap->downloadDepthmap();
-    cv::Mat im = depthMap->getDepthmap();
-
-
-
-
-
-
-    cv::Mat imOut = cv::Mat(imgSize.y, imgSize.x, CV_8UC1);
-
-    for (int y = 0; y < imgSize.y; y++)
-        for (int x = 0; x < imgSize.x; x++)
-        {
-            unsigned int index = x + imgSize.x * y;
-            float val = im.at<float>(y,x);
-            unsigned char pix = val * 256;
-            imOut.at<unsigned char>(y,x) = pix;
-            monoDepthEstimator->currDepthFrame->dataImage->depth->GetData(MEMORYDEVICE_CPU)[index] = val;
-        }
-
-    monoDepthEstimator->currDepthFrame->dataImage->depth->UpdateDeviceFromHost();
-
-    // cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
-    // cv::imshow( "Display window", imOut );                   // Show our image inside it.
-    // cv::waitKey(0);                                          // Wait for a keystroke in the window
-
-    // paused = true;
-
-}
 
 void MonoEngine::LoadGTDepth(long long timestamp)
 {
