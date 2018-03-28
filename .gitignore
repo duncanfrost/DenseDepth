@@ -3,4 +3,5 @@ CMakeLists.txt.user*
 .ycm_extra_conf.py
 .ycm_extra_conf.pyc
 build
+.cquery_cached_index/
 
