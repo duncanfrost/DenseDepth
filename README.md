@@ -13,7 +13,8 @@ Ensure that the following packages and their development files are installed pro
 
 ## License
 
-BSPViewer
+ORUtils is Copyright 2014-2017 Oxford University Innovation Limited and the
+authors of InfiniTAM
 
 Copyright (C) 2017-2018 Duncan Frost (duncan@robots.ox.ac.uk)
 
