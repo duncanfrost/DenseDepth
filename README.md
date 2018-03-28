@@ -1,5 +1,7 @@
 # Dense Monocular Depth Estimation
 
+DTAM-style monocular depth estimation
+
 
 ## Building and Installing
 
