@@ -58,6 +58,9 @@ include_directories(
 ${PROJECT_SOURCE_DIR}
 ${EIGEN3_INCLUDE_DIR}
 )
+include_directories(
+${PROJECT_SOURCE_DIR}/ThirdParty
+)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
